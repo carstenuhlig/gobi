@@ -7,15 +7,15 @@ import java.nio.charset.*;
 public class ImportFile {
 	private static final FileSystem FS = FileSystems.getDefault();
 //	private static String type;
-	private static enum Type { SUBSTITIONMATRICES,PAIRFILE,SEQLIBFILE }; 
+	public static enum Type { SUBSTITIONMATRICES,PAIRFILE,SEQLIBFILE }; 
 	private static Path path;
 	private static Type type;
 	
 	//TODO ImportFile
 	//TODO ImportFile Testing
 	public ImportFile(String p, Type t) {
-		this.path = FS.getPath(p);
-		this.type = t;
+		ImportFile.path = FS.getPath(p);
+		ImportFile.type = t;
 	}
 	
 	public static boolean readFile() throws IOException {
@@ -34,14 +34,11 @@ public class ImportFile {
 		switch (type) {
 		case PAIRFILE:
 			//TODO Pairfile process
-			System.out.println(line + " " + lineCnt);
+			System.out.println(line + " |line: " + lineCnt);
 		case SUBSTITIONMATRICES:
 			//TODO SubsMatrices process
 		case SEQLIBFILE:
 			//TODO SeqLibFile process
-		default:
-			System.out.println("Fehler");
-			//TODO log Fehler
 		}
 	}
 }
