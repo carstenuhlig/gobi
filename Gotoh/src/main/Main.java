@@ -1,10 +1,17 @@
 package main;
 
+import java.io.IOException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import util.ImportFile;
+
+import data.Matrix;
+import data.Raw;
 
 public class Main {
 	// Options
@@ -80,8 +87,20 @@ public class Main {
 		if (cmd.hasOption("check")) {
 			checkscores = true;
 		}
+	}
 
-//		System.out.println(seqlibfile + " " + pairfile);
-		
+	public void init() throws IOException {
+		// Daten init
+		Raw r = new Raw();
+		Matrix m = new Matrix();
+
+		// Import
+		if (!ImportFile.readFile(pairfile, "PAIRFILE", m, r))
+			System.exit(1);
+		if (!ImportFile.readFile(seqlibfile, "SEQLIBFILE", m, r))
+			System.exit(1);
+		if (!ImportFile.readFile("res/substitionmatrices.txt",
+				"SUBSTITIONMATRICES", m, r))
+			System.exit(1);
 	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.charset.*;
 
+import data.Raw;
+
 public class ImportFile {
 	private static final FileSystem FS = FileSystems.getDefault();
 //	private static String type;
@@ -13,15 +15,23 @@ public class ImportFile {
 	
 	//TODO ImportFile
 	//TODO ImportFile Testing
-	public ImportFile(String p, Type t) {
-		ImportFile.path = FS.getPath(p);
-		ImportFile.type = t;
-	}
 	
-	public static boolean readFile() throws IOException {
+	/**
+	 * ReadFile for smatrices, pairfiles and seqlibfiles.
+	 * @param p Path provided as String (relative to working directory or absolute)
+	 * @param t Type of File that has to be imported provided as String (will be converted to util.ImportFile.Type)
+	 * @return if succeeded true
+	 * @throws IOException not readable File, etc.
+	 */
+	public static boolean readFile(String p, String t, data.Matrix m,data.Raw r) throws IOException {
+		//Variable setting
+		ImportFile.path = Paths.get(p);
+		ImportFile.type = Type.valueOf(t);
+		
+		//main Method
 		int lineCnt = 1;
 		for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
-			processLines(line,lineCnt);
+			processLines(line,lineCnt,m,r);
 			lineCnt++;
 		}
 		if (lineCnt > 2)
@@ -30,15 +40,32 @@ public class ImportFile {
 			return false;
 	}
 
-	private static void processLines(String line, int lineCnt) {
+	private static void processLines(String line, int lineCnt,data.Matrix m, Raw r) {
 		switch (type) {
 		case PAIRFILE:
-			//TODO Pairfile process
-			System.out.println(line + " |line: " + lineCnt);
+			//" " as seperator for PAIRFILE
+			//TODO tab as seperator for Import Pairfile
+			
+			//split String into 2 ints
+			String[] strp = line.split(":");		
+			String f = strp[0];
+			String s = strp[1];
+			
+			//push to database
+			r.addPair(f, s);
+			break;
 		case SUBSTITIONMATRICES:
 			//TODO SubsMatrices process
+			break;
 		case SEQLIBFILE:
-			//TODO SeqLibFile process
+			//TODO Valdiation of ImportData
+			String[] strs = line.split(":");
+			String id = strs[0];
+			String seq = strs[1];
+			
+			//push to database
+			r.addSequence(id, seq);
+			break;
 		}
 	}
 }
