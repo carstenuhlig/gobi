@@ -7,7 +7,7 @@ public class Matrix {
 	private ArrayList<SMatrix> matrices = new ArrayList<SMatrix>();
 
 	private static enum Type {
-		LOCAL, GLOBAL, FREESHIFT, SUBSTITIONMATRIX
+		LOCAL, GLOBAL, FREESHIFT, SUBSTITUTIONMATRIX
 	};
 
 	public int[][][] getMatrices(String id1, String id2) {
@@ -48,6 +48,8 @@ public class Matrix {
 
 	private class SMatrix {
 		public String name; // like id or hash
+		
+		//matrices in [row][column]-format
 		public int[][] mat;
 		public int[][] matA;
 		public int[][] matI;
@@ -58,7 +60,7 @@ public class Matrix {
 		public SMatrix(String name, int[][] matrix) {
 			this.name = name;
 			this.mat = matrix;
-			t = Matrix.Type.SUBSTITIONMATRIX;
+			t = Matrix.Type.SUBSTITUTIONMATRIX;
 		}
 
 		// calculated

@@ -30,6 +30,7 @@ public class ImportTest {
 					.readFile("res/sample.txt", "SEQLIBFILE", m, r));
 			assertTrue(ImportFile.readFile("res/matrix.txt",
 					"SUBSTITIONMATRICES", m, r));
+			int[][] blahint = m.getSubstitionMatrix("BLOSUM50");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");
