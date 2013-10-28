@@ -28,6 +28,8 @@ public class ImportTest {
 			assertTrue(ImportFile.readFile("res/pfile.txt", "PAIRFILE", m, r));
 			assertTrue(ImportFile
 					.readFile("res/sample.txt", "SEQLIBFILE", m, r));
+			assertTrue(ImportFile.readFile("res/matrix.txt",
+					"SUBSTITIONMATRICES", m, r));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");
@@ -39,14 +41,21 @@ public class ImportTest {
 			System.out.println("|");
 		}
 
-		
 		System.out.println();
-		
-		
+
 		System.out.println("seqlib");
 		for (int j = 0; j < r.sequences.size(); j++) {
 			System.out.println("id = " + r.getSequenceByIndex(j)[0]
 					+ " AND sequence = " + r.getSequenceByIndex(j)[1]);
 		}
+
+		// String blah =
+		// "W -3 -3 -4 -5 -5 -1 -3 -3 -3 -3 -2 -3 -1  1 -4 -4 -3 15  2 -3 -5 -2 -2 -1 -5";
+		// String[] new_blah = blah.split(" ");
+		// for (String string : new_blah) {
+		// System.out.print("|" + string + "|");
+		// }
+		// System.out.println();
+
 	}
 }

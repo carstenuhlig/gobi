@@ -33,7 +33,6 @@ public class Main {
 	 *             when parsing of commandline arguments failed
 	 */
 	public static void main(String[] args) throws ParseException {
-		// TODO
 		Options opt = new Options();
 		opt.addOption("seqlib", true, "<seqlibfile>");
 		opt.addOption("pairs", true, "<pairfile>");

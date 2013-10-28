@@ -56,6 +56,18 @@ public class ImportFile {
 			break;
 		case SUBSTITIONMATRICES:
 			//TODO SubsMatrices process
+			if (lineCnt > 1) {
+				String[] tmp1 = line.split(" ");
+				int[] tmp2 = new int[25];
+				
+				int counter = 0;
+				int i = 1;
+				while ( counter < 25) {
+					if (tmp1[i] != "")
+						tmp2[counter] = Integer.parseInt(tmp1[i]);
+					counter++;
+				}
+			}
 			break;
 		case SEQLIBFILE:
 			//TODO Valdiation of ImportData
