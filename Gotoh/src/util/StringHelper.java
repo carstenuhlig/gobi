@@ -4,7 +4,7 @@ public class StringHelper {
 
 	/**
 	 * Method to process a line (like import line-by-line for matrices)
-	 * 
+	 *
 	 * @param str
 	 *            the String (line)
 	 * @param start
@@ -15,15 +15,15 @@ public class StringHelper {
 	 *            BLOSUM50 25)
 	 * @return returns one-dim matrix
 	 */
-	public static int[] processStringToIntMatrix(String str, int start, int end) {
+	public static double[] processStringToDoubleMatrix(String str, int start, int end) {
 		String[] tmp1 = str.split(" ");
-		int[] tmp2 = new int[end];
+		double[] tmp2 = new double[end];
 
 		int counter = 0;
 		int i = start;
 		while (counter < end) {
 			if (!tmp1[i].isEmpty()) {
-				tmp2[counter] = Integer.parseInt(tmp1[i]);
+				tmp2[counter] = Double.parseDouble(tmp1[i]);
 				counter++;
 			}
 			i++;

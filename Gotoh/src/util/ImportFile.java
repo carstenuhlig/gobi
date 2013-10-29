@@ -12,14 +12,14 @@ public class ImportFile {
 
 	private static Path path;
 	private static Type type;
-	private static int[][] matrix;
+	private static double[][] matrix;
 	private static String name;
 
 	// TODO ImportFile Testing
 
 	/**
 	 * ReadFile for smatrices, pairfiles and seqlibfiles.
-	 * 
+	 *
 	 * @param p
 	 *            Path provided as String (relative to working directory or
 	 *            absolute)
@@ -35,7 +35,7 @@ public class ImportFile {
 		ImportFile.path = Paths.get(p);
 		ImportFile.type = aType;
 
-		ImportFile.matrix = new int[25][25];
+		ImportFile.matrix = new double[25][25];
 
 		ImportFile.name = "";
 
@@ -46,6 +46,7 @@ public class ImportFile {
 			lineCnt++;
 		}
 		if (lineCnt > 2) {
+			//TODO Import Chars
 			if (type == Type.SUBSTITUTIONMATRIX) {
 				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
 			}
@@ -74,7 +75,7 @@ public class ImportFile {
 			if (lineCnt == 0)
 				ImportFile.name = line.split(" ")[1];
 			if (lineCnt > 1) {
-				int[] tmp1 = util.StringHelper.processStringToIntMatrix(line,
+				double[] tmp1 = util.StringHelper.processStringToDoubleMatrix(line,
 						1, 25);
 				if (tmp1[24] != 0)
 					ImportFile.matrix[lineCnt - 2] = tmp1;

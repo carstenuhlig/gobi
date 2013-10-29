@@ -31,7 +31,7 @@ public class ImportTest {
 					.readFile("res/sample.txt", Type.SEQLIBFILE, m, r));
 			assertTrue(ImportFile.readFile("res/matrix.txt",
 					Type.SUBSTITUTIONMATRIX, m, r));
-			int[][] blahint = m.getSubstitutionMatrix("BLOSUM50");
+			double[][] blahdouble = m.getSubstitutionMatrix("BLOSUM50");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");
@@ -58,7 +58,7 @@ public class ImportTest {
 		// System.out.print("|" + string + "|");
 		// }
 		// System.out.println();
-		
+
 		//TODO test toString SMatrix
 		m.printAllSubstitionMatrices();
 	}

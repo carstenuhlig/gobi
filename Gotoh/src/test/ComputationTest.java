@@ -33,9 +33,18 @@ public class ComputationTest {
 
 	@Test
 	public void test() {
-		Computation.init("TEXT", "TEXT2", 25,
-				m.getSubstitutionMatrix("BLOSUM50"), 12, 1, Type.FREESHIFT);
+		Computation.init("TEDSD", "ASDSTEXT", 25,
+				m.getSubstitutionMatrix("BLOSUM50"), 12.0, 1.0, Type.FREESHIFT, "IDT1", "IDT2");
 		m.printSubstitutionMatrixByName("BLOSUM50");
+		Computation.calcMatrices();
 //		m.printAllSubstitionMatrices();
+
+		System.out.println("nun großer Test");
+
+		System.out.println();
+
+		Computation.saveMatrices(m);
+
+		m.printAllCalculatedMatrices();
 	}
 }
