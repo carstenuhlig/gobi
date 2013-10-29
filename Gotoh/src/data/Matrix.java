@@ -38,7 +38,7 @@ public class Matrix {
 	// Alphabet und Reihenfolge haben
 	public int[][] getSubstitutionMatrix(String name) {
 		for (SMatrix sm : substitionmatrices) {
-			if (sm.name == name)
+			if (sm.name.equals(name))
 				return sm.mat;
 		}
 		return null;
@@ -47,6 +47,13 @@ public class Matrix {
 	public void printAllSubstitionMatrices() {
 		for (SMatrix sm : substitionmatrices) {
 			System.out.println(sm.toString());
+		}
+	}
+
+	public void printSubstitutionMatrixByName(String name) {
+		for (SMatrix sm : substitionmatrices) {
+			if (sm.name.equals(name))
+				System.out.println(sm);
 		}
 	}
 
@@ -59,7 +66,8 @@ public class Matrix {
 		public int[][] matI;
 		public int[][] matD;
 		public Type t;
-		public int[] convmat;
+		// convmat in [index -> char]
+		public char[] convmat;
 
 		// substitionmatrix
 		public SMatrix(String name, int[][] matrix) {
@@ -68,7 +76,7 @@ public class Matrix {
 			t = Type.SUBSTITUTIONMATRIX;
 		}
 
-		// calculated
+		// calculated matrix
 		public SMatrix(String name, int[][] matrixA, int[][] matrixD,
 				int[][] matrixI, Type type) {
 			this.name = name;
@@ -76,6 +84,11 @@ public class Matrix {
 			this.matD = matrixD;
 			this.matI = matrixI;
 			this.t = type;
+		}
+
+		public void setChars(char[] chr) {
+			convmat = new char[chr.length];
+			System.arraycopy(chr, 0, convmat, 0, chr.length);
 		}
 
 		@Override

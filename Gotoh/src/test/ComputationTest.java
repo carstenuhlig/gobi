@@ -23,7 +23,7 @@ public class ComputationTest {
 	public void init() {
 		m = new Matrix();
 		r = new Raw();
-		
+
 		try {
 			ImportFile.readFile("res/matrix.txt", Type.SUBSTITUTIONMATRIX, m, r);
 		} catch (IOException e) {
@@ -35,5 +35,7 @@ public class ComputationTest {
 	public void test() {
 		Computation.init("TEXT", "TEXT2", 25,
 				m.getSubstitutionMatrix("BLOSUM50"), 12, 1, Type.FREESHIFT);
+		m.printSubstitutionMatrixByName("BLOSUM50");
+//		m.printAllSubstitionMatrices();
 	}
 }
