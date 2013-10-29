@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import util.ImportFile;
+import util.Type;
 
 public class ImportTest {
 
@@ -25,12 +26,12 @@ public class ImportTest {
 	@Test
 	public void test() {
 		try {
-			assertTrue(ImportFile.readFile("res/pfile.txt", "PAIRFILE", m, r));
+			assertTrue(ImportFile.readFile("res/pfile.txt", Type.PAIRFILE, m, r));
 			assertTrue(ImportFile
-					.readFile("res/sample.txt", "SEQLIBFILE", m, r));
+					.readFile("res/sample.txt", Type.SEQLIBFILE, m, r));
 			assertTrue(ImportFile.readFile("res/matrix.txt",
-					"SUBSTITIONMATRICES", m, r));
-			int[][] blahint = m.getSubstitionMatrix("BLOSUM50");
+					Type.SUBSTITUTIONMATRIX, m, r));
+			int[][] blahint = m.getSubstitutionMatrix("BLOSUM50");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");
@@ -57,6 +58,8 @@ public class ImportTest {
 		// System.out.print("|" + string + "|");
 		// }
 		// System.out.println();
-
+		
+		//TODO test toString SMatrix
+		m.printAllSubstitionMatrices();
 	}
 }

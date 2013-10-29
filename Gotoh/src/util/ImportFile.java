@@ -1,6 +1,7 @@
 package util;
 
 import java.io.IOException;
+import util.Type;
 import java.nio.file.*;
 import java.nio.charset.*;
 
@@ -9,17 +10,11 @@ import data.Raw;
 public class ImportFile {
 	private static final FileSystem FS = FileSystems.getDefault();
 
-	// private static String type;
-	public static enum Type {
-		SUBSTITUTIONMATRICES, PAIRFILE, SEQLIBFILE
-	};
-
 	private static Path path;
 	private static Type type;
 	private static int[][] matrix;
 	private static String name;
 
-	// TODO ImportFile
 	// TODO ImportFile Testing
 
 	/**
@@ -28,18 +23,17 @@ public class ImportFile {
 	 * @param p
 	 *            Path provided as String (relative to working directory or
 	 *            absolute)
-	 * @param t
-	 *            Type of File that has to be imported provided as String (will
-	 *            be converted to util.ImportFile.Type)
+	 * @param aType
+	 *            Type of File that has to be imported provided as util.Type
 	 * @return if succeeded true
 	 * @throws IOException
 	 *             not readable File, etc.
 	 */
-	public static boolean readFile(String p, String t, data.Matrix m, data.Raw r)
-			throws IOException {
+	public static boolean readFile(String p, Type aType,
+			data.Matrix m, data.Raw r) throws IOException {
 		// Variable setting
 		ImportFile.path = Paths.get(p);
-		ImportFile.type = Type.valueOf(t);
+		ImportFile.type = aType;
 
 		ImportFile.matrix = new int[25][25];
 
@@ -52,8 +46,8 @@ public class ImportFile {
 			lineCnt++;
 		}
 		if (lineCnt > 2) {
-			if (t.contains("SUB")) {
-				m.addSubstitionMatrix(ImportFile.name, ImportFile.matrix);
+			if (type == Type.SUBSTITUTIONMATRIX) {
+				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
 			}
 			return true;
 		} else
@@ -75,12 +69,13 @@ public class ImportFile {
 			// push to database
 			r.addPair(f, s);
 			break;
-		case SUBSTITUTIONMATRICES:
+		case SUBSTITUTIONMATRIX:
 			// TODO handles more formats for substitutionmatrix-name
 			if (lineCnt == 0)
 				ImportFile.name = line.split(" ")[1];
 			if (lineCnt > 1) {
-				int[] tmp1 = util.StringHelper.processStringToIntMatrix(line, 1, 25);
+				int[] tmp1 = util.StringHelper.processStringToIntMatrix(line,
+						1, 25);
 				if (tmp1[24] != 0)
 					ImportFile.matrix[lineCnt - 2] = tmp1;
 			}

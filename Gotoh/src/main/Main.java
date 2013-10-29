@@ -9,6 +9,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import util.ImportFile;
+import util.Type;
 
 import data.Matrix;
 import data.Raw;
@@ -94,12 +95,12 @@ public class Main {
 		Matrix m = new Matrix();
 
 		// Import
-		if (!ImportFile.readFile(pairfile, "PAIRFILE", m, r))
+		if (!ImportFile.readFile(pairfile, Type.PAIRFILE, m, r))
 			System.exit(1);
-		if (!ImportFile.readFile(seqlibfile, "SEQLIBFILE", m, r))
+		if (!ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r))
 			System.exit(1);
 		if (!ImportFile.readFile("res/substitionmatrices.txt",
-				"SUBSTITIONMATRICES", m, r))
+				Type.SUBSTITUTIONMATRIX, m, r))
 			System.exit(1);
 	}
 }

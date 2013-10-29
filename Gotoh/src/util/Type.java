@@ -1,0 +1,5 @@
+package util;
+
+public enum Type {
+	SUBSTITUTIONMATRIX, PAIRFILE, SEQLIBFILE, FREESHIFT, LOCAL, GLOBAL
+}
