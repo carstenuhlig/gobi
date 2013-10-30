@@ -47,13 +47,13 @@ public class Computation {
 
 		for (int row = 1; row < a.length()+1; row++) {
 			// A0,k = g(k)
-			mat[0][row][0] = calcGapScore(row-1);
+			mat[0][row][0] = calcGapScore(row);
 			// Di,0 = -Inf
 			mat[1][row][0] = -Double.MAX_VALUE;
 		}
 		for (int col = 1; col < b.length()+1; col++) {
 			// Ak,0 = g(k)
-			mat[0][0][col] = calcGapScore(col-1);
+			mat[0][0][col] = calcGapScore(col);
 			// I0,j = -Inf
 			mat[2][0][col] = -Double.MAX_VALUE;
 		}
@@ -78,6 +78,7 @@ public class Computation {
 			}
 		}
 		// Matrix A
+		//TODO SubstitionMatrix nach char -> in int etc.
 		for (int row = 1; row < mat[2].length; row++) {
 			for (int col = 1; col < mat[2][0].length; col++) {
 				mat[0][row][col] = Math.max(mat[0][row - 1][col - 1]
@@ -87,6 +88,8 @@ public class Computation {
 		}
 	}
 	
+	
+	//TODO Matrices for local alignment... braucht man das so?
 	public static void calcMatricesLocal() {
 		// Matrix I
 		// row fängt bei 1 an col bei 0 wegen Matrix I --> Unterschied zu Matrix

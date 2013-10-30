@@ -19,7 +19,6 @@ public class Matrix {
 				return bigmatrix;
 			}
 		}
-
 		return null;
 	}
 

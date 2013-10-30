@@ -32,6 +32,9 @@ public class ImportTest {
 			assertTrue(ImportFile.readFile("res/matrix.txt",
 					Type.SUBSTITUTIONMATRIX, m, r));
 			double[][] blahdouble = m.getSubstitutionMatrix("BLOSUM50");
+			
+			assertTrue(ImportFile.readDir("res/matrices", m, r));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");

@@ -10,24 +10,14 @@ public class StringHelper {
 	 * @param start
 	 *            usually 0 but sometimes omit directly first column (A-Z in
 	 *            substition matrices)
-	 * @param end
-	 *            number of values to save into the new matrix means (in
-	 *            BLOSUM50 25)
-	 * @return returns one-dim matrix
+	 * @return returns one-dim matrix in double values
 	 */
-	public static double[] processStringToDoubleMatrix(String str, int start, int end) {
-		String[] tmp1 = str.split(" ");
-		double[] tmp2 = new double[end];
-
-		int counter = 0;
-		int i = start;
-		while (counter < end) {
-			if (!tmp1[i].isEmpty()) {
-				tmp2[counter] = Double.parseDouble(tmp1[i]);
-				counter++;
-			}
-			i++;
+	public static double[] processStringToDoubleMatrix(String str, int start) {
+		String[] strarray = str.split("\\s+");
+		double[] tmp = new double[strarray.length-start];
+		for (int i = start; i<strarray.length;i++){
+			tmp[i-start] = Double.parseDouble(strarray[i]);
 		}
-		return tmp2;
+		return tmp;
 	}
 }

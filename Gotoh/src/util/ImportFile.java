@@ -13,13 +13,21 @@ public class ImportFile {
 	private static Path path;
 	private static Type type;
 	private static double[][] matrix;
+	private static double[][] new_matrix;
 	private static String name;
+	private static int rows;
+	private static int cols;
+	//as count variable for which line in file of "MATRIX\t\d\t..."
+	private static int matCnt;
+	private static char[] matChrs;
+	//if matrix is symmetric and other half has to be filled in
+	private static boolean sym;
 
 	// TODO ImportFile Testing
 
 	/**
 	 * ReadFile for smatrices, pairfiles and seqlibfiles.
-	 *
+	 * 
 	 * @param p
 	 *            Path provided as String (relative to working directory or
 	 *            absolute)
@@ -29,8 +37,8 @@ public class ImportFile {
 	 * @throws IOException
 	 *             not readable File, etc.
 	 */
-	public static boolean readFile(String p, Type aType,
-			data.Matrix m, data.Raw r) throws IOException {
+	public static boolean readFile(String p, Type aType, data.Matrix m,
+			data.Raw r) throws IOException {
 		// Variable setting
 		ImportFile.path = Paths.get(p);
 		ImportFile.type = aType;
@@ -46,8 +54,65 @@ public class ImportFile {
 			lineCnt++;
 		}
 		if (lineCnt > 2) {
-			//TODO Import Chars
+			// TODO Import Chars
 			if (type == Type.SUBSTITUTIONMATRIX) {
+				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
+			}
+			return true;
+		} else
+			return false;
+	}
+
+	/**
+	 * ReadFile for smatrices, pairfiles and seqlibfiles.
+	 * 
+	 * @param p
+	 *            Path provided as Path Object (relative to working directory or
+	 *            absolute)
+	 * @param aType
+	 *            Type of File that has to be imported provided as util.Type
+	 * @return if succeeded true
+	 * @throws IOException
+	 *             not readable File, etc.
+	 */
+	/**
+	 * @param p
+	 * @param aType
+	 * @param m
+	 * @param r
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean readFile(Path p, Type aType, data.Matrix m, data.Raw r)
+			throws IOException {
+		// Variable setting
+		ImportFile.path = p;
+		ImportFile.type = aType;
+
+		// ImportFile.matrix = new double[25][25];
+
+		ImportFile.name = "";
+
+		// main Method
+		int lineCnt = 0;
+		for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
+			processLines(line, lineCnt, m, r);
+			
+			//wenn anzahl an cols bekannt matChrs init
+			if (cols > 0) {
+				matChrs = new char[rows];
+				matrix = new double[rows][cols];
+			}
+			
+			lineCnt++;
+		}
+		if (lineCnt > 2) {
+			// TODO Import Chars
+			if (type == Type.SUBSTITUTIONMATRIX) {
+				if (sym) {
+					new_matrix = util.MatrixHelper.makeMatrixSymmetric(ImportFile.matrix);
+					m.addSubstitutionMatrix(ImportFile.name, new_matrix);
+				}
 				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
 			}
 			return true;
@@ -72,13 +137,30 @@ public class ImportFile {
 			break;
 		case SUBSTITUTIONMATRIX:
 			// TODO handles more formats for substitutionmatrix-name
-			if (lineCnt == 0)
-				ImportFile.name = line.split(" ")[1];
-			if (lineCnt > 1) {
-				double[] tmp1 = util.StringHelper.processStringToDoubleMatrix(line,
-						1, 25);
-				if (tmp1[24] != 0)
-					ImportFile.matrix[lineCnt - 2] = tmp1;
+			String pattern = "(\\w+)(\\s+)(\\w+)";
+			switch (line.replaceFirst(pattern, "$1")) {
+			case "NAME":
+				ImportFile.name = line.replaceFirst(pattern, "$3");
+				break;
+			case "NUMROW":
+				ImportFile.rows = Integer.parseInt(line.replaceFirst(pattern, "$3"));
+				break;
+			case "NUMCOL":
+				ImportFile.cols = Integer.parseInt(line.replaceFirst(pattern, "$3"));
+				break;
+			case "ROWINDEX":
+				matChrs = line.replaceFirst(pattern, "$3").toCharArray();
+				break;
+			case "MATRIX":
+				System.out.println(util.MatrixHelper.matrix1DimString(matChrs));
+				double[]  tmp1 = util.StringHelper.processStringToDoubleMatrix(line, 1);
+				if (matCnt == 0 && tmp1.length == 1)
+					sym = true;
+				matrix[matCnt] = tmp1;
+				matCnt++;
+				break;
+			default:
+				break;
 			}
 			break;
 		case SEQLIBFILE:
@@ -91,5 +173,20 @@ public class ImportFile {
 			r.addSequence(id, seq);
 			break;
 		}
+	}
+
+	public static boolean readDir(String dir, data.Matrix m, data.Raw r) {
+		try (DirectoryStream<Path> ds = Files.newDirectoryStream(FS
+				.getPath(dir))) {
+			for (Path p : ds) {
+				System.out.println("Datei: \"" + p.getFileName()
+						+ "\" wird prozessiert.");
+				if (!readFile(p, Type.SUBSTITUTIONMATRIX, m, r))
+					return false;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 }

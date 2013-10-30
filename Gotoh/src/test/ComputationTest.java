@@ -33,8 +33,8 @@ public class ComputationTest {
 
 	@Test
 	public void test() {
-		Computation.init("AASSS", "AASSSAAAAAS", 25,
-				m.getSubstitutionMatrix("BLOSUM50"), -12.0, -1.0, Type.FREESHIFT, "IDT1", "IDT2");
+		Computation.init("WTHA", "WTHGQA", 25,
+				m.getSubstitutionMatrix("BLOSUM50"), -10.0, -2.0, Type.FREESHIFT, "IDT1", "IDT2");
 		m.printSubstitutionMatrixByName("BLOSUM50");
 		Computation.calcMatrices();
 //		m.printAllSubstitionMatrices();
