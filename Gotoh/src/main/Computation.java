@@ -43,7 +43,7 @@ public class Computation {
 		Computation.smat = smatrix;
 		Computation.type = type;
 		Computation.id_a = id1;
-		Computation.id_b = id2;
+		Computation.id_b = id2; 
 
 		for (int row = 1; row < a.length()+1; row++) {
 			// A0,k = g(k)
@@ -80,7 +80,34 @@ public class Computation {
 		// Matrix A
 		for (int row = 1; row < mat[2].length; row++) {
 			for (int col = 1; col < mat[2][0].length; col++) {
-				mat[1][row][col] = Math.max(mat[0][row - 1][col - 1]
+				mat[0][row][col] = Math.max(mat[0][row - 1][col - 1]
+						+ getSMatrixScore(row, col),
+						Math.max(mat[1][row][col], mat[2][row][col]));
+			}
+		}
+	}
+	
+	public static void calcMatricesLocal() {
+		// Matrix I
+		// row fängt bei 1 an col bei 0 wegen Matrix I --> Unterschied zu Matrix
+		// D und A sowieso
+		for (int row = 1; row < mat[2].length; row++) {
+			for (int col = 1; col < mat[2][0].length; col++) {
+				mat[2][row][col] = Math.max(mat[0][row - 1][col] + ge + go,
+						mat[2][row - 1][col] + ge);
+			}
+		}
+		// Matrix D
+		for (int row = 1; row < mat[2].length; row++) {
+			for (int col = 1; col < mat[2][0].length; col++) {
+				mat[1][row][col] = Math.max(mat[0][row][col - 1] + ge + go,
+						mat[1][row][col - 1] + ge);
+			}
+		}
+		// Matrix A
+		for (int row = 1; row < mat[2].length; row++) {
+			for (int col = 1; col < mat[2][0].length; col++) {
+				mat[0][row][col] = Math.max(mat[0][row - 1][col - 1]
 						+ getSMatrixScore(row, col),
 						Math.max(mat[1][row][col], mat[2][row][col]));
 			}
