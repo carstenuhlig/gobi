@@ -196,11 +196,10 @@ public class Matrix {
 		private void optimiseAlignmentArray() {
 			int end = -1;
 			for (int i = 0; i < this.alignment[0].length; i++) {
-				// "\u0000" steht für null char bei chars
-				if (alignment[0][i] == '\u0000')
+				if (Character.getNumericValue(alignment[0][i]) == -1)
 					end = i;
 				// TODO mit while schleife schneller
-				if (end > 0 && alignment[0][i] != '\u0000')
+				if (Character.getNumericValue(alignment[0][i]) > -1)
 					break;
 			}
 
@@ -210,6 +209,7 @@ public class Matrix {
 					alignment[0].length - end - 1);
 			System.arraycopy(alignment[1], end + 1, new_alignment[1], 0,
 					alignment[1].length - end - 1);
+			this.alignment = new_alignment;
 		}
 
 		public void setChars(char[] chr) {

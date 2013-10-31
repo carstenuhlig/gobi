@@ -114,7 +114,7 @@ public class Computation {
 		case GLOBAL:
 			int row = a.length();
 			int col = b.length();
-			while (row > 0 || col > 0) {
+			while (row > 0 && col > 0) {
 				if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
 						a.charAt(row - 1), b.charAt(col - 1)))) {
 					alignment[0][a.length() + b.length() - 1 - count] = a
