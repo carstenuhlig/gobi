@@ -13,15 +13,27 @@ public class ImportFile {
 	private static Path path;
 	private static Type type;
 	private static double[][] matrix;
-	private static double[][] new_matrix;
 	private static String name;
 	private static int rows;
 	private static int cols;
-	//as count variable for which line in file of "MATRIX\t\d\t..."
+	// as count variable for which line in file of "MATRIX\t\d\t..."
 	private static int matCnt;
 	private static char[] matChrs;
-	//if matrix is symmetric and other half has to be filled in
+	// if matrix is symmetric and other half has to be filled in
 	private static boolean sym;
+
+	private static boolean initialized;
+
+	// to reset values
+	private static void reset() {
+		matrix = null;
+		rows = 0;
+		cols = 0;
+		matCnt = 0;
+		matChrs = null;
+		sym = false;
+		initialized = false;
+	}
 
 	// TODO ImportFile Testing
 
@@ -43,9 +55,11 @@ public class ImportFile {
 		ImportFile.path = Paths.get(p);
 		ImportFile.type = aType;
 
+		// TODO änderung wobei nur für einlesen von pairfile und seqlibfile
 		ImportFile.matrix = new double[25][25];
 
 		ImportFile.name = "";
+		ImportFile.sym = false;
 
 		// main Method
 		int lineCnt = 0;
@@ -56,7 +70,8 @@ public class ImportFile {
 		if (lineCnt > 2) {
 			// TODO Import Chars
 			if (type == Type.SUBSTITUTIONMATRIX) {
-				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
+				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix,
+						ImportFile.matChrs);
 			}
 			return true;
 		} else
@@ -85,9 +100,11 @@ public class ImportFile {
 	 */
 	public static boolean readFile(Path p, Type aType, data.Matrix m, data.Raw r)
 			throws IOException {
+		reset();
 		// Variable setting
 		ImportFile.path = p;
 		ImportFile.type = aType;
+		ImportFile.sym = false;
 
 		// ImportFile.matrix = new double[25][25];
 
@@ -97,23 +114,25 @@ public class ImportFile {
 		int lineCnt = 0;
 		for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
 			processLines(line, lineCnt, m, r);
-			
-			//wenn anzahl an cols bekannt matChrs init
-			if (cols > 0) {
+
+			// wenn anzahl an cols bekannt matChrs init
+			if (cols > 0 && !initialized) {
 				matChrs = new char[rows];
 				matrix = new double[rows][cols];
+				initialized = true;
 			}
-			
 			lineCnt++;
 		}
 		if (lineCnt > 2) {
 			// TODO Import Chars
 			if (type == Type.SUBSTITUTIONMATRIX) {
-				if (sym) {
-					new_matrix = util.MatrixHelper.makeMatrixSymmetric(ImportFile.matrix);
-					m.addSubstitutionMatrix(ImportFile.name, new_matrix);
-				}
-				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix);
+				// if (sym) {
+				// new_matrix =
+				// util.MatrixHelper.makeMatrixSymmetric(ImportFile.matrix);
+				// m.addSubstitutionMatrix(ImportFile.name, new_matrix);
+				// }
+				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix,
+						ImportFile.matChrs);
 			}
 			return true;
 		} else
@@ -124,8 +143,7 @@ public class ImportFile {
 			Raw r) {
 		switch (type) {
 		case PAIRFILE:
-			// " " as seperator for PAIRFILE
-			// TODO tab as seperator for Import Pairfile
+			// TODO Richtig nach Format einlesen
 
 			// split String into 2 ints
 			String[] strp = line.split(":");
@@ -137,25 +155,26 @@ public class ImportFile {
 			break;
 		case SUBSTITUTIONMATRIX:
 			// TODO handles more formats for substitutionmatrix-name
-			String pattern = "(\\w+)(\\s+)(\\w+)";
+			String pattern = "(\\w+)(\\s+)(\\S+).*";
 			switch (line.replaceFirst(pattern, "$1")) {
 			case "NAME":
 				ImportFile.name = line.replaceFirst(pattern, "$3");
 				break;
 			case "NUMROW":
-				ImportFile.rows = Integer.parseInt(line.replaceFirst(pattern, "$3"));
+				ImportFile.rows = Integer.parseInt(line.replaceFirst(pattern,
+						"$3"));
 				break;
 			case "NUMCOL":
-				ImportFile.cols = Integer.parseInt(line.replaceFirst(pattern, "$3"));
+				ImportFile.cols = Integer.parseInt(line.replaceFirst(pattern,
+						"$3"));
 				break;
 			case "ROWINDEX":
 				matChrs = line.replaceFirst(pattern, "$3").toCharArray();
 				break;
 			case "MATRIX":
-				System.out.println(util.MatrixHelper.matrix1DimString(matChrs));
-				double[]  tmp1 = util.StringHelper.processStringToDoubleMatrix(line, 1);
-				if (matCnt == 0 && tmp1.length == 1)
-					sym = true;
+				// System.out.println(util.MatrixHelper.matrix1DimString(matChrs));
+				double[] tmp1 = util.StringHelper.processStringToDoubleMatrix(
+						line, 1);
 				matrix[matCnt] = tmp1;
 				matCnt++;
 				break;

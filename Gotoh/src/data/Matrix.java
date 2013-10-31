@@ -30,8 +30,13 @@ public class Matrix {
 				type, as1, as2));
 	}
 
-	public void addSubstitutionMatrix(String name, double[][] matrix) {
-		substitionmatrices.add(new SMatrix(name, matrix));
+	public void addSubstitutionMatrix(String name, double[][] matrix,
+			char[] chars) {
+//		double[][] new_matrix = new double[matrix.length][matrix.length];
+//		char[] new_chars = new char[chars.length];
+//		System.arraycopy(matrix, 0, new_matrix, 0, matrix.length);
+//		System.arraycopy(chars, 0, new_chars, 0, chars.length);
+		substitionmatrices.add(new SMatrix(name, matrix, chars));
 	}
 
 	// TODO gucken ob alle substitionmatrizen gleich struktur.. bzw. gleiches
@@ -40,6 +45,14 @@ public class Matrix {
 		for (SMatrix sm : substitionmatrices) {
 			if (sm.name.equals(name))
 				return sm.mat;
+		}
+		return null;
+	}
+	
+	public char[] getConvMat(String name) {
+		for (SMatrix sm : substitionmatrices) {
+			if (sm.name.equals(name))
+				return sm.chars;
 		}
 		return null;
 	}
@@ -77,6 +90,9 @@ public class Matrix {
 		public String a;
 		public String b;
 		public Type t;
+		// für Substitionsmatrix wenn sie symmetrisch ist
+		// sodass die eine "hälfte" der matrix unausgefüllt ist
+		private boolean sym;
 
 		// Strings mit Gaps
 		public String calc_a;
@@ -85,13 +101,18 @@ public class Matrix {
 		public double score;
 
 		// convmat in [index -> char]
-		public char[] convmat;
+		public char[] chars;
 
 		// substitionmatrix
-		public SMatrix(String name, double[][] matrix) {
+		public SMatrix(String name, double[][] matrix, char[] chars) {
 			this.name = name;
 			this.mat = matrix;
+			this.chars = chars;
 			t = Type.SUBSTITUTIONMATRIX;
+			if (matrix[0].length != matrix[1].length)
+				sym = true;
+			else
+				sym = false;
 		}
 
 		// calculated matrix
@@ -108,8 +129,8 @@ public class Matrix {
 		}
 
 		public void setChars(char[] chr) {
-			convmat = new char[chr.length];
-			System.arraycopy(chr, 0, convmat, 0, chr.length);
+			chars = new char[chr.length];
+			System.arraycopy(chr, 0, chars, 0, chr.length);
 		}
 
 		@Override
@@ -118,21 +139,37 @@ public class Matrix {
 			returnstr += "Name:\t" + name + "\n";
 			returnstr += "Type:\t" + t + "\n";
 			if (t == Type.SUBSTITUTIONMATRIX) {
-				returnstr += "\t";
-				for (int xtmp = 0; xtmp < mat.length; xtmp++) {
-					returnstr += (xtmp + 1) + "\t";
-				}
-				returnstr += "\n";
-				for (int y = 0; y < mat.length; y++) {
-					returnstr += (y + 1) + "\t";
-					for (int x = 0; x < mat.length; x++) {
-						returnstr += mat[y][x] + "\t";
+				if (sym == false) 
+				{
+					returnstr += "\t";
+					for (int xtmp = 0; xtmp < mat.length; xtmp++) {
+						returnstr += (xtmp + 1) + "\t";
 					}
 					returnstr += "\n";
+					for (int y = 0; y < mat.length; y++) {
+						returnstr += (y + 1) + "\t";
+						for (int x = 0; x < mat.length; x++) {
+							returnstr += mat[y][x] + "\t";
+						}
+						returnstr += "\n";
+					}
+				}
+				else
+				{
+					for (int col = 0; col<chars.length; col++)
+						returnstr += "\t" + chars[col]; 
+					returnstr += "\n";
+					for (int row = 0; row<chars.length; row++) {
+						returnstr += chars[row];
+						for (double d : mat[row]) {
+							returnstr += "\t" + d;
+						}
+						returnstr += "\n";
+					}
 				}
 			} else {
 				// TODO Performance: tab vor xtmp, etc.
-				//TODO Check
+				// TODO Check
 				returnstr += "Matrix:\tA\n\t";
 				for (int xtmp = 0; xtmp < matA[0].length; xtmp++) {
 					returnstr += xtmp + "\t";
