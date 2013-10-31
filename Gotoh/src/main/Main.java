@@ -21,10 +21,12 @@ public class Main {
 	public static String matrixname;
 	public static int gapopen;
 	public static int gapextend;
-	public static String mode;
+	public static Type mode;
 	public static boolean printalignment;
 	public static boolean printmatrices;
 	public static boolean checkscores;
+	public static Matrix m;
+	public static Raw r;
 
 	/**
 	 * Main method
@@ -62,19 +64,23 @@ public class Main {
 
 		if (cmd.getOptionValues("m") != null) {
 			matrixname = cmd.getOptionValues("m")[0];
-		}
+		} else
+			matrixname = "dayhoff";
 
 		if (cmd.getOptionValues("go") != null) {
 			gapopen = Integer.parseInt(cmd.getOptionValues("go")[0]);
-		}
+		} else
+			gapopen = -12;
 
 		if (cmd.getOptionValues("ge") != null) {
 			gapextend = Integer.parseInt(cmd.getOptionValues("ge")[0]);
-		}
+		} else
+			gapextend = -1;
 
 		if (cmd.getOptionValues("mode") != null) {
-			mode = cmd.getOptionValues("mode")[0];
-		}
+			mode = Type.valueOf(cmd.getOptionValues("mode")[0]);
+		} else
+			mode = Type.GLOBAL;
 
 		if (cmd.hasOption("printlali")) {
 			printalignment = true;
@@ -87,20 +93,62 @@ public class Main {
 		if (cmd.hasOption("check")) {
 			checkscores = true;
 		}
+		
+		try {
+			init();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void init() throws IOException {
+	public static void init() throws IOException {
 		// Daten init
-		Raw r = new Raw();
-		Matrix m = new Matrix();
+		r = new Raw();
+		m = new Matrix();
 
 		// Import
-		if (!ImportFile.readFile(pairfile, Type.PAIRFILE, m, r))
-			System.exit(1);
-		if (!ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r))
-			System.exit(1);
-		if (!ImportFile.readFile("res/substitionmatrices.txt",
-				Type.SUBSTITUTIONMATRIX, m, r))
-			System.exit(1);
+		importFiles();
+		doMatrices();
+	}
+
+	public static void doMatrices(String[] id1, String[] id2) {
+
+		for (int i = 0; i < id1.length; i++) {
+			String as1 = r.getSequenceById(id1[i]);
+			String as2 = r.getSequenceById(id2[i]);
+			double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+			char[] schars = m.getConvMat(matrixname);
+			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
+					mode, id1[i], id2[i]);
+			if (mode == Type.LOCAL)
+				Computation.calcMatricesLocal();
+			else
+				Computation.calcMatrices();
+			Computation.saveMatrices(m);
+		}
+	}
+	
+	//default mit pairfile
+	public static void doMatrices () {
+		for (int i = 0; i<r.pairs.size();i++) {
+			String[] ids = r.getPair(i);
+			String as1 = r.getSequenceById(ids[0]);
+			String as2 = r.getSequenceById(ids[1]);
+			double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+			char[] schars = m.getConvMat(matrixname);
+			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
+					mode, ids[0], ids[1]);
+			if (mode == Type.LOCAL)
+				Computation.calcMatricesLocal();
+			else
+				Computation.calcMatrices();
+			Computation.saveMatrices(m);
+		}
+	}
+	
+	public static void importFiles() throws IOException {
+		ImportFile.readDir("res/matrices", m, r);
+		ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
+		ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
 	}
 }

@@ -10,10 +10,6 @@ public class Computation {
 	// zweite AS Sequenz
 	// b = col
 	private static String b;
-	// Länge des AS Alphabets (in SubstitionsMatrix)
-	// TODO Länge aus SubstitutionsMatrix beziehen
-	private static int as_alpha_length;
-
 	// gap_extend score (default: 12
 	private static double go;
 	// gap_open score (default: 1)
@@ -33,12 +29,11 @@ public class Computation {
 	private static String id_a;
 	private static String id_b;
 
-	public static void init(String as1, String as2, int l, double[][] smatrix,
+	public static void init(String as1, String as2, double[][] smatrix,
 			char[] schars, double gapopen, double gapextend, Type type,
 			String id1, String id2) {
 		Computation.a = as1;
 		Computation.b = as2;
-		Computation.as_alpha_length = l;
 		Computation.mat = new double[3][a.length() + 1][b.length() + 1];
 		Computation.ge = gapextend;
 		Computation.go = gapopen;
@@ -60,35 +55,9 @@ public class Computation {
 			// I0,j = -Inf
 			mat[2][0][col] = -Double.MAX_VALUE;
 		}
-		System.out.println("finished");
 	}
 
 	public static void calcMatrices() {
-		// Matrix I
-		// row fängt bei 1 an col bei 0 wegen Matrix I --> Unterschied zu Matrix
-		// D und A sowieso
-		// for (int row = 1; row < mat[2].length; row++) {
-		// for (int col = 1; col < mat[2][0].length; col++) {
-		// mat[2][row][col] = Math.max(mat[0][row - 1][col] + ge + go,
-		// mat[2][row - 1][col] + ge);
-		// }
-		// }
-		// // Matrix D
-		// for (int row = 1; row < mat[2].length; row++) {
-		// for (int col = 1; col < mat[2][0].length; col++) {
-		// mat[1][row][col] = Math.max(mat[0][row][col - 1] + ge + go,
-		// mat[1][row][col - 1] + ge);
-		// }
-		// }
-		// // Matrix A
-		// for (int row = 1; row < mat[2].length; row++) {
-		// for (int col = 1; col < mat[2][0].length; col++) {
-		// mat[0][row][col] = Math.max(mat[0][row - 1][col - 1]
-		// + getSMatrixScore(a.charAt(row-1), b.charAt(col-1)),
-		// Math.max(mat[1][row][col], mat[2][row][col]));
-		// }
-		// }
-
 		for (int row = 1; row < mat[2].length; row++) {
 			for (int col = 1; col < mat[2][0].length; col++) {
 				// Matrix I

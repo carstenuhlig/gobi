@@ -10,7 +10,8 @@ public class Matrix {
 	public double[][][] getMatrices(String id1, String id2) {
 		// return as 3 Matrices A = [0][][], D = [1][][], I = [2][][]
 		for (SMatrix sm : matrices) {
-			if (sm.name == id1 + ":" + id2 || sm.name == id2 + ":" + id1) {
+			if (sm.name.equals(id1 + ":" + id2)
+					|| sm.name.equals(id2 + ":" + id1)) {
 				double[][][] bigmatrix = new double[3][sm.matA.length][sm.matA.length];
 				bigmatrix[0] = sm.matA;
 				bigmatrix[1] = sm.matD;
@@ -32,10 +33,10 @@ public class Matrix {
 
 	public void addSubstitutionMatrix(String name, double[][] matrix,
 			char[] chars) {
-//		double[][] new_matrix = new double[matrix.length][matrix.length];
-//		char[] new_chars = new char[chars.length];
-//		System.arraycopy(matrix, 0, new_matrix, 0, matrix.length);
-//		System.arraycopy(chars, 0, new_chars, 0, chars.length);
+		// double[][] new_matrix = new double[matrix.length][matrix.length];
+		// char[] new_chars = new char[chars.length];
+		// System.arraycopy(matrix, 0, new_matrix, 0, matrix.length);
+		// System.arraycopy(chars, 0, new_chars, 0, chars.length);
 		substitionmatrices.add(new SMatrix(name, matrix, chars));
 	}
 
@@ -48,7 +49,7 @@ public class Matrix {
 		}
 		return null;
 	}
-	
+
 	public char[] getConvMat(String name) {
 		for (SMatrix sm : substitionmatrices) {
 			if (sm.name.equals(name))
@@ -78,7 +79,10 @@ public class Matrix {
 
 	// jede Matrix nur 1 Typ, d.h. entweder Substitutionsmatrix, lokal
 	// Alignment, global Alignment oder Freeshift Alignment
-	// TODO Performance Mehrere Typen für eine Matrix
+	// TODO Performance Mehrere Typen für eine Matrix (weniger speicher
+	// verbrauch wenn alle alignment arten dann 3fache menge an Daten)
+	// TODO SMatrix als eigene public Klasse für alle zugreifbar ->
+	// PERFORMANCE Smatrix als eigene klasse (nicht innere klasse)
 	private class SMatrix {
 		public String name; // like id or hash
 
@@ -139,8 +143,7 @@ public class Matrix {
 			returnstr += "Name:\t" + name + "\n";
 			returnstr += "Type:\t" + t + "\n";
 			if (t == Type.SUBSTITUTIONMATRIX) {
-				if (sym == false) 
-				{
+				if (sym == false) {
 					returnstr += "\t";
 					for (int xtmp = 0; xtmp < mat.length; xtmp++) {
 						returnstr += (xtmp + 1) + "\t";
@@ -153,13 +156,11 @@ public class Matrix {
 						}
 						returnstr += "\n";
 					}
-				}
-				else
-				{
-					for (int col = 0; col<chars.length; col++)
-						returnstr += "\t" + chars[col]; 
+				} else {
+					for (int col = 0; col < chars.length; col++)
+						returnstr += "\t" + chars[col];
 					returnstr += "\n";
-					for (int row = 0; row<chars.length; row++) {
+					for (int row = 0; row < chars.length; row++) {
 						returnstr += chars[row];
 						for (double d : mat[row]) {
 							returnstr += "\t" + d;

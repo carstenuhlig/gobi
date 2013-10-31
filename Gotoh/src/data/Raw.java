@@ -22,7 +22,7 @@ public class Raw {
 	
 	public String getSequenceById(String id) {
 		for (Seq s : sequences) {
-			if (s.id == id)
+			if (s.id.equals(id))
 				return s.sequence;
 		}
 		return null;

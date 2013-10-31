@@ -20,7 +20,6 @@ public class ImportFile {
 	private static int matCnt;
 	private static char[] matChrs;
 	// if matrix is symmetric and other half has to be filled in
-	private static boolean sym;
 
 	private static boolean initialized;
 
@@ -31,7 +30,6 @@ public class ImportFile {
 		cols = 0;
 		matCnt = 0;
 		matChrs = null;
-		sym = false;
 		initialized = false;
 	}
 
@@ -59,7 +57,6 @@ public class ImportFile {
 		ImportFile.matrix = new double[25][25];
 
 		ImportFile.name = "";
-		ImportFile.sym = false;
 
 		// main Method
 		int lineCnt = 0;
@@ -104,7 +101,6 @@ public class ImportFile {
 		// Variable setting
 		ImportFile.path = p;
 		ImportFile.type = aType;
-		ImportFile.sym = false;
 
 		// ImportFile.matrix = new double[25][25];
 
@@ -143,33 +139,28 @@ public class ImportFile {
 			Raw r) {
 		switch (type) {
 		case PAIRFILE:
-			// TODO Richtig nach Format einlesen
-
-			// split String into 2 ints
-			String[] strp = line.split(":");
-			String f = strp[0];
-			String s = strp[1];
-
+			String pattern1 = "(\\S+)(\\s+)(\\S+).*";
 			// push to database
-			r.addPair(f, s);
+			r.addPair(line.replaceFirst(pattern1, "$1"),
+					line.replaceFirst(pattern1, "$3"));
 			break;
 		case SUBSTITUTIONMATRIX:
 			// TODO handles more formats for substitutionmatrix-name
-			String pattern = "(\\w+)(\\s+)(\\S+).*";
-			switch (line.replaceFirst(pattern, "$1")) {
+			String pattern2 = "(\\w+)(\\s+)(\\S+).*";
+			switch (line.replaceFirst(pattern2, "$1")) {
 			case "NAME":
-				ImportFile.name = line.replaceFirst(pattern, "$3");
+				ImportFile.name = line.replaceFirst(pattern2, "$3");
 				break;
 			case "NUMROW":
-				ImportFile.rows = Integer.parseInt(line.replaceFirst(pattern,
+				ImportFile.rows = Integer.parseInt(line.replaceFirst(pattern2,
 						"$3"));
 				break;
 			case "NUMCOL":
-				ImportFile.cols = Integer.parseInt(line.replaceFirst(pattern,
+				ImportFile.cols = Integer.parseInt(line.replaceFirst(pattern2,
 						"$3"));
 				break;
 			case "ROWINDEX":
-				matChrs = line.replaceFirst(pattern, "$3").toCharArray();
+				matChrs = line.replaceFirst(pattern2, "$3").toCharArray();
 				break;
 			case "MATRIX":
 				// System.out.println(util.MatrixHelper.matrix1DimString(matChrs));

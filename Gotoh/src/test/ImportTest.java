@@ -27,8 +27,8 @@ public class ImportTest {
 	public void test() {
 		try {
 			assertTrue(ImportFile
-					.readFile("res/pfile.txt", Type.PAIRFILE, m, r));
-			assertTrue(ImportFile.readFile("res/sample.txt", Type.SEQLIBFILE,
+					.readFile("res/sanity.pairs", Type.PAIRFILE, m, r));
+			assertTrue(ImportFile.readFile("res/domains.seqlib", Type.SEQLIBFILE,
 					m, r));
 //			assertTrue(ImportFile.readFile("res/matrix.txt",
 //					Type.SUBSTITUTIONMATRIX, m, r));
@@ -40,22 +40,26 @@ public class ImportTest {
 			e.printStackTrace();
 			System.out.println("IOException bei Einlesen von Dateien");
 		}
-
+	}
+	
+	private void printPairs() {
 		System.out.println("pairs");
 		for (int i = 0; i < r.pairs.size(); i++) {
-			System.out.println("|" + r.getPair(i)[0] + "+" + r.getPair(i)[1]
+			System.out.println("|" + r.getPair(i)[0] + "\t" + r.getPair(i)[1]
 					+ "|");
 		}
 
-		System.out.println();
-
+	}
+	
+	private void printSeqLib() {
 		System.out.println("seqlib");
 		for (int j = 0; j < r.sequences.size(); j++) {
 			System.out.println("id = " + r.getSequenceByIndex(j)[0]
 					+ " AND sequence = " + r.getSequenceByIndex(j)[1]);
 		}
-
-		// TODO test toString SMatrix
+	}
+	
+	private void printSubstitionMatrices() {
 		m.printAllSubstitionMatrices();
 	}
 }
