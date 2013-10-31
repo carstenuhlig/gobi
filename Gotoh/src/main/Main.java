@@ -93,7 +93,7 @@ public class Main {
 		if (cmd.hasOption("check")) {
 			checkscores = true;
 		}
-		
+
 		try {
 			init();
 		} catch (IOException e) {
@@ -125,12 +125,14 @@ public class Main {
 			else
 				Computation.calcMatrices();
 			Computation.saveMatrices(m);
+			m.printAllCalculatedMatrices();
+			m.deleteCalculatedMatrixByName(id1[i], id2[i]);
 		}
 	}
-	
-	//default mit pairfile
-	public static void doMatrices () {
-		for (int i = 0; i<r.pairs.size();i++) {
+
+	// default mit pairfile
+	public static void doMatrices() {
+		for (int i = 0; i < r.pairs.size(); i++) {
 			String[] ids = r.getPair(i);
 			String as1 = r.getSequenceById(ids[0]);
 			String as2 = r.getSequenceById(ids[1]);
@@ -143,9 +145,14 @@ public class Main {
 			else
 				Computation.calcMatrices();
 			Computation.saveMatrices(m);
+			// m.printAllCalculatedMatrices();
+			System.out.print(". ");
+			if (i % 80 == 0 && i > 0)
+				System.out.println(i + " von " + r.pairs.size());
+			m.deleteCalculatedMatrixByName(ids[0], ids[1]);
 		}
 	}
-	
+
 	public static void importFiles() throws IOException {
 		ImportFile.readDir("res/matrices", m, r);
 		ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);

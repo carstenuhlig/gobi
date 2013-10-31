@@ -76,6 +76,15 @@ public class Matrix {
 				System.out.println(sm);
 		}
 	}
+	
+	public void deleteCalculatedMatrixByName(String id1, String id2) {
+		for (int i = 0; i<matrices.size(); i++) {
+			if ( ((SMatrix) matrices.get(i)).name.equals(id1 + ":" + id2) ) {
+				matrices.remove(i);
+				return;
+			}
+		}
+	}
 
 	// jede Matrix nur 1 Typ, d.h. entweder Substitutionsmatrix, lokal
 	// Alignment, global Alignment oder Freeshift Alignment

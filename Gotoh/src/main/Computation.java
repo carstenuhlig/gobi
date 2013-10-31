@@ -43,17 +43,20 @@ public class Computation {
 		Computation.id_b = id2;
 		Computation.schars = schars;
 
-		for (int row = 1; row < a.length() + 1; row++) {
-			// A0,k = g(k)
-			mat[0][row][0] = calcGapScore(row);
-			// Di,0 = -Inf
-			mat[1][row][0] = -Double.MAX_VALUE;
-		}
-		for (int col = 1; col < b.length() + 1; col++) {
-			// Ak,0 = g(k)
-			mat[0][0][col] = calcGapScore(col);
-			// I0,j = -Inf
-			mat[2][0][col] = -Double.MAX_VALUE;
+		// bei local alignment mindestens wert von 0
+		if (type != Type.LOCAL) {
+			for (int row = 1; row < a.length() + 1; row++) {
+				// A0,k = g(k)
+				mat[0][row][0] = calcGapScore(row);
+				// Di,0 = -Inf
+				mat[1][row][0] = -Double.MAX_VALUE;
+			}
+			for (int col = 1; col < b.length() + 1; col++) {
+				// Ak,0 = g(k)
+				mat[0][0][col] = calcGapScore(col);
+				// I0,j = -Inf
+				mat[2][0][col] = -Double.MAX_VALUE;
+			}
 		}
 	}
 
@@ -78,30 +81,22 @@ public class Computation {
 
 	// TODO Matrices for local alignment... braucht man das so?
 	public static void calcMatricesLocal() {
-		// Matrix I
-		// row fängt bei 1 an col bei 0 wegen Matrix I --> Unterschied zu Matrix
-		// D und A sowieso
 		for (int row = 1; row < mat[2].length; row++) {
 			for (int col = 1; col < mat[2][0].length; col++) {
-				mat[2][row][col] = Math.max(mat[0][row - 1][col] + ge + go,
-						mat[2][row - 1][col] + ge);
-			}
-		}
-		// Matrix D
-		for (int row = 1; row < mat[2].length; row++) {
-			for (int col = 1; col < mat[2][0].length; col++) {
-				mat[1][row][col] = Math.max(mat[0][row][col - 1] + ge + go,
-						mat[1][row][col - 1] + ge);
-			}
-		}
-		// Matrix A
-		for (int row = 1; row < mat[2].length; row++) {
-			for (int col = 1; col < mat[2][0].length; col++) {
+				// Matrix I
+				mat[2][row][col] = Math.max(Math.max(mat[0][row - 1][col] + ge
+						+ go, mat[2][row - 1][col] + ge), 0);
+				// Matrix D
+				mat[1][row][col] = Math.max(Math.max(mat[0][row][col - 1] + ge
+						+ go, mat[1][row][col - 1] + ge), 0);
+				// Matrix A
 				mat[0][row][col] = Math.max(
-						mat[0][row - 1][col - 1]
-								+ getSMatrixScore(a.charAt(row - 1),
-										b.charAt(col - 1)),
-						Math.max(mat[1][row][col], mat[2][row][col]));
+						Math.max(
+								mat[0][row - 1][col - 1]
+										+ getSMatrixScore(a.charAt(row - 1),
+												b.charAt(col - 1)),
+								Math.max(mat[1][row][col], mat[2][row][col])),
+						0);
 			}
 		}
 	}
