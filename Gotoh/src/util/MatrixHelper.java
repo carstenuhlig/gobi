@@ -1,5 +1,9 @@
 package util;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 public class MatrixHelper {
 
 	// Deprecated
@@ -65,5 +69,15 @@ public class MatrixHelper {
 			returnstr += c + "\t";
 		}
 		return returnstr;
+	}
+	
+	public static String formatDecimal(double d) {
+		NumberFormat df = DecimalFormat.getInstance();
+		
+		df.setMinimumFractionDigits(3);
+		df.setMaximumFractionDigits(3);
+		df.setRoundingMode(RoundingMode.HALF_EVEN);
+		
+		return df.format(d);
 	}
 }

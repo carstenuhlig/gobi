@@ -20,7 +20,7 @@ public class Computation {
 	private static char[] schars;
 
 	private static Type type;
-	
+
 	private static double score;
 
 	// matrix A,D,I;0,1,2 <- dyn. Programmierungs Matrix mit Matrix A,D und I
@@ -172,6 +172,20 @@ public class Computation {
 			col = tmpintarray[1];
 			score = mat[0][row][col];
 
+			for (int j = b.length() - 1; j >= col; j--) {
+				alignment[0][a.length() + b.length() - 1 - count] = '-';
+				alignment[1][a.length() + b.length() - 1 - count] = b
+						.charAt(j);
+				count++;
+			}
+			
+			for (int i = a.length() - 1; i >= row; i--) {
+				alignment[0][a.length() + b.length() - 1 - count] = a
+						.charAt(i);
+				alignment[1][a.length() + b.length() - 1 - count] = '-';
+				count++;
+			}
+
 			while (row > 0 && col > 0 && mat[0][row][col] > 0) {
 				if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
 						a.charAt(row - 1), b.charAt(col - 1)))) {
@@ -198,8 +212,6 @@ public class Computation {
 						alignment[1][a.length() + b.length() - 1 - count] = '-';
 						count++;
 						row--;
-						// if (!(row > 0))
-						// break;
 					}
 				} else if (util.MatrixHelper.doubleEquality(mat[0][row][col],
 						mat[1][row][col])) {
@@ -215,12 +227,27 @@ public class Computation {
 								.charAt(col - 1);
 						count++;
 						col--;
-						// if (!(col > 0))
-						// break;
 					}
 				}
-				// if (mat[0][row][col] == 0)
 			}
+			
+			//restlichen AS in Alignment
+			while (col > 0) {
+				alignment[0][a.length() + b.length() - 1 - count] = '-';
+				alignment[1][a.length() + b.length() - 1 - count] = b
+						.charAt(col - 1);
+				count++;
+				col--;
+			}
+			
+			while (row > 0) {
+				alignment[0][a.length() + b.length() - 1 - count] = a
+						.charAt(row - 1);
+				alignment[1][a.length() + b.length() - 1 - count] = '-';
+				count++;
+				row--;
+			}
+			
 			Computation.backtrack = alignment;
 			break;
 		case FREESHIFT:
@@ -283,9 +310,9 @@ public class Computation {
 		}
 		return Computation.score;
 	}
-	
+
 	public static void saveAlignment(Matrix m) {
-		//check ob matrizen schon gespeichert sind
+		// check ob matrizen schon gespeichert sind
 		if (m.getMatrices(id_a, id_b) == null) {
 			saveMatrices(m);
 		}

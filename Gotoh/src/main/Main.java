@@ -167,10 +167,10 @@ public class Main {
 
 			if (!printalignment)
 				System.out.println(ids[0] + " " + ids[1] + " "
-						+ Computation.backtrack());
+						+ util.MatrixHelper.formatDecimal(Computation.backtrack()));
 			else {
 				System.out.println(">" + ids[0] + " " + ids[1] + " "
-						+ Computation.backtrack());
+						+ util.MatrixHelper.formatDecimal(Computation.backtrack()));
 				Computation.saveAlignment(m);
 				m.printAlignment(name);
 				if (!printmatrices)
