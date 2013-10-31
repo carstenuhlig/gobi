@@ -70,18 +70,47 @@ public class Matrix {
 		}
 	}
 
+	public void addAlignment(String id1, String id2, String a, String b,
+			char[][] alignment, double score, Type type, double[][][] matrix) {
+		for (SMatrix sm : matrices) {
+			if (sm.name.equals(id1 + ":" + id2)) {
+				sm.score = score;
+				sm.alignment = alignment;
+				// TODO beim saveMatrices String a und b hinzufügen
+				sm.a = a;
+				sm.b = b;
+				sm.optimiseAlignmentArray();
+				return;
+			}
+		}
+		matrices.add(new SMatrix(id1 + ":" + id2, a, b, alignment, score, type,
+				matrix));
+	}
+
 	public void printSubstitutionMatrixByName(String name) {
 		for (SMatrix sm : substitionmatrices) {
 			if (sm.name.equals(name))
 				System.out.println(sm);
 		}
 	}
-	
+
 	public void deleteCalculatedMatrixByName(String id1, String id2) {
-		for (int i = 0; i<matrices.size(); i++) {
-			if ( ((SMatrix) matrices.get(i)).name.equals(id1 + ":" + id2) ) {
+		for (int i = 0; i < matrices.size(); i++) {
+			if (((SMatrix) matrices.get(i)).name.equals(id1 + ":" + id2)) {
 				matrices.remove(i);
 				return;
+			}
+		}
+	}
+
+	public void emptyMatrices() {
+		matrices.clear();
+	}
+
+	public void printAlignment(String name) {
+		for (SMatrix sm : matrices) {
+			if (sm.name.equals(name)) {
+				sm.printAlignment();
 			}
 		}
 	}
@@ -108,8 +137,7 @@ public class Matrix {
 		private boolean sym;
 
 		// Strings mit Gaps
-		public String calc_a;
-		public String calc_b;
+		public char[][] alignment;
 
 		public double score;
 
@@ -139,6 +167,49 @@ public class Matrix {
 			this.t = type;
 			this.a = as1;
 			this.b = as2;
+		}
+
+		public SMatrix(String name, String a, String b, char[][] alignment,
+				double score, Type type, double[][][] matrix) {
+			this.name = name;
+			this.matA = matrix[0];
+			this.matD = matrix[1];
+			this.matI = matrix[2];
+			this.t = type;
+			this.a = a;
+			this.b = b;
+			this.score = score;
+			this.alignment = alignment;
+			optimiseAlignmentArray();
+		}
+
+		private void printAlignment() {
+			String a_align = util.StringHelper
+					.processDoubleArrayToString(this.alignment[0]);
+			String b_align = util.StringHelper
+					.processDoubleArrayToString(this.alignment[1]);
+			String[] ids = this.name.split(":");
+			System.out.println(ids[0] + ": " + a_align);
+			System.out.println(ids[1] + ": " + b_align);
+		}
+
+		private void optimiseAlignmentArray() {
+			int end = -1;
+			for (int i = 0; i < this.alignment[0].length; i++) {
+				// "\u0000" steht für null char bei chars
+				if (alignment[0][i] == '\u0000')
+					end = i;
+				// TODO mit while schleife schneller
+				if (end > 0 && alignment[0][i] != '\u0000')
+					break;
+			}
+
+			char[][] new_alignment = new char[2][alignment[0].length - end - 1];
+
+			System.arraycopy(alignment[0], end + 1, new_alignment[0], 0,
+					alignment[0].length - end - 1);
+			System.arraycopy(alignment[1], end + 1, new_alignment[1], 0,
+					alignment[1].length - end - 1);
 		}
 
 		public void setChars(char[] chr) {

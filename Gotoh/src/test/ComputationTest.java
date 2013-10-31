@@ -24,9 +24,9 @@ public class ComputationTest {
 
 	@Test
 	public void test() {
-		Computation.init("WTHA", "WTHGQA", 25,
-				m.getSubstitutionMatrix("BLOSUM50"), m.getConvMat("BLOSUM50"),
-				-10.0, -2.0, Type.GLOBAL, "Gobiepraesentation1", "Gobiepraesentation2");
+		Computation.init("WTHA", "WTHGQA", m.getSubstitutionMatrix("BLOSUM50"),
+				m.getConvMat("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
+				"Gobiepraesentation1", "Gobiepraesentation2");
 		m.printSubstitutionMatrixByName("BLOSUM50");
 		Computation.calcMatrices();
 		// m.printAllSubstitionMatrices();

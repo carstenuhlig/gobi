@@ -78,11 +78,11 @@ public class Main {
 			gapextend = -1;
 
 		if (cmd.getOptionValues("mode") != null) {
-			mode = Type.valueOf(cmd.getOptionValues("mode")[0]);
+			mode = Type.valueOf(cmd.getOptionValues("mode")[0].toUpperCase());
 		} else
-			mode = Type.GLOBAL;
+			mode = Type.FREESHIFT;
 
-		if (cmd.hasOption("printlali")) {
+		if (cmd.hasOption("printali")) {
 			printalignment = true;
 		}
 
@@ -109,6 +109,8 @@ public class Main {
 		// Import
 		importFiles();
 		doMatrices();
+		// scoreOnePairByIds("1j2xA00", "1wq2B00", Type.GLOBAL);
+
 	}
 
 	public static void doMatrices(String[] id1, String[] id2) {
@@ -130,12 +132,30 @@ public class Main {
 		}
 	}
 
+	public static void scoreOnePairByIds(String id1, String id2, Type modus) {
+		String as1 = r.getSequenceById(id1);
+		String as2 = r.getSequenceById(id2);
+		double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+		char[] schars = m.getConvMat(matrixname);
+		Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus,
+				id1, id2);
+		if (mode == Type.LOCAL)
+			Computation.calcMatricesLocal();
+		else
+			Computation.calcMatrices();
+		Computation.saveMatrices(m);
+		System.out.println(Computation.backtrack());
+		// m.printAllCalculatedMatrices();
+		m.deleteCalculatedMatrixByName(id1, id2);
+	}
+
 	// default mit pairfile
 	public static void doMatrices() {
 		for (int i = 0; i < r.pairs.size(); i++) {
 			String[] ids = r.getPair(i);
 			String as1 = r.getSequenceById(ids[0]);
 			String as2 = r.getSequenceById(ids[1]);
+			String name = ids[0] + ":" + ids[1];
 			double[][] smatrix = m.getSubstitutionMatrix(matrixname);
 			char[] schars = m.getConvMat(matrixname);
 			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
@@ -144,12 +164,30 @@ public class Main {
 				Computation.calcMatricesLocal();
 			else
 				Computation.calcMatrices();
-			Computation.saveMatrices(m);
-			// m.printAllCalculatedMatrices();
-			System.out.print(". ");
-			if (i % 80 == 0 && i > 0)
-				System.out.println(i + " von " + r.pairs.size());
-			m.deleteCalculatedMatrixByName(ids[0], ids[1]);
+
+			if (!printalignment)
+				System.out.println(ids[0] + " " + ids[1] + " "
+						+ Computation.backtrack());
+			else {
+				System.out.println(">" + ids[0] + " " + ids[1] + " "
+						+ Computation.backtrack());
+				Computation.saveAlignment(m);
+				m.printAlignment(name);
+				if (!printmatrices)
+					m.emptyMatrices();
+			}
+			
+			if (printmatrices && !printalignment) {
+				Computation.saveMatrices(m);
+				m.printAllCalculatedMatrices();
+				m.emptyMatrices();
+			} else if (printmatrices && printalignment) {
+				m.printAllCalculatedMatrices();
+			}
+			// System.out.print(". ");
+			// if (i % 80 == 0 && i > 0)
+			// System.out.println(i + " von " + r.pairs.size());
+			// m.deleteCalculatedMatrixByName(ids[0], ids[1]);
 		}
 	}
 

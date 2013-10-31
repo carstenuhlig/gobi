@@ -1,8 +1,8 @@
 package util;
 
 public class MatrixHelper {
-	
-	//Deprecated
+
+	// Deprecated
 	public static double[][] makeMatrixSymmetric(double[][] mat) {
 		double[][] mat2 = new double[mat.length][mat.length];
 		for (int row = mat.length - 1; row >= 0; row--) {
@@ -11,6 +11,31 @@ public class MatrixHelper {
 			}
 		}
 		return null;
+	}
+
+	public static boolean doubleEquality(double a, double b, double tolerance) {
+		double d;
+		if (a > b)
+			d = a - b;
+		else
+			d = b - a;
+		if (d < tolerance)
+			return true;
+		else
+			return false;
+	}
+	
+	public static boolean doubleEquality(double a, double b) {
+		double d;
+		double tolerance = 0.000000001;
+		if (a > b)
+			d = a - b;
+		else
+			d = b - a;
+		if (d < tolerance)
+			return true;
+		else
+			return false;
 	}
 
 	public static String matrix2DimString(double[][] mat) {
