@@ -2,6 +2,7 @@ package data;
 
 import java.util.ArrayList;
 import util.Type;
+import util.MatrixHelper;
 
 public class Matrix {
 	private ArrayList<SMatrix> substitionmatrices = new ArrayList<SMatrix>();
@@ -232,7 +233,8 @@ public class Matrix {
 					for (int y = 0; y < mat.length; y++) {
 						returnstr += (y + 1) + "\t";
 						for (int x = 0; x < mat.length; x++) {
-							returnstr += mat[y][x] + "\t";
+							returnstr += util.MatrixHelper.formatDecimal(
+									mat[y][x], 1, 3) + "\t";
 						}
 						returnstr += "\n";
 					}
@@ -243,7 +245,8 @@ public class Matrix {
 					for (int row = 0; row < chars.length; row++) {
 						returnstr += chars[row];
 						for (double d : mat[row]) {
-							returnstr += "\t" + d;
+							returnstr += "\t"
+									+ util.MatrixHelper.formatDecimal(d, 1, 3);
 						}
 						returnstr += "\n";
 					}
@@ -253,45 +256,66 @@ public class Matrix {
 				// TODO Check
 				returnstr += "Matrix:\tA\n\t";
 				for (int xtmp = 0; xtmp < matA[0].length; xtmp++) {
-					returnstr += xtmp + "\t";
+					if (xtmp > 0)
+						returnstr += b.charAt(xtmp - 1) + "\t";
+					else
+						returnstr += " \t";
 				}
 				returnstr += "\n";
 				for (int y = 0; y < matA.length; y++) {
-					returnstr += y + "\t";
+					if (y > 0)
+						returnstr += a.charAt(y - 1) + "\t";
+					else
+						returnstr += " \t";
 					for (int x = 0; x < matA[0].length; x++) {
-						returnstr += matA[y][x] + "\t";
+						returnstr += util.MatrixHelper.formatDecimal(
+								matA[y][x], 1, 3) + "\t";
 					}
 					returnstr += "\n\n";
 				}
 
 				returnstr += "Matrix:\tD\n\t";
 				for (int xtmp = 0; xtmp < matD[0].length; xtmp++) {
-					returnstr += xtmp + "\t";
+					if (xtmp > 0)
+						returnstr += b.charAt(xtmp - 1) + "\t";
+					else
+						returnstr += " \t";
 				}
 				returnstr += "\n";
 				for (int y = 0; y < matD.length; y++) {
-					returnstr += y + "\t";
+					if (y > 0)
+						returnstr += a.charAt(y - 1) + "\t";
+					else
+						returnstr += " \t";
 					for (int x = 0; x < matD[0].length; x++) {
 						if (matD[y][x] == -Double.MAX_VALUE)
 							returnstr += "-Inf\t";
 						else
-							returnstr += matD[y][x] + "\t";
+							returnstr += util.MatrixHelper.formatDecimal(
+									matD[y][x], 1, 3) + "\t";
 					}
 					returnstr += "\n\n";
 				}
 
 				returnstr += "Matrix:\tI\n\t";
 				for (int xtmp = 0; xtmp < matI[0].length; xtmp++) {
-					returnstr += xtmp + "\t";
+					if (xtmp > 0)
+						returnstr += b.charAt(xtmp - 1) + "\t";
+					else
+						returnstr += " \t";
 				}
 				returnstr += "\n";
 				for (int y = 0; y < matI.length; y++) {
-					returnstr += y + "\t";
+					if (y > 0)
+						returnstr += a.charAt(y - 1) + "\t";
+					else
+						returnstr += " \t";
 					for (int x = 0; x < matI[0].length; x++) {
 						if (matI[y][x] == -Double.MAX_VALUE)
 							returnstr += "-Inf\t";
 						else
-							returnstr += matI[y][x] + "\t";
+							returnstr += util.MatrixHelper.formatDecimal(
+									matI[y][x], 1, 3) + "\t";
 					}
 					returnstr += "\n\n";
 				}

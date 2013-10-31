@@ -65,6 +65,7 @@ public class Main {
 		if (cmd.getOptionValues("m") != null) {
 			matrixname = cmd.getOptionValues("m")[0];
 		} else
+			
 			matrixname = "dayhoff";
 
 		if (cmd.getOptionValues("go") != null) {
@@ -122,10 +123,10 @@ public class Main {
 			char[] schars = m.getConvMat(matrixname);
 			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
 					mode, id1[i], id2[i]);
-			if (mode == Type.LOCAL)
-				Computation.calcMatricesLocal();
-			else
+			if (mode == Type.GLOBAL)
 				Computation.calcMatrices();
+			else
+				Computation.calcMatricesLocal();
 			Computation.saveMatrices(m);
 			m.printAllCalculatedMatrices();
 			m.deleteCalculatedMatrixByName(id1[i], id2[i]);
@@ -160,7 +161,7 @@ public class Main {
 			char[] schars = m.getConvMat(matrixname);
 			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
 					mode, ids[0], ids[1]);
-			if (mode == Type.LOCAL)
+			if (mode == Type.LOCAL || mode == Type.FREESHIFT)
 				Computation.calcMatricesLocal();
 			else
 				Computation.calcMatrices();

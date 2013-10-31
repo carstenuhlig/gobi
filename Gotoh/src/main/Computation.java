@@ -50,7 +50,7 @@ public class Computation {
 
 		// bei local alignment mindestens wert von 0, d.h. so lassen wie bei
 		// Initialisierung von Array
-		if (type != Type.LOCAL) {
+		if (type != Type.LOCAL || type != Type.FREESHIFT) {
 			for (int row = 1; row < a.length() + 1; row++) {
 				// A0,k = g(k)
 				mat[0][row][0] = calcGapScore(row);
@@ -174,14 +174,12 @@ public class Computation {
 
 			for (int j = b.length() - 1; j >= col; j--) {
 				alignment[0][a.length() + b.length() - 1 - count] = '-';
-				alignment[1][a.length() + b.length() - 1 - count] = b
-						.charAt(j);
+				alignment[1][a.length() + b.length() - 1 - count] = b.charAt(j);
 				count++;
 			}
-			
+
 			for (int i = a.length() - 1; i >= row; i--) {
-				alignment[0][a.length() + b.length() - 1 - count] = a
-						.charAt(i);
+				alignment[0][a.length() + b.length() - 1 - count] = a.charAt(i);
 				alignment[1][a.length() + b.length() - 1 - count] = '-';
 				count++;
 			}
@@ -230,8 +228,8 @@ public class Computation {
 					}
 				}
 			}
-			
-			//restlichen AS in Alignment
+
+			// restlichen AS in Alignment
 			while (col > 0) {
 				alignment[0][a.length() + b.length() - 1 - count] = '-';
 				alignment[1][a.length() + b.length() - 1 - count] = b
@@ -239,7 +237,7 @@ public class Computation {
 				count++;
 				col--;
 			}
-			
+
 			while (row > 0) {
 				alignment[0][a.length() + b.length() - 1 - count] = a
 						.charAt(row - 1);
@@ -247,7 +245,7 @@ public class Computation {
 				count++;
 				row--;
 			}
-			
+
 			Computation.backtrack = alignment;
 			break;
 		case FREESHIFT:
@@ -255,6 +253,22 @@ public class Computation {
 			row = tmpintarray2[0];
 			col = tmpintarray2[1];
 
+			Computation.score = mat[0][row][col];
+
+			// Anfang: (gaps werden hinzugefügt)
+			for (int j = b.length() - 1; j >= col; j--) {
+				alignment[0][a.length() + b.length() - 1 - count] = '-';
+				alignment[1][a.length() + b.length() - 1 - count] = b.charAt(j);
+				count++;
+			}
+
+			for (int i = a.length() - 1; i >= row; i--) {
+				alignment[0][a.length() + b.length() - 1 - count] = a.charAt(i);
+				alignment[1][a.length() + b.length() - 1 - count] = '-';
+				count++;
+			}
+
+			// Hauptteil
 			while (row > 0 && col > 0) {
 				if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
 						a.charAt(row - 1), b.charAt(col - 1)))) {
@@ -265,14 +279,12 @@ public class Computation {
 					count++;
 					row--;
 					col--;
-					// if (!(row > 0) || !(col > 0))
-					// break;
 				} else if (util.MatrixHelper.doubleEquality(mat[0][row][col],
 						mat[2][row][col])) {
 					int k = 1;
-					while (!util.MatrixHelper.doubleEquality(
-							((double) mat[0][row - k][col] + calcGapScore(k)),
-							((double) mat[0][row][col]))) {
+					while (k < row && !util.MatrixHelper.doubleEquality(
+							mat[0][row - k][col] + calcGapScore(k),
+							mat[0][row][col])) {
 						k++;
 					}
 					for (int i = 1; i < k + 1; i++) {
@@ -281,13 +293,11 @@ public class Computation {
 						alignment[1][a.length() + b.length() - 1 - count] = '-';
 						count++;
 						row--;
-						// if (!(row > 0))
-						// break;
 					}
 				} else if (util.MatrixHelper.doubleEquality(mat[0][row][col],
 						mat[1][row][col])) {
 					int k = 1;
-					while (!util.MatrixHelper.doubleEquality(mat[0][row][col
+					while (k < col &&!util.MatrixHelper.doubleEquality(mat[0][row][col
 							- k]
 							+ calcGapScore(k), mat[0][row][col])) {
 						k++;
@@ -298,13 +308,32 @@ public class Computation {
 								.charAt(col - 1);
 						count++;
 						col--;
-						// if (!(col > 0))
-						// break;
 					}
 				}
+
+				// Bedingung wenn Rand erreicht dann stop
+				if (row == 0 || col == 0)
+					break;
 			}
+
+			// restlichen AS in Alignment
+			while (col > 0) {
+				alignment[0][a.length() + b.length() - 1 - count] = '-';
+				alignment[1][a.length() + b.length() - 1 - count] = b
+						.charAt(col - 1);
+				count++;
+				col--;
+			}
+
+			while (row > 0) {
+				alignment[0][a.length() + b.length() - 1 - count] = a
+						.charAt(row - 1);
+				alignment[1][a.length() + b.length() - 1 - count] = '-';
+				count++;
+				row--;
+			}
+
 			Computation.backtrack = alignment;
-			Computation.score = mat[0][mat[0].length - 1][mat[0][0].length - 1];
 			break;
 		default:
 		}

@@ -80,4 +80,14 @@ public class MatrixHelper {
 		
 		return df.format(d);
 	}
+	
+	public static String formatDecimal(double d, int min, int max) {
+		NumberFormat df = DecimalFormat.getInstance();
+		
+		df.setMinimumFractionDigits(min);
+		df.setMaximumFractionDigits(max);
+		df.setRoundingMode(RoundingMode.HALF_EVEN);
+		
+		return df.format(d);
+	}
 }
