@@ -419,7 +419,7 @@ public class Computation {
 
 			x1 = -1;
 
-			for (int x2 = x1; x2 < backtrack[0].length; x2++) {
+			for (int x2 = start; x2 < ende + 1; x2++) {
 				switch (modi) {
 				case 0:
 					if (backtrack[0][x2] == '-') {
@@ -469,9 +469,75 @@ public class Computation {
 						returndouble += getSMatrixScore(backtrack[0][x2],
 								backtrack[1][x2]);
 					}
-					break;
 				}
 			}
+			if (returndouble == score)
+				return true;
+			else
+				return false;
+		case LOCAL:
+			start = getStartLOCAL();
+			ende = getEndLOCAL();
+			returndouble = 0;
+
+			x1 = -1;
+
+			for (int x2 = start; x2 < ende + 1; x2++) {
+				switch (modi) {
+				case 0:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 1:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						returndouble += ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 2:
+					if (backtrack[0][x2] == '-') {
+						returndouble += ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				default:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+				}
+			}
+			if (returndouble == score)
+				return true;
+			else
+				return false;
 		default:
 			break;
 		}
@@ -498,6 +564,22 @@ public class Computation {
 				|| Character.getNumericValue(backtrack[0][x]) == -1) {
 			x--;
 		}
+		return x;
+	}
+
+	public static int getStartLOCAL() {
+		int x = 0;
+		while (backtrack[0][x] == '-' || backtrack[1][x] == '-'
+				|| Character.getNumericValue(backtrack[0][x]) == -1)
+			x++;
+		return x;
+	}
+
+	public static int getEndLOCAL() {
+		int x = backtrack[0].length - 1;
+		while (backtrack[0][x] == '-' || backtrack[1][x] == '-'
+				|| Character.getNumericValue(backtrack[0][x]) == -1)
+			x--;
 		return x;
 	}
 

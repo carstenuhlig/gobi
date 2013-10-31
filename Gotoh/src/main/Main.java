@@ -41,15 +41,15 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ParseException {
 		Options opt = new Options();
-		opt.addOption("seqlib", true, "<seqlibfile>");
-		opt.addOption("pairs", true, "<pairfile>");
+		opt.addOption("", "seqlib", true, "<seqlibfile>");
+		opt.addOption("", "pairs", true, "<pairfile>");
 		opt.addOption("m", true, "substitutionmatrix");
-		opt.addOption("go", true, "gap open score (default:12)");
-		opt.addOption("ge", true, "gap extend score (default:1)");
-		opt.addOption("mode", true, "mode (local|global|freeshift)");
-		opt.addOption("printali", false, "print every alignment");
-		opt.addOption("printmatrices", false, "print all matrices");
-		opt.addOption("check", false, "validation (checkscores)");
+		opt.addOption("", "go", true, "gap open score (default:12)");
+		opt.addOption("", "ge", true, "gap extend score (default:1)");
+		opt.addOption("", "mode", true, "mode (local|global|freeshift)");
+		opt.addOption("", "printali", false, "print every alignment");
+		opt.addOption("", "printmatrices", false, "print all matrices");
+		opt.addOption("", "check", false, "validation (checkscores)");
 
 		CommandLineParser parser = new GnuParser();
 		CommandLine cmd = parser.parse(opt, args);
@@ -69,7 +69,6 @@ public class Main {
 		if (cmd.getOptionValues("m") != null) {
 			matrixname = cmd.getOptionValues("m")[0];
 		} else
-
 			matrixname = "dayhoff";
 
 		if (cmd.getOptionValues("go") != null) {
@@ -177,7 +176,17 @@ public class Main {
 						+ " "
 						+ util.MatrixHelper.formatDecimal(Computation
 								.backtrack()));
-			else {
+			if (checkscores) {
+				Computation.backtrack();
+				// falls falsch durch check score fehler -> printAlignment wird
+				// durchgeführt
+				// PERFORMANCE Aufräumen...
+				if (!Computation.checkAlignment()) {
+					Computation.saveAlignment(m);
+					m.printAlignment(name);
+					m.emptyMatrices();
+				}
+			} else {
 				System.out.println(">"
 						+ ids[0]
 						+ " "
