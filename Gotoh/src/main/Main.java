@@ -30,7 +30,7 @@ public class Main {
 
 	/**
 	 * Main method
-	 * 
+	 *
 	 * @param args
 	 * @throws ParseException
 	 *             when parsing of commandline arguments failed
@@ -65,7 +65,7 @@ public class Main {
 		if (cmd.getOptionValues("m") != null) {
 			matrixname = cmd.getOptionValues("m")[0];
 		} else
-			
+
 			matrixname = "dayhoff";
 
 		if (cmd.getOptionValues("go") != null) {
@@ -167,17 +167,26 @@ public class Main {
 				Computation.calcMatrices();
 
 			if (!printalignment)
-				System.out.println(ids[0] + " " + ids[1] + " "
-						+ util.MatrixHelper.formatDecimal(Computation.backtrack()));
+				System.out.println(ids[0]
+						+ " "
+						+ ids[1]
+						+ " "
+						+ util.MatrixHelper.formatDecimal(Computation
+								.backtrack()));
 			else {
-				System.out.println(">" + ids[0] + " " + ids[1] + " "
-						+ util.MatrixHelper.formatDecimal(Computation.backtrack()));
+				System.out.println(">"
+						+ ids[0]
+						+ " "
+						+ ids[1]
+						+ " "
+						+ util.MatrixHelper.formatDecimal(Computation
+								.backtrack()));
 				Computation.saveAlignment(m);
 				m.printAlignment(name);
 				if (!printmatrices)
 					m.emptyMatrices();
 			}
-			
+
 			if (printmatrices && !printalignment) {
 				Computation.saveMatrices(m);
 				m.printAllCalculatedMatrices();
@@ -186,8 +195,8 @@ public class Main {
 				m.printAllCalculatedMatrices();
 			}
 			// System.out.print(". ");
-			// if (i % 80 == 0 && i > 0)
-			// System.out.println(i + " von " + r.pairs.size());
+			if (i % 1200 == 0 && i > 0)
+				System.out.println(i + " von " + r.pairs.size());
 			// m.deleteCalculatedMatrixByName(ids[0], ids[1]);
 		}
 	}

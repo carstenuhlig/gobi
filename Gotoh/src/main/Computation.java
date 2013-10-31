@@ -392,19 +392,19 @@ public class Computation {
 	private static int[] getHighestFreeShiftScore() {
 		int[] returnint = new int[2];
 		double max = -Double.MAX_VALUE;
-		for (int row = a.length() - 1; row >= 0; row--) {
-			if (mat[0][row][b.length() - 1] > max) {
-				max = mat[0][row][b.length() - 1];
+		for (int row = a.length(); row > 0; row--) {
+			if (mat[0][row][b.length()] > max) {
+				max = mat[0][row][b.length()];
 				returnint[0] = row;
-				returnint[1] = b.length() - 1;
+				returnint[1] = b.length();
 			}
 		}
 
-		for (int col = b.length() - 1; col >= 0; col--) {
-			if (mat[0][a.length() - 1][col] > max) {
-				max = mat[0][a.length() - 1][col];
+		for (int col = b.length(); col > 0; col--) {
+			if (mat[0][a.length()][col] > max) {
+				max = mat[0][a.length()][col];
 				returnint[1] = col;
-				returnint[0] = a.length() - 1;
+				returnint[0] = a.length();
 			}
 		}
 		return returnint;

@@ -37,7 +37,7 @@ public class ImportFile {
 
 	/**
 	 * ReadFile for smatrices, pairfiles and seqlibfiles.
-	 * 
+	 *
 	 * @param p
 	 *            Path provided as String (relative to working directory or
 	 *            absolute)
@@ -77,7 +77,7 @@ public class ImportFile {
 
 	/**
 	 * ReadFile for smatrices, pairfiles and seqlibfiles.
-	 * 
+	 *
 	 * @param p
 	 *            Path provided as Path Object (relative to working directory or
 	 *            absolute)
@@ -189,8 +189,8 @@ public class ImportFile {
 		try (DirectoryStream<Path> ds = Files.newDirectoryStream(FS
 				.getPath(dir))) {
 			for (Path p : ds) {
-				System.out.println("Datei: \"" + p.getFileName()
-						+ "\" wird prozessiert.");
+//				System.out.println("Datei: \"" + p.getFileName()
+//						+ "\" wird prozessiert.");
 				if (!readFile(p, Type.SUBSTITUTIONMATRIX, m, r))
 					return false;
 			}
