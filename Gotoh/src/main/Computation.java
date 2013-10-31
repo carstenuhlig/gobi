@@ -282,9 +282,10 @@ public class Computation {
 				} else if (util.MatrixHelper.doubleEquality(mat[0][row][col],
 						mat[2][row][col])) {
 					int k = 1;
-					while (k < row && !util.MatrixHelper.doubleEquality(
-							mat[0][row - k][col] + calcGapScore(k),
-							mat[0][row][col])) {
+					while (k < row
+							&& !util.MatrixHelper.doubleEquality(
+									mat[0][row - k][col] + calcGapScore(k),
+									mat[0][row][col])) {
 						k++;
 					}
 					for (int i = 1; i < k + 1; i++) {
@@ -297,9 +298,10 @@ public class Computation {
 				} else if (util.MatrixHelper.doubleEquality(mat[0][row][col],
 						mat[1][row][col])) {
 					int k = 1;
-					while (k < col &&!util.MatrixHelper.doubleEquality(mat[0][row][col
-							- k]
-							+ calcGapScore(k), mat[0][row][col])) {
+					while (k < col
+							&& !util.MatrixHelper.doubleEquality(
+									mat[0][row][col - k] + calcGapScore(k),
+									mat[0][row][col])) {
 						k++;
 					}
 					for (int i = 1; i < k + 1; i++) {
@@ -338,6 +340,165 @@ public class Computation {
 		default:
 		}
 		return Computation.score;
+	}
+
+	public static boolean checkAlignment() {
+		// modi definiert ... egal; 0 : S(a,b); 1 = insertion; 2 = deletion
+		int modi = -1;
+
+		switch (type) {
+		case GLOBAL:
+			int x1 = 0;
+			double returndouble = 0;
+
+			while (Character.getNumericValue(backtrack[0][x1]) == -1) {
+				x1++;
+			}
+
+			for (int x2 = x1; x2 < backtrack[0].length; x2++) {
+				switch (modi) {
+				case 0:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 1:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						returndouble += ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 2:
+					if (backtrack[0][x2] == '-') {
+						returndouble += ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				default:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				}
+			}
+			if (returndouble == score)
+				return true;
+			else
+				return false;
+		case FREESHIFT:
+			int start = getStartFREESHIFT();
+			int ende = getEndFREESHIFT();
+			returndouble = 0;
+
+			x1 = -1;
+
+			for (int x2 = x1; x2 < backtrack[0].length; x2++) {
+				switch (modi) {
+				case 0:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 1:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						returndouble += ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				case 2:
+					if (backtrack[0][x2] == '-') {
+						returndouble += ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				default:
+					if (backtrack[0][x2] == '-') {
+						modi = 2;
+						returndouble += go + ge;
+					} else if (backtrack[1][x2] == '-') {
+						modi = 1;
+						returndouble += go + ge;
+					} else { // wenn S(a,b)
+						modi = 0;
+						returndouble += getSMatrixScore(backtrack[0][x2],
+								backtrack[1][x2]);
+					}
+					break;
+				}
+			}
+		default:
+			break;
+		}
+		// wenn true dann check score erfolgreich und richtiges ergebnis
+		return false;
+	}
+
+	public static int getStartFREESHIFT() {
+		if (Character.getNumericValue(backtrack[0][0]) != -1)
+			return 0;
+		int x = 1;
+		while (backtrack[0][x] == backtrack[0][x - 1]
+				|| Character.getNumericValue(backtrack[0][x]) == -1) {
+			x++;
+		}
+		return x;
+	}
+
+	public static int getEndFREESHIFT() {
+		if (Character.getNumericValue(backtrack[0][backtrack[0].length - 1]) != -1)
+			return backtrack[0].length - 1;
+		int x = backtrack[0].length - 2;
+		while (backtrack[0][x] == backtrack[0][x + 1]
+				|| Character.getNumericValue(backtrack[0][x]) == -1) {
+			x--;
+		}
+		return x;
 	}
 
 	public static void saveAlignment(Matrix m) {
@@ -392,7 +553,7 @@ public class Computation {
 	private static int[] getHighestFreeShiftScore() {
 		int[] returnint = new int[2];
 		double max = -Double.MAX_VALUE;
-		for (int row = a.length(); row > 0; row--) {
+		for (int row = 1; row < a.length() + 1; row++) {
 			if (mat[0][row][b.length()] > max) {
 				max = mat[0][row][b.length()];
 				returnint[0] = row;
@@ -400,13 +561,26 @@ public class Computation {
 			}
 		}
 
-		for (int col = b.length(); col > 0; col--) {
+		for (int col = 1; col < b.length() + 1; col++) {
 			if (mat[0][a.length()][col] > max) {
 				max = mat[0][a.length()][col];
-				returnint[1] = col;
 				returnint[0] = a.length();
+				returnint[1] = col;
 			}
 		}
+
+		// for (int tmp = 0; tmp < mat[0][0].length; tmp++) {
+		// System.out.print(tmp + "\t");
+		// }
+		// System.out.println("");
+		// for (int i = 0; i < mat[0].length; i++) {
+		// System.out.print(i + "\t");
+		// for (int j = 0; j < mat[0][0].length; j++) {
+		// System.out.print(util.MatrixHelper.formatDecimal(mat[0][i][j],
+		// 0, 1) + "\t");
+		// }
+		// System.out.println();
+		// }
 		return returnint;
 	}
 }
