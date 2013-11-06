@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -202,7 +203,10 @@ public class Main {
 	}
 
 	public static void importFiles() throws IOException {
-		ImportFile.readDir("res/matrices", m, r);
+		//TODO relativ zum Pfad oder innerhalb der Klasse
+		URL tosubstitutionmatrices = main.Main.class.getClassLoader().getResource("res/matrices");
+//		tosubstitutionmatrices.toString();
+		ImportFile.readDir(tosubstitutionmatrices.toString(), m, r);
 		ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
 		ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
 	}
