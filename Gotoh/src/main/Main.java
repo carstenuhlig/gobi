@@ -1,7 +1,10 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -203,11 +206,16 @@ public class Main {
 	}
 
 	public static void importFiles() throws IOException {
-		//TODO relativ zum Pfad oder innerhalb der Klasse
-		URL tosubstitutionmatrices = main.Main.class.getClassLoader().getResource("res/matrices");
-//		tosubstitutionmatrices.toString();
-		ImportFile.readDir(tosubstitutionmatrices.toString(), m, r);
+		ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
 		ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
 		ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
+	}
+	
+	public static String getCurrentFolder() {
+		File f = new File(System.getProperty("java.class.path"));
+		File dir = f.getAbsoluteFile().getParentFile();
+		String dirString = dir.toString();
+		String[] strings = dirString.split(":");
+		return strings[0];
 	}
 }
