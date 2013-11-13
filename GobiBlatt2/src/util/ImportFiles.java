@@ -28,58 +28,67 @@ public class ImportFiles {
 		return liste;
 	}
 
+	/**
+	 * @param giIdsList
+	 * @param p
+	 * @return
+	 * @throws IOException
+	 */
 	public static Data[] getNCBIObjectsFromGiIds(LinkedList<Integer> giIdsList,
 			String p) throws IOException {
 		Data[] data = new Data[giIdsList.size()];
-		LinkedList<Integer> liste = new LinkedList<Integer>();
+		// FIXME teilweise null data objects
 		Path path = FS.getPath(p);
 
 		// TODO prüfen ob gids nur aus nummern bestehen
-		String innerpattern = "^gi\\|(\\d+)\\|ref\\|(\\S+)\\|\\s?(.*)\\s?$";
-		int outercounter = 0;
+		// String innerpattern =
+		// "^\\|(\\d+)\\|(\\w+)\\|([\\w\\.]*)\\|\\s?(.*)\\s?$";
+		String innerpattern = "^\\|(\\d+)\\|(\\w+)\\|([\\w\\.]*)\\|\\s?(.*)\\s?$";
+		int outercounter = -1;
 
 		// temporary variables
 		String[] singles;
-		int innercounter;
 
 		// data object
 		String seq = "";
 		String[] srcdatabase = null;
 		String[] addition = null;
 		int[] gid = null;
+		String[] proteinid = null;
 
 		for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
 			if (line.charAt(0) == '>') {
-				//save data before
-				data[innercounter] = new Data(seq, srcdatabase, gid, addition);
-				
-				
-				//new object or Proteinsequence
+				// save data before
+				if (outercounter > -1)
+					data[outercounter] = new Data(seq, srcdatabase, gid,
+							proteinid, addition);
+				outercounter++;
+
+				// new object or Proteinsequence
 				seq = "";
-				singles = line.split(">");
+				singles = line.split(">gi");
 
-				srcdatabase = new String[singles.length];
-				addition = new String[singles.length];
-				gid = new int[singles.length];
+				srcdatabase = new String[singles.length - 1];
+				addition = new String[singles.length - 1];
+				proteinid = new String[singles.length - 1];
+				gid = new int[singles.length - 1];
 
-				innercounter = 0;
-
-				for (String str : singles) {
-					gid[innercounter] = Integer.parseInt(str.replaceFirst(
+				for (int i = 1; i < singles.length; i++) {
+					gid[i - 1] = Integer.parseInt(singles[i].replaceFirst(
 							innerpattern, "$1"));
-					srcdatabase[innercounter] = str.replaceFirst(innerpattern, "$2");
-					addition[innercounter] = str.replaceFirst(innerpattern, "$3");
-
-					innercounter++;
+					srcdatabase[i - 1] = singles[i].replaceFirst(innerpattern,
+							"$2");
+					proteinid[i - 1] = singles[i].replaceFirst(innerpattern,
+							"$3");
+					addition[i - 1] = singles[i].replaceFirst(innerpattern,
+							"$4");
+					if (proteinid[i - 1] == null)
+						System.out.println();
 				}
-			} else
-			{
+			} else {
 				seq += line;
 			}
-
 		}
-
-		// String outerpattern = "(>gi[^>]*)+";
-		return null;
+		return data;
 	}
 }
