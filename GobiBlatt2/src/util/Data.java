@@ -4,36 +4,52 @@ import java.util.Arrays;
 
 public class Data {
 	String seq;
-	String[] srcdatabase;
-	int[] gid;
-	String[] addition;
-	String[] proteinid;
+	String srcdatabase;
+	int gid;
+	String addition;
 
-	public Data(String seq, String[] srcdatabase, int[] gid, String[] proteinid) {
-		this.seq = seq;
-		this.srcdatabase = srcdatabase;
-		this.gid = gid;
-		this.proteinid = proteinid;
+	@Override
+	public String toString() {
+		return "Data [seq=" + seq + ", srcdatabase=" + srcdatabase + ", gid="
+				+ gid + ", addition=" + addition + "]";
 	}
 
-	public Data(String seq, String[] srcdatabase, int[] gid,
-			String[] proteinid, String[] addition) {
+	public Data(String seq, String srcdatabase, int gid, String addition) {
 		this.seq = seq;
 		this.srcdatabase = srcdatabase;
 		this.gid = gid;
-		this.proteinid = proteinid;
 		this.addition = addition;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Data [seq=" + seq + "\nsrcdatabase="
-				+ Arrays.toString(srcdatabase) + "\ngid="
-				+ Arrays.toString(gid) + "\naddition="
-				+ Arrays.toString(addition) + "\nproteinid="
-				+ Arrays.toString(proteinid) + "]";
+	public String getSeq() {
+		return seq;
+	}
+
+	public void setSeq(String seq) {
+		this.seq = seq;
+	}
+
+	public String getSrcdatabase() {
+		return srcdatabase;
+	}
+
+	public void setSrcdatabase(String srcdatabase) {
+		this.srcdatabase = srcdatabase;
+	}
+
+	public int getGid() {
+		return gid;
+	}
+
+	public void setGid(int gid) {
+		this.gid = gid;
+	}
+
+	public String getAddition() {
+		return addition;
+	}
+
+	public void setAddition(String addition) {
+		this.addition = addition;
 	}
 }

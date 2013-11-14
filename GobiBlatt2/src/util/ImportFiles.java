@@ -36,9 +36,8 @@ public class ImportFiles {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Data[] getNCBIObjectsFromGiIds(LinkedList<Integer> giIdsList,
-			String p) throws IOException {
-		Data[] data = new Data[giIdsList.size()];
+	public static void getNCBIObjectsFromGiIds(LinkedList<Integer> giIdsList,
+			String p, Database data) throws IOException {
 		// FIXME teilweise null data objects
 		Path path = FS.getPath(p);
 
@@ -62,8 +61,12 @@ public class ImportFiles {
 			if (line.charAt(0) == '>') {
 				// save data before
 				if (outercounter > -1)
-					data[outercounter] = new Data(seq, srcdatabase, gid,
-							proteinid, addition);
+				{
+					for ( int i = 0; i<srcdatabase.length;i++) {
+						//PERFORMANCE delete addition
+						data.addData(proteinid[i],new Data(seq, srcdatabase[i], gid[i], addition[i]));
+					}
+				}
 				outercounter++;
 
 				// new object or Proteinsequence
@@ -85,13 +88,12 @@ public class ImportFiles {
 					addition[i - 1] = singles[i].replaceFirst(innerpattern,
 							"$4");
 					if (proteinid[i - 1] == null)
-						System.out.println();
+						System.err.println("proteinid: NULL");
 				}
 			} else {
 				seq += line;
 			}
 		}
-		return data;
 	}
 
 	public static LinkedList<BLASTPiece> getMatchObjectsFromBLAST(String pdbid) {
