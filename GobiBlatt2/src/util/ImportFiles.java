@@ -26,6 +26,8 @@ public class ImportFiles {
 	static String innerpattern;
 	static String outerpattern;
 	static String regex;
+	static Path path;
+	static LinkedList<GeneDouble> ret;
 
 	public static LinkedList<Integer> getGiTaxIdList(int taxid, String p)
 			throws IOException {
@@ -71,7 +73,7 @@ public class ImportFiles {
 	public static void getNCBIObjectsFromGiIds(LinkedList<Integer> giIdsList,
 			String p, Database data) throws IOException {
 		// FIXME teilweise null data objects
-		Path path = FS.getPath(p);
+		path = FS.getPath(p);
 		BufferedReader reader = Files.newBufferedReader(path,
 				StandardCharsets.UTF_8);
 
@@ -131,15 +133,15 @@ public class ImportFiles {
 						gid[i - 1] = Integer.parseInt(matcher.reset(singles[i])
 								.replaceFirst("$1"));
 					} catch (NumberFormatException e) {
-//						System.err.print(counter);
+						// System.err.print(counter);
 					}
 
 					srcdatabase[i - 1] = matcher.reset(singles[i])
 							.replaceFirst("$2");
 					proteinid[i - 1] = matcher.reset(singles[i]).replaceFirst(
 							"$3");
-//					addition[i - 1] = matcher.reset(singles[i]).replaceFirst(
-//							"$4");
+					// addition[i - 1] = matcher.reset(singles[i]).replaceFirst(
+					// "$4");
 					if (proteinid[i - 1] == null)
 						System.err.println("proteinid: NULL");
 				}
@@ -266,5 +268,31 @@ public class ImportFiles {
 		}
 
 		return blastdata;
+	}
+
+	public static LinkedList<GeneDouble> integrateGeneIDs(Database database)
+			throws IOException {
+		regex = "^(\\w+)\\s+(\\w+)$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher("");
+		Pattern p2 = Pattern.compile("^(\\w+)\\..*");
+		Matcher m2 = p2.matcher("");
+
+		String pid = null;
+		String gid = null;
+
+		ret = new LinkedList<>();
+
+		final String path_to_ensemble = "/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment2/uhligc/mart_export.txt";
+		path = FS.getPath(path_to_ensemble);
+
+		for (String line : Files.readAllLines(path, StandardCharsets.UTF_8)) {
+			gid = matcher.reset(line).replaceFirst("$1");
+			pid = matcher.reset(line).replaceFirst("$2");
+			database.addGeneID(m2.reset(pid).replaceFirst("$1"), pid);
+			ret.add(new GeneDouble(gid, pid));
+		}
+
+		return ret;
 	}
 }

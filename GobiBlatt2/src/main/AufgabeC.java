@@ -8,18 +8,10 @@ import util.ImportFiles;
 
 public class AufgabeC {
 	public static void main(String[] args) {
-		String pdbid = args[0];
-		String file = args[1];
 
-//		LinkedList<BLASTPiece> data = ImportFiles.getMatchObjectsFromBLAST(pdbid);
-//
-//		for (BLASTPiece blastPiece : data) {
-//			System.out.println(blastPiece);
-//		}
-
-		System.out.println();
-		System.out.println();
-		System.out.println();
+		//pdbid or file
+//		String pdbid = args[0];
+		String file = args[0];
 
 		LinkedList<BLASTPiece> data2 = null;
 		try {
