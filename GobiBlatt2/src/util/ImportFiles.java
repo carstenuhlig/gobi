@@ -91,4 +91,11 @@ public class ImportFiles {
 		}
 		return data;
 	}
+	
+	public static LinkedList<BLASTPiece> getMatchObjectsFromBLAST(String pdbid) {
+		final String path_to_blast = "res\\blast\\";
+		
+		//TODO AufgabeC (und D)
+		return null;
+	}
 }
