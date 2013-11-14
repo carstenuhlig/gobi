@@ -21,6 +21,12 @@ public class Data {
 		this.addition = addition;
 	}
 
+	public Data(String seq, String srcdatabase, int gid) {
+		this.seq = seq;
+		this.srcdatabase = srcdatabase;
+		this.gid = gid;
+	}
+
 	public String getSeq() {
 		return seq;
 	}

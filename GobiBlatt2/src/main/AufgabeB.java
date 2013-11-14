@@ -9,9 +9,10 @@ import util.ImportFiles;
 
 public class AufgabeB {
 	public static void main(String[] args) {
-		String p = "/home/u/uhligc/aufgaben_gobi/assignment2/gi_taxid_prot_testfile.dmp";
+//		String p = "/home/u/uhligc/aufgaben_gobi/assignment2/gi_taxid_prot_testfile.dmp";
+		String p = "/home/proj/biosoft/PROTEINS/NR/gi_taxid_prot.dmp";
 		LinkedList<Integer> tmp = new LinkedList<Integer>();
-		System.out.println("anfang");
+		System.out.println("Aufgabe B");
 		try {
 			tmp = ImportFiles.getGiTaxIdList(9606, p);
 		} catch (IOException e) {
@@ -19,9 +20,8 @@ public class AufgabeB {
 			System.err.println("Datei wurde nicht gefunden");
 		}
 
-
-		System.out.println("bllblblblb");
-		String p2 = "/home/u/uhligc/aufgaben_gobi/assignment2/nrdump_testfile.fasta";
+//		String p2 = "/home/u/uhligc/aufgaben_gobi/assignment2/nrdump_testfile.fasta";
+		String p2 = "/home/proj/biosoft/PROTEINS/NR/nrdump.fasta";
 		Database database = new Database("Human GIDs");
 
 		try {
@@ -30,5 +30,7 @@ public class AufgabeB {
 			e.printStackTrace();
 			System.err.println("Datei wurde nicht gefunden");
 		}
+
+		System.out.println(database);
 	}
 }

@@ -20,9 +20,17 @@ public class Mapping {
 	private static final FileSystem FS = FileSystems.getDefault();
 	private static final Path path_to_blast = FS
 			.getPath("/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/BLAST");
-	private static final String path_to_nrdump = "/home/proj/biosoft/PROTEINS/NR/nrdump.fasta";
-	private static final String path_to_gids = "/home/proj/biosoft/PROTEINS/NR/gi_taxid_prot.dmp";
+//	private static final String path_to_nrdump = "/home/proj/biosoft/PROTEINS/NR/nrdump.fasta";
+//	private static final String path_to_gids = "/home/proj/biosoft/PROTEINS/NR/gi_taxid_prot.dmp";
+	private static final String path_to_nrdump = "/home/u/uhligc/aufgaben_gobi/assignment2/nrdump_testfile.fasta";
+	private static final String path_to_gids = "/home/u/uhligc/aufgaben_gobi/assignment2/gi_taxid_prot_testfile.dmp";
 	private static final int taxid = 9606;
+	static LinkedList<BLASTPiece> data;
+	static Data d;
+	static String filename;
+	static String to_write;
+	static String pdbid;
+	static LinkedList<Integer> tmp;
 
 	private static Path path_to_mapping;
 
@@ -33,28 +41,32 @@ public class Mapping {
 				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
 
 		// get GIDs
-		LinkedList<Integer> tmp = new LinkedList<Integer>();
+		tmp = new LinkedList<Integer>();
 		tmp = ImportFiles.getGiTaxIdList(taxid, path_to_gids);
+
+		System.out.println("finished reading Gids");
 
 		// get NCBI_NR Database From GIDs
 		Database database = new Database("Human GIDs");
 		ImportFiles.getNCBIObjectsFromGiIds(tmp, path_to_nrdump, database);
 
+		System.out.println("finished reading NCBI_NR database");
+
 		// process BLAST folder
 		// variables
-		String filename = null;
-		String to_write = null;
-		String pdbid = null;
-		LinkedList<BLASTPiece> data = null;
-		Data d = null;
+		filename = null;
+		to_write = null;
+		pdbid = null;
+		data = null;
+		d = null;
 
-		String beginning_line = "PDB-ID\tProtein-ID\tBLAST E-Value\tRound\n";
+		String beginning_line = "PDB-ID\tProtein-ID\t\tBLAST E-Value\t\tRound\n";
 		writer.write(beginning_line, 0, beginning_line.length());
 
 		try (DirectoryStream<Path> ds = Files.newDirectoryStream(path_to_blast)) {
 			for (Path p : ds) {
-				filename = p.toString();
-				pdbid = filename.substring(0, 3);
+				filename = p.getFileName().toString();
+				pdbid = filename.substring(0, 4);
 
 				data = ImportFiles.getMatchObjectsFromBLASTFile(filename);
 
@@ -65,11 +77,15 @@ public class Mapping {
 					// then proteinid is in human database
 					if (d != null) {
 						// TODO print in file path_to_mapping
-						to_write = pdbid + "\t" + piece.getProteinid() + "\t" + piece.getEvalue() + "\t" + piece.getRound() + "\n";
+						to_write = pdbid + "\t" + piece.getProteinid() + "\t\t" + piece.getEvalue() + "\t\t" + piece.getRound() + "\n";
 						writer.write(to_write, 0, to_write.length());
+//						System.out.println(to_write);
 					}
 				}
 			}
 		}
+		//close writer
+		writer.flush();
+		writer.close();
 	}
 }
