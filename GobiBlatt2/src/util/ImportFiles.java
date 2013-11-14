@@ -97,10 +97,10 @@ public class ImportFiles {
 	public static LinkedList<BLASTPiece> getMatchObjectsFromBLAST(String pdbid) {
 		final String path_to_blast = "/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/BLAST";
 
-		//TODO glob matching caseinsensitive!!
+		// TODO glob matching caseinsensitive!!
 		PathMatcher matcher = FS.getPathMatcher("glob:" + pdbid + "*.blast");
 
-		//dataobject variables
+		// dataobject variables
 		int round;
 		String unprocessed_eval;
 		double eval;
@@ -109,43 +109,94 @@ public class ImportFiles {
 
 		LinkedList<BLASTPiece> blastdata = new LinkedList<>();
 
-
 		try (DirectoryStream<Path> ds = Files.newDirectoryStream(FS
 				.getPath(path_to_blast))) {
 
 			for (Path p : ds) {
-				if (matcher.matches(p.getFileName()))
-				{
-					//dataobject variables
+				if (matcher.matches(p.getFileName())) {
+					// dataobject variables
 					round = -1;
 					eval = -1.0;
 					unprocessed_eval = null;
 					proteinid = null;
 					srcdatabase = null;
 
-					//pattern
+					// pattern
 					String outerpattern = "^Results from round (\\d{1,})$";
 					String innerpattern = "^(\\w{2,3})\\|([\\w\\.]*)\\|.{30,}\\s{2,}\\d+\\s+(\\S+)$";
 
-					for (String line : Files.readAllLines(p, StandardCharsets.UTF_8)) {
+					for (String line : Files.readAllLines(p,
+							StandardCharsets.UTF_8)) {
 						if (line.matches(outerpattern)) {
-							round = Integer.parseInt(line.replaceFirst(outerpattern, "$1"));
-						} else if (line.matches(innerpattern))
-						{
+							round = Integer.parseInt(line.replaceFirst(
+									outerpattern, "$1"));
+						} else if (line.matches(innerpattern)) {
 							srcdatabase = line.replaceFirst(innerpattern, "$1");
 							proteinid = line.replaceFirst(innerpattern, "$2");
-							unprocessed_eval = line.replaceFirst(innerpattern, "$3");
+							unprocessed_eval = line.replaceFirst(innerpattern, "$4");
 							if (unprocessed_eval.charAt(0) == 'e')
 								unprocessed_eval = "1" + unprocessed_eval;
 							eval = Double.parseDouble(unprocessed_eval);
 
-							blastdata.add(new BLASTPiece(proteinid, eval, round, srcdatabase));
+							if (proteinid.isEmpty())
+								proteinid = line.replaceFirst(innerpattern, "$3");
+
+							blastdata.add(new BLASTPiece(proteinid, eval,
+									round, srcdatabase));
 						}
 					}
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		return blastdata;
+	}
+
+	public static LinkedList<BLASTPiece> getMatchObjectsFromBLASTFile(
+			String file) throws NumberFormatException, IOException {
+		final String path_to_blast = "/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/BLAST";
+
+		Path p = FS.getPath(path_to_blast + "/" + file);
+
+		// dataobject variables
+		int round;
+		String unprocessed_eval;
+		double eval;
+		String proteinid;
+		String srcdatabase;
+
+		LinkedList<BLASTPiece> blastdata = new LinkedList<>();
+
+		// dataobject variables
+		round = -1;
+		eval = -1.0;
+		unprocessed_eval = null;
+		proteinid = null;
+		srcdatabase = null;
+
+		// pattern
+		String outerpattern = "^Results from round (\\d{1,})$";
+		String innerpattern = "^(\\w{2,3})\\|([\\w\\.]*)\\|(\\w*).{30,}\\s{2,}\\d+\\s+(\\S+)$";
+
+		for (String line : Files.readAllLines(p, StandardCharsets.UTF_8)) {
+			if (line.matches(outerpattern)) {
+				round = Integer.parseInt(line.replaceFirst(outerpattern, "$1"));
+			} else if (line.matches(innerpattern)) {
+				srcdatabase = line.replaceFirst(innerpattern, "$1");
+				proteinid = line.replaceFirst(innerpattern, "$2");
+				unprocessed_eval = line.replaceFirst(innerpattern, "$4");
+				if (unprocessed_eval.charAt(0) == 'e')
+					unprocessed_eval = "1" + unprocessed_eval;
+				eval = Double.parseDouble(unprocessed_eval);
+
+				if (proteinid.isEmpty())
+					proteinid = line.replaceFirst(innerpattern, "$3");
+
+				blastdata.add(new BLASTPiece(proteinid, eval, round,
+						srcdatabase));
+			}
 		}
 
 		return blastdata;
