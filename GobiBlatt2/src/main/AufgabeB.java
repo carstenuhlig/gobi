@@ -1,9 +1,8 @@
 package main;
 
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.HashMap;
 
-import util.Data;
 import util.Database;
 import util.ImportFiles;
 
@@ -13,10 +12,10 @@ public class AufgabeB {
 		String p = "/home/proj/biosoft/PROTEINS/NR/gi_taxid_prot.dmp";
 //		if (!args[0].isEmpty())
 //			p = args[0];
-		LinkedList<Integer> tmp = new LinkedList<Integer>();
+		HashMap<Integer,Boolean> tmp = new HashMap<Integer,Boolean>();
 		System.out.println("Aufgabe B");
 		try {
-			tmp = ImportFiles.getGiTaxIdList(9606, p);
+			tmp = ImportFiles.getGiTaxIdListViaHashMap(9606, p);
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("Datei wurde nicht gefunden");

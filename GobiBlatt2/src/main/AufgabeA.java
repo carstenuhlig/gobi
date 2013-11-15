@@ -1,9 +1,9 @@
 package main;
-import util.ImportFiles;
 
 import java.io.IOException;
-import java.nio.*;
-import java.util.*;
+import java.util.LinkedList;
+
+import util.ImportFiles;
 
 public class AufgabeA {
 	public static void main(String[] args) {

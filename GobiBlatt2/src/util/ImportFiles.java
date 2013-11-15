@@ -9,6 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +65,42 @@ public class ImportFiles {
 		return liste;
 	}
 
+	public static HashMap<Integer, Boolean> getGiTaxIdListViaHashMap(int taxid,
+			String p) throws IOException {
+		HashMap<Integer, Boolean> liste = new HashMap<>();
+		int counter = 0;
+		Path path = FS.getPath(p);
+		int tmp = -1;
+		BufferedReader reader = Files.newBufferedReader(path,
+				StandardCharsets.UTF_8);
+
+		regex = "(\\w+)\\s+(\\w+).*";
+
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher("");
+
+		line = null;
+		int totalcountoflines = 73981456;
+		int onepercent = (int) (totalcountoflines / 100);
+
+		System.out.println("Processing gitaxid");
+		while ((line = reader.readLine()) != null) {
+			tmp = Integer.parseInt(matcher.reset(line).replaceFirst("$2"));
+			// PERFORMANCE unique ids... -> linkedlist unschön
+			counter++;
+			if (counter % onepercent == 0)
+				System.out.print(".");
+			if (counter % (onepercent * 10) == 0)
+				System.out.println();
+			if (taxid == tmp)
+				liste.put(Integer.parseInt(matcher.reset(line).replaceFirst(
+						"$1")), true);
+		}
+		reader.close();
+
+		return liste;
+	}
+
 	/**
 	 * @param giIdsList
 	 * @param p
@@ -82,7 +119,7 @@ public class ImportFiles {
 		// TODO prüfen ob gids nur aus nummern bestehen
 
 		// pattern compile matcher
-		innerpattern = "^\\|(\\d+)\\|(\\w+)\\|([\\w\\.]*)\\|\\s?(.*)\\s?$";
+		innerpattern = "^\\|(\\d+)\\|(\\w+)\\|([\\w\\.]*)\\|.*";
 		Pattern pattern = Pattern.compile(innerpattern);
 		Matcher matcher = pattern.matcher("");
 
@@ -92,9 +129,7 @@ public class ImportFiles {
 		singles = null;
 
 		// data object
-		seq = "";
 		srcdatabase = null;
-		addition = null;
 		gid = null;
 		proteinid = null;
 
@@ -112,9 +147,13 @@ public class ImportFiles {
 				// save data before
 				if (outercounter > -1) {
 					for (int i = 0; i < srcdatabase.length; i++) {
-						// PERFORMANCE delete addition
-						data.addData(proteinid[i], new Data(seq,
-								srcdatabase[i], gid[i]));
+						for (Integer integer : giIdsList) {
+							if (gid[i] == integer) {
+								data.addData(proteinid[i], new Data(
+										srcdatabase[i], gid[i]));
+								System.out.print("-");
+							}
+						}
 					}
 				}
 				outercounter++;
@@ -124,7 +163,7 @@ public class ImportFiles {
 				singles = line.split(">gi");
 
 				srcdatabase = new String[singles.length - 1];
-//				addition = new String[singles.length - 1];
+				// addition = new String[singles.length - 1];
 				proteinid = new String[singles.length - 1];
 				gid = new int[singles.length - 1];
 
@@ -140,13 +179,102 @@ public class ImportFiles {
 							.replaceFirst("$2");
 					proteinid[i - 1] = matcher.reset(singles[i]).replaceFirst(
 							"$3");
-					// addition[i - 1] = matcher.reset(singles[i]).replaceFirst(
-					// "$4");
 					if (proteinid[i - 1] == null)
 						System.err.println("proteinid: NULL");
 				}
 			} else {
-				seq += line;
+				// seq += line;
+			}
+			if (counter % onepercent == 0)
+				System.out.print(".");
+			if (counter % (onepercent * 10) == 0)
+				System.out.println();
+		}
+		reader.close();
+	}
+
+	/**
+	 * @param giIdsList
+	 * @param p
+	 * @return
+	 * @throws IOException
+	 */
+	public static void getNCBIObjectsFromGiIds(
+			HashMap<Integer, Boolean> giIdsList, String p, Database data)
+			throws IOException {
+		// FIXME teilweise null data objects
+		path = FS.getPath(p);
+		BufferedReader reader = Files.newBufferedReader(path,
+				StandardCharsets.UTF_8);
+
+		System.out.println("Processing NCBI_NR");
+
+		// TODO prüfen ob gids nur aus nummern bestehen
+
+		// pattern compile matcher
+		innerpattern = "^\\|(\\d+)\\|(\\w+)\\|([\\w\\.]*)\\|.*";
+		Pattern pattern = Pattern.compile(innerpattern);
+		Matcher matcher = pattern.matcher("");
+
+		int outercounter = -1;
+
+		// temporary variables
+		singles = null;
+
+		// data object
+		srcdatabase = null;
+		gid = null;
+		proteinid = null;
+
+		// bufferedreader line-by-line variable
+		line = null;
+
+		// profiling variables
+		int counter = 0;
+		int totalcountoflines = 56096686;
+		int onepercent = (int) (totalcountoflines / 100);
+
+		while ((line = reader.readLine()) != null) {
+			counter++;
+			if (line.charAt(0) == '>') {
+				// save data before
+				if (outercounter > -1) {
+					for (int i = 0; i < srcdatabase.length; i++) {
+						if (giIdsList.containsKey(gid[i])) {
+							data.addData(proteinid[i], new Data(srcdatabase[i],
+									gid[i]));
+//							System.out.print("-");
+						}
+					}
+				}
+				outercounter++;
+
+				// new object or Proteinsequence
+				seq = "";
+				singles = line.split(">gi");
+
+				srcdatabase = new String[singles.length - 1];
+				// addition = new String[singles.length - 1];
+				proteinid = new String[singles.length - 1];
+				gid = new int[singles.length - 1];
+
+				for (int i = 1; i < singles.length; i++) {
+					try {
+						gid[i - 1] = Integer.parseInt(matcher.reset(singles[i])
+								.replaceFirst("$1"));
+					} catch (NumberFormatException e) {
+						// System.err.print(counter);
+					}
+
+					srcdatabase[i - 1] = matcher.reset(singles[i])
+							.replaceFirst("$2");
+					proteinid[i - 1] = matcher.reset(singles[i]).replaceFirst(
+							"$3");
+					if (proteinid[i - 1] == null)
+						System.err.println("proteinid: NULL");
+				}
+			} else {
+				// seq += line;
 			}
 			if (counter % onepercent == 0)
 				System.out.print(".");

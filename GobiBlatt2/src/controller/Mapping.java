@@ -9,6 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import util.BLASTPiece;
@@ -23,15 +24,20 @@ public class Mapping {
 			.getPath("/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/BLAST");
 	private static final String path_to_nrdump = "/home/proj/biosoft/PROTEINS/NR/nrdump.fasta";
 	private static final String path_to_gids = "/home/proj/biosoft/PROTEINS/NR/gi_taxid_prot.dmp";
-//	private static final String path_to_nrdump = "/home/u/uhligc/aufgaben_gobi/assignment2/nrdump_testfile.fasta";
-//	private static final String path_to_gids = "/home/u/uhligc/aufgaben_gobi/assignment2/gi_taxid_prot_testfile.dmp";
+	// private static final String path_to_nrdump =
+	// "/home/u/uhligc/aufgaben_gobi/assignment2/nrdump_testfile.fasta";
+	// private static final String path_to_gids =
+	// "/home/u/uhligc/aufgaben_gobi/assignment2/gi_taxid_prot_testfile.dmp";
 	private static final int taxid = 9606;
 	static LinkedList<BLASTPiece> data;
 	static Data d;
 	static String filename;
 	static String to_write;
 	static String pdbid;
-	static LinkedList<Integer> tmp;
+	static HashMap<Integer, Boolean> tmp;
+	static int counter;
+	final static int totalblastfilecount = 39334;
+	final static int onepercent = (int) (totalblastfilecount / 100);
 
 	private static Path path_to_mapping;
 
@@ -42,8 +48,8 @@ public class Mapping {
 				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
 
 		// get GIDs
-		tmp = new LinkedList<Integer>();
-		tmp = ImportFiles.getGiTaxIdList(taxid, path_to_gids);
+		tmp = new HashMap<Integer, Boolean>();
+		tmp = ImportFiles.getGiTaxIdListViaHashMap(taxid, path_to_gids);
 
 		System.out.println("finished reading Gids");
 
@@ -78,27 +84,35 @@ public class Mapping {
 					// then proteinid is in human database
 					if (d != null) {
 						// TODO print in file path_to_mapping
-						to_write = pdbid + "\t" + piece.getProteinid() + "\t\t" + piece.getEvalue() + "\t\t" + piece.getRound() + "\n";
+						to_write = pdbid + "\t" + piece.getProteinid() + "\t\t"
+								+ piece.getEvalue() + "\t\t" + piece.getRound()
+								+ "\n";
 						writer.write(to_write, 0, to_write.length());
-//						System.out.println(to_write);
+						// System.out.println(to_write);
 					}
 				}
+				counter++;
+				if (counter % onepercent == 0)
+					System.out.print(".");
+				if (counter % (onepercent * 10) == 0)
+					System.out.println();
 			}
 		}
-		//close writer
+		// close writer
 		writer.flush();
 		writer.close();
 	}
 
-	public static void makeMapping(String file, boolean genes_flag) throws IOException {
+	public static void makeMapping(String file, boolean genes_flag)
+			throws IOException {
 		path_to_mapping = FS.getPath(file);
 
 		BufferedWriter writer = Files.newBufferedWriter(path_to_mapping,
 				StandardCharsets.UTF_8, StandardOpenOption.CREATE);
 
 		// get GIDs
-		tmp = new LinkedList<Integer>();
-		tmp = ImportFiles.getGiTaxIdList(taxid, path_to_gids);
+		tmp = new HashMap<Integer, Boolean>();
+		tmp = ImportFiles.getGiTaxIdListViaHashMap(taxid, path_to_gids);
 
 		System.out.println("finished reading Gids");
 
@@ -135,14 +149,16 @@ public class Mapping {
 					// then proteinid is in human database
 					if (d != null) {
 						// TODO print in file path_to_mapping
-						to_write = pdbid + "\t" + piece.getProteinid() + "\t\t" + piece.getEvalue() + "\t\t" + piece.getRound()  + "\t\t" + d.getGeneid() + "\n";
+						to_write = pdbid + "\t" + piece.getProteinid() + "\t\t"
+								+ piece.getEvalue() + "\t\t" + piece.getRound()
+								+ "\t\t" + d.getGeneid() + "\n";
 						writer.write(to_write, 0, to_write.length());
-//						System.out.println(to_write);
+						// System.out.println(to_write);
 					}
 				}
 			}
 		}
-		//close writer
+		// close writer
 		writer.flush();
 		writer.close();
 	}
