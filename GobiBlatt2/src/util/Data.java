@@ -6,20 +6,12 @@ public class Data {
 	String seq;
 	String srcdatabase;
 	int gid;
-	String addition;
 	String geneid;
 
 	@Override
 	public String toString() {
 		return "Data [seq=" + seq + ", srcdatabase=" + srcdatabase + ", gid="
-				+ gid + ", addition=" + addition + "]";
-	}
-
-	public Data(String seq, String srcdatabase, int gid, String addition, boolean addition_flag) {
-		this.seq = seq;
-		this.srcdatabase = srcdatabase;
-		this.gid = gid;
-		this.addition = addition;
+				+ gid;
 	}
 
 	public Data(String seq, String srcdatabase, int gid) {
@@ -57,14 +49,6 @@ public class Data {
 
 	public void setGid(int gid) {
 		this.gid = gid;
-	}
-
-	public String getAddition() {
-		return addition;
-	}
-
-	public void setAddition(String addition) {
-		this.addition = addition;
 	}
 
 	public String getGeneid() {

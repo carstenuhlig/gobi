@@ -124,7 +124,7 @@ public class ImportFiles {
 				singles = line.split(">gi");
 
 				srcdatabase = new String[singles.length - 1];
-				addition = new String[singles.length - 1];
+//				addition = new String[singles.length - 1];
 				proteinid = new String[singles.length - 1];
 				gid = new int[singles.length - 1];
 
