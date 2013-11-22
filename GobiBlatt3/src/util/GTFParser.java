@@ -79,7 +79,7 @@ public class GTFParser {
 
 			// reset values
 			// TODO
-			genes.addGene(String gene_id);
+			genes.addGene();
 		}
 	}
 }
