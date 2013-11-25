@@ -10,6 +10,10 @@ public class Exon {
 		this.start = start;
 		this.stop = stop;
 	}
+        
+        public Exon(CDS cds) {
+		this.cds = cds;
+	}
 
 	public int getStart() {
 		return start;
@@ -26,4 +30,8 @@ public class Exon {
 	public void setStop(int stop) {
 		this.stop = stop;
 	}
+        
+        public CDS getCDS() {
+            return this.cds;
+        }
 }

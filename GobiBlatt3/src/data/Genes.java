@@ -4,28 +4,65 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Genes {
-	HashMap<String,Gene> genes;
 
-	public Genes() {
-		genes = new HashMap<>();
-	}
+    HashMap<String, Gene> genes;
 
-	public Gene get(String gene_id) {
-		return genes.get(gene_id);
-	}
+    public Genes() {
+        genes = new HashMap<>();
+    }
 
-	public void addGene(List<String> gene_id, List<String> transcript_id, int start, int end, int chr, String strand) {
-		if (gene_id.size() == transcript_id.size()) {
-			for (int i = 0; i < gene_id.size(); i++) {
-				if (genes.containsKey(gene_id.get(i))) {
-                                    Gene temp_gene;
-                                    temp_gene = genes.get(gene_id.get(i));
-                                    temp_gene.addTranscript(transcript_id.get(i));
-				} else
-				{
-					genes.put(gene_id.get(i), new Gene());
-				}
-			}
-		}
-	}
+    public Gene get(String gene_id) {
+        return genes.get(gene_id);
+    }
+
+    public void addGene(List<String> gene_id, List<String> transcript_id, int start, int end, int chr, String strand) {
+        if (gene_id.size() == transcript_id.size()) {
+            for (int i = 0; i < gene_id.size(); i++) {
+                if (genes.containsKey(gene_id.get(i))) {
+                    Gene temp_gene;
+                    temp_gene = genes.get(gene_id.get(i));
+                    temp_gene.addTranscript(transcript_id.get(i), start, end, strand, chr);
+                } else {
+                    genes.put(gene_id.get(i), new Gene(transcript_id.get(i), new Transcript(new Protein(new Exon(new CDS(start, end, strand))), chr)));
+                }
+            }
+        }
+    }
+
+    public void addGene(List<String> gene_id, List<String> transcript_id, int start, int end, int chr, String strand, boolean is_exon) {
+        if (gene_id.size() == transcript_id.size()) {
+            for (int i = 0; i < gene_id.size(); i++) {
+                if (genes.containsKey(gene_id.get(i))) {
+                    Gene temp_gene;
+                    temp_gene = genes.get(gene_id.get(i));
+                    temp_gene.addTranscript(transcript_id.get(i), start, end, strand, chr);
+                } else {
+                    genes.put(gene_id.get(i), new Gene(transcript_id.get(i), new Transcript(new Protein(new Exon(new CDS(strand), start, end)), chr)));
+                }
+            }
+        }
+    }
+
+    public void addGene(List<String> gene_id, List<String> transcript_id, int start, int end, int chr, String strand, boolean is_exon, boolean is_start_codon) {
+        if (gene_id.size() == transcript_id.size()) {
+            for (int i = 0; i < gene_id.size(); i++) {
+                if (genes.containsKey(gene_id.get(i))) {
+                    Gene temp_gene;
+                    temp_gene = genes.get(gene_id.get(i));
+                    if (is_start_codon) {
+                        temp_gene.addTranscript(transcript_id.get(i), start, end, strand, chr, true);
+                    } else {
+                        temp_gene.addTranscript(transcript_id.get(i), start, end, strand, chr, false);
+                    }
+                } else {
+                    if (is_start_codon) {
+                        genes.put(gene_id.get(i), new Gene(transcript_id.get(i), new Transcript(new Protein(new Exon(new CDS(strand), start, end), start, true), chr)));
+                    } else {
+                        genes.put(gene_id.get(i), new Gene(transcript_id.get(i), new Transcript(new Protein(new Exon(new CDS(strand), start, end), start, false), chr)));
+                    }
+
+                }
+            }
+        }
+    }
 }
