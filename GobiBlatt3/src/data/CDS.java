@@ -5,6 +5,10 @@ public class CDS {
 		this.start = start;
 		this.end = end;
 	}
+        
+        public CDS() {
+		
+	}
 
 	int start,end;
 	String seq;

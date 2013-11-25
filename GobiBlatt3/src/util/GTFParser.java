@@ -22,6 +22,9 @@ public class GTFParser {
 				StandardCharsets.UTF_8);
 
 		String regexdelimit = "\\s+|;\\s*";
+		String regexchr = "^.*chromosome\\.(\\d+).*$";
+		
+		int chromosome = Integer.parseInt(path.getFileName().toString().replaceFirst(regexchr, "$1"));
 
 		String line;
 		String[] pieces;
@@ -47,39 +50,55 @@ public class GTFParser {
 			feature = pieces[2];
 			start = Integer.parseInt(pieces[3]);
 			end = Integer.parseInt(pieces[4]);
-			score = Integer.parseInt(pieces[5]);
+			try {
+				score = Integer.parseInt(pieces[5]);
+			} catch (NumberFormatException e) {
+				score = -Integer.MAX_VALUE;
+			}
 			// TODO check for available strand inputs -> evtl als Character oder
 			// Integer oder boolean
 			strand = pieces[6];
 			try {
 				frame = Integer.parseInt(pieces[7]);
 			} catch (NumberFormatException e) {
-				frame = -1000;
+				frame = -Integer.MAX_VALUE;
 			}
 			for (int i = 8; i < pieces.length; i += 2) {
 				switch (pieces[i]) {
+				case "gene_name":
 				case "gene_id":
-					gene_id.add(pieces[i + 1]);
+					gene_id.add(pieces[i + 1].replace("\"", ""));
 					break;
+				case "protein_id":
+				case "transcript_name":
 				case "transcript_id":
-					transcript_id.add(pieces[i + 1]);
+					transcript_id.add(pieces[i + 1].replace("\"", ""));
 					break;
 				case "exon_number":
-					exonnr.add(Integer.parseInt(pieces[i + 1]));
+					exonnr.add(Integer.parseInt(pieces[i + 1].replace("\"", "")));
 					break;
 				default:
 					System.err
-							.println("fehlende Eigenschaft gefunden. Bitte beheben!");
+							.println("fehlende Eigenschaft gefunden. Bitte beheben!:" + pieces[i] + " " + pieces[i+1]);
 					break;
 				}
 			}
 
 			// save in database
 			// TODO
+			if (!gene_id.isEmpty() && !transcript_id.isEmpty()) {
+				genes.addGene(gene_id,transcript_id,start,end,chromosome,strand);
+			}
+
+			System.out.print("");
 
 			// reset values
-			// TODO
-			genes.addGene();
+			frame = -Integer.MAX_VALUE;
+			score = -Integer.MAX_VALUE;
+			gene_id.clear();
+			transcript_id.clear();
+			exonnr.clear();
+
 		}
 	}
 }

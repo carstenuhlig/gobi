@@ -3,8 +3,8 @@ package data;
 public class Transcript {
 	Protein protein;
 
-	public Transcript() {
-		protein = new Protein();
+	public Transcript(Protein protein) {
+		this.protein = protein;
 	}
 
 	public Protein getProtein() {
