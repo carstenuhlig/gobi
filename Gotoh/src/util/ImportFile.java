@@ -122,11 +122,6 @@ public class ImportFile {
 		if (lineCnt > 2) {
 			// TODO Import Chars
 			if (type == Type.SUBSTITUTIONMATRIX) {
-				// if (sym) {
-				// new_matrix =
-				// util.MatrixHelper.makeMatrixSymmetric(ImportFile.matrix);
-				// m.addSubstitutionMatrix(ImportFile.name, new_matrix);
-				// }
 				m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix,
 						ImportFile.matChrs);
 			}
