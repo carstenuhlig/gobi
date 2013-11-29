@@ -10,7 +10,7 @@ public class Main {
 		Genes g = new Genes();
 		
 //		String path = args[0];
-		String path = "res\\homo_sapiens.chromosome.1.gtf";
+		String path = "/home/proj/biosoft/GENOMIC/HUMAN/Homo_sapiens.GRCh37.63.gtf";
 		
 		try {
 			GTFParser.readFile(path, g);
