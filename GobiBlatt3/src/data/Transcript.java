@@ -5,6 +5,15 @@ public class Transcript {
     Protein protein;
     int chromosome;
 
+<<<<<<< HEAD
+    Transcript(Protein protein) {
+        this.protein = protein;
+    }
+
+	public Protein getProtein() {
+		return protein;
+	}
+=======
 //	public Transcript(Protein protein) {
 //		this.protein = protein;
 //	}
@@ -41,4 +50,5 @@ public class Transcript {
         temp_cds.setStart(start);
         temp_cds.setStop(stop);
     }
+>>>>>>> 74e87e40ab761eaf381ed6bcad1bb77fff601d7e
 }

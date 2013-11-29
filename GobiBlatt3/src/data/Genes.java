@@ -15,6 +15,18 @@ public class Genes {
         return genes.get(gene_id);
     }
 
+<<<<<<< HEAD
+    public void addGene() {
+
+    }
+
+    public void addGene(String gene_id, String transcript_id, String seqname, String strand, int start, int end) {
+        if (genes.containsKey(gene_id)) {
+            Gene temp_gene = genes.get(gene_id);
+            temp_gene.addTranscript(transcript_id, new Transcript(new Protein(new Exon(new CDS(start, end))), seqname, transcript_id));
+        } else {
+            genes.put(gene_id, new Gene(new Transcript(new Protein(new Exon(new CDS(start, end)))), seqname, transcript_id, strand));
+=======
     public void addGene(List<String> gene_id, List<String> transcript_id, int start, int end, int chr, String strand) {
         if (gene_id.size() == transcript_id.size()) {
             for (int i = 0; i < gene_id.size(); i++) {
@@ -63,6 +75,7 @@ public class Genes {
 
                 }
             }
+>>>>>>> 74e87e40ab761eaf381ed6bcad1bb77fff601d7e
         }
     }
 }
