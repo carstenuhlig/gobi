@@ -19,14 +19,14 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(g);
-        
-//        try {
-//            FillSequences.fillSequences(g);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        
 //        System.out.println(g);
+        
+        try {
+            FillSequences.fillSequences(g);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+       System.out.println(g);
     }
 }

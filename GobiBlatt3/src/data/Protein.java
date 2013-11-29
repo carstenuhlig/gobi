@@ -29,7 +29,7 @@ public class Protein {
             this.stop = stop;
         }
     }
- 
+
     public int getNrExons() {
         return exons.size();
     }
@@ -54,11 +54,12 @@ public class Protein {
         StringBuilder sb = new StringBuilder();
         for (Iterator<Exon> it = exons.iterator(); it.hasNext();) {
             Exon exon = it.next();
+            sb.append("Protein: ");
+            sb.append(id);
+            sb.append("\n");
             sb.append(exon.toString());
         }
-        
+
         return sb.toString();
     }
-    
-    
 }

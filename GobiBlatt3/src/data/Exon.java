@@ -24,4 +24,10 @@ public class Exon {
     public String toString() {
         return cds.toString();
     }
+
+    public void setCds(CDS cds) {
+        this.cds = cds;
+    }
+    
+    
 }

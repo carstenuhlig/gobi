@@ -40,9 +40,11 @@ public class FillSequences {
                 for (int i = 0; i < transcript.getProtein().getNrExons(); i++) {
                     CDS tmp = transcript.getProtein().getExon(i).getCDS();
                     tmp.setSeq(gse.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop()));
+                    transcript.getProtein().getExon(i).setCds(tmp);
 //                    System.out.println(".");
                 }
             }
+            System.out.print("gen ");
         }
 
         gse.close();
