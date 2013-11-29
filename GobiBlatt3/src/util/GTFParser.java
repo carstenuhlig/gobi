@@ -29,23 +29,29 @@ public class GTFParser {
         String line;
         String[] pieces;
         String seqname;
+        String protein_id = null;
         String source;
         String feature;
         int start;
         int end;
-        int score;
-        String strand;
         int frame;
+        String strand;
         String gene_id = null;
         // transcript_id = id für sequenz
-        String transcript_id;
+        String transcript_id = null;
 
         while ((line = reader.readLine()) != null) {
             // split
             pieces = line.split(regexdelimit);
             //falls nicht chromosome enthält.. egal
-            if (!pieces[0].matches(regexchromosome))
+            if (!pieces[0].matches(regexchromosome)) {
                 continue;
+            }
+            
+            if (!pieces[2].equals("CDS")) {
+                continue;
+            }
+            
             // save pieces
             seqname = pieces[0];
             source = pieces[1];
@@ -55,61 +61,39 @@ public class GTFParser {
             // TODO check for available strand inputs -> evtl als Character oder
             // Integer oder boolean
             strand = pieces[6];
-            
-            transcript_id = "";
+
             // TODO check for available strand inputs -> evtl als Character oder
             // Integer oder boolean
             strand = pieces[6];
-            try {
-                frame = Integer.parseInt(pieces[7]);
-            } catch (NumberFormatException e) {
-                frame = -Integer.MAX_VALUE;
-            }
+
+            frame = Integer.parseInt(pieces[7]);
+            
             for (int i = 8; i < pieces.length; i += 2) {
                 switch (pieces[i]) {
                     case "gene_id":
-                        gene_id = pieces[i + 1];
+                        gene_id = pieces[i + 1].replace("\"", "");
                         break;
                     case "transcript_id":
-                        transcript_id = pieces[i + 1];
+                        transcript_id = pieces[i + 1].replace("\"", "");
+                        break;
+                    case "protein_id":
+                        protein_id = pieces[i + 1].replace("\"", "");
                         break;
                     default:
-                        System.err.println("fehlende Eigenschaft gefunden. Bitte beheben!");
+//                      System.err.println("fehlende Eigenschaft gefunden. Bitte beheben!");
                         break;
                 }
             }
-            
-            genes.addGene(gene_id, transcript_id, seqname, strand, start, end);
+
+            genes.addGene(protein_id, gene_id, transcript_id, seqname, strand, start, end, frame);
         }
         reader.close();
 
-            // save in database
-            // TODO
-            if (!gene_id.isEmpty() && !transcript_id.isEmpty()) {
-                switch (pieces[2]) {
-                    case "CDS":
-                        genes.addGene(gene_id, transcript_id, start, end, chromosome, strand);
-                        break;
-                    case "exon":
-                        genes.addGene(gene_id, transcript_id, start, end, chromosome, strand, true);
-                        break;
-                    case "start_codon":
-                        genes.addGene(gene_id, transcript_id, start, end, chromosome, strand, true, true);
-                        break;
-                    case "stop_codon":
-                        genes.addGene(gene_id, transcript_id, start, end, chromosome, strand, true, false);
-                        break;
-                    default:
-                        System.err.print("Found undefined feature: " + pieces[2]);
-                        break;
-                }
-
-            }
-
+        // save in database
+        // TODO
 //            System.out.print("");
-            // reset values
-            frame = -Integer.MAX_VALUE;
-            score = -Integer.MAX_VALUE;
-        }
+        // reset values
+//        frame = -Integer.MAX_VALUE;
+//        score = -Integer.MAX_VALUE;
     }
 }

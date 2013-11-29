@@ -19,4 +19,9 @@ public class Exon {
 	public CDS getCDS() {
 		return this.cds;
 	}
+
+    @Override
+    public String toString() {
+        return cds.toString();
+    }
 }

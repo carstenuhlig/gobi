@@ -2,11 +2,18 @@ package data;
 
 public class CDS {
 
-    int start, stop;
+    long start, stop;
+    int frame;
     String seq;
     String strand;
 
+    //TODO int durch long ersetzten für genes.addGene etc.
     public CDS(int start, int end) {
+        this.start = start;
+        this.stop = end;
+    }
+
+    public CDS(long start, long end) {
         this.start = start;
         this.stop = end;
     }
@@ -16,12 +23,19 @@ public class CDS {
         this.stop = end;
         this.strand = strand;
     }
+    
+    public CDS(int start, int end, String strand, int frame) {
+        this.start = start;
+        this.stop = end;
+        this.strand = strand;
+        this.frame = frame;
+    }
 
     public CDS(String strand) {
         this.strand = strand;
     }
 
-    public int getStart() {
+    public long getStart() {
         return start;
     }
 
@@ -29,7 +43,7 @@ public class CDS {
         this.start = start;
     }
 
-    public int getStop() {
+    public long getStop() {
         return stop;
     }
 
@@ -47,18 +61,36 @@ public class CDS {
         this.seq = seq;
         this.strand = strand;
     }
-    
-    public void addInformation(String strand) {
-        if (this.strand.isEmpty())
-            this.strand = strand;
-    }
-    
-    public void addInformation(int start, int stop) {
-        this.start = start;
-        this.stop = stop;
+
+    public void setSeq(String seq) {
+        this.seq = seq;
     }
 
     public void setStrand(String strand) {
         this.strand = strand;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Start: ");
+        sb.append(start);
+        sb.append(" | Ende: ");
+        sb.append(stop);
+        sb.append(" | Strand: ");
+        sb.append(strand);
+        sb.append(" | Frame: ");
+        sb.append(frame);
+        
+        if (seq != null)
+        {
+            sb.append("\n");
+            sb.append("Sequenz = ");
+            sb.append(seq);
+        }
+        sb.append("\n");
+
+        return sb.toString(); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

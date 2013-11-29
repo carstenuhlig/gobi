@@ -1,6 +1,7 @@
 package data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Protein {
@@ -13,9 +14,10 @@ public class Protein {
         exons = new ArrayList<>();
     }
 
-    public Protein(Exon exon) {
+    public Protein(String protein_id, Exon exon) {
         exons = new ArrayList<>();
         exons.add(exon);
+        this.id = protein_id;
     }
 
     public Protein(Exon exon, int start, boolean is_start_codon) {
@@ -46,4 +48,17 @@ public class Protein {
     public void addExon(Exon exon) {
         exons.add(exon);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Iterator<Exon> it = exons.iterator(); it.hasNext();) {
+            Exon exon = it.next();
+            sb.append(exon.toString());
+        }
+        
+        return sb.toString();
+    }
+    
+    
 }
