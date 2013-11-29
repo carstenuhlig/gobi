@@ -62,4 +62,9 @@ public class Protein {
 
         return sb.toString();
     }
+
+    public String getId() {
+        return id;
+    }
+
 }

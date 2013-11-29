@@ -23,12 +23,20 @@ public class CDS {
         this.stop = end;
         this.strand = strand;
     }
-    
+
     public CDS(int start, int end, String strand, int frame) {
         this.start = start;
         this.stop = end;
         this.strand = strand;
         this.frame = frame;
+    }
+
+    public int getFrame() {
+        return frame;
+    }
+
+    public String getStrand() {
+        return strand;
     }
 
     public CDS(String strand) {
@@ -81,9 +89,8 @@ public class CDS {
         sb.append(strand);
         sb.append(" | Frame: ");
         sb.append(frame);
-        
-        if (seq != null)
-        {
+
+        if (seq != null) {
             sb.append("\n");
             sb.append("Sequenz = ");
             sb.append(seq);

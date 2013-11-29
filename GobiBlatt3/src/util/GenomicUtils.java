@@ -45,7 +45,7 @@ public class GenomicUtils {
                     sb.append('C');
                     break;
                 default:
-                    System.err.print("fehler");
+
                     break;
             }
         }

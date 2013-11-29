@@ -46,4 +46,8 @@ public class Genes {
     public HashMap<String, Gene> getGenes() {
         return genes;
     }
+    
+    public int getHashMapSize() {
+        return genes.size();
+    }
 }

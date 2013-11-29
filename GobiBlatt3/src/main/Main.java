@@ -22,7 +22,7 @@ public class Main {
 //        System.out.println(g);
         
         try {
-            FillSequences.fillSequences(g);
+            FillSequences.writeSequences(g,"res/seqlibfile.txt","res/pairsfile.txt","res/reference_sequences.txt");
         } catch (Exception e) {
             e.printStackTrace();
         }
