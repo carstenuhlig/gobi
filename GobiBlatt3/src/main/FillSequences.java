@@ -71,7 +71,6 @@ public class FillSequences {
 //        GenomeSequenceExtractor gse = new GenomeSequenceExtractor();
 
 //        gse.init(default_prefix);
-
         Path seqlibfile = FS.getPath(path_seqlibfile);
         Path pairsfile = FS.getPath(path_pairsfile);
         Path reference = FS.getPath(path_reference_seqlibfile);
@@ -99,7 +98,7 @@ public class FillSequences {
                     StringBuilder sb = new StringBuilder();
 
                     int size_exons = transcript.getProtein().getNrExons();
-                    
+
                     for (int i = 0; i < size_exons; i++) {
                         CDS tmp = transcript.getProtein().getExon(i).getCDS();
                         String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
@@ -119,7 +118,6 @@ public class FillSequences {
         }
 
 //        gse.close();
-
         writer1.close();
 
         writer2.close();
