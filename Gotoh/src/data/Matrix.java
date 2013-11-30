@@ -219,6 +219,7 @@ public class Matrix {
                     .processDoubleArrayToString(this.alignment[0]);
             String b_align = util.StringHelper
                     .processDoubleArrayToString(this.alignment[1]);
+            
             String[] ids = this.name.split(":");
             sb.append(ids[0]);
             sb.append(": ");

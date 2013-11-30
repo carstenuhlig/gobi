@@ -174,8 +174,18 @@ public class Main {
 
     // default mit pairfile
     public static void doMatrices() throws IOException {
+        if (!outputfile.isEmpty()) {
+            prepareOutputFile();
+        }
         for (int i = 0; i < r.pairs.size(); i++) {
             String[] ids = r.getPair(i);
+            
+            //damit nicht abbricht
+            //TODO dynamisch als option
+            if (ids[0].length() > 3000 && ids[1].length() > 3000) {
+                continue; 
+            }
+            
             String as1 = r.getSequenceById(ids[0]);
             String as2 = r.getSequenceById(ids[1]);
             String name = ids[0] + ":" + ids[1];
@@ -199,29 +209,30 @@ public class Main {
             }
             if (checkscores) {
                 Computation.backtrack();
-				// falls falsch durch check score fehler -> printAlignment wird
+                // falls falsch durch check score fehler -> printAlignment wird
                 // durchgeführt
                 // PERFORMANCE Aufräumen...
                 if (!Computation.checkAlignment()) {
                     Computation.saveAlignment(m);
-                    if (outputfile.isEmpty()) {
-                        m.printAlignment(name);
-                    } else
-                    {
-                        writeLinesToFile(m.getAlignmentAsString(name));
-                    }
+                    m.printAlignment(name);
                     m.emptyMatrices();
                 }
             } else {
-                System.out.println(">"
-                        + ids[0]
-                        + " "
-                        + ids[1]
-                        + " "
-                        + util.MatrixHelper.formatDecimal(Computation
-                                .backtrack()));
-                Computation.saveAlignment(m);
-                m.printAlignment(name);
+                if (outputfile.isEmpty()) {
+                    System.out.println(">"
+                            + ids[0]
+                            + " "
+                            + ids[1]
+                            + " "
+                            + util.MatrixHelper.formatDecimal(Computation
+                                    .backtrack()));
+                    Computation.saveAlignment(m);
+                    m.printAlignment(name);
+                } else {
+                    Computation.backtrack();
+                    Computation.saveAlignment(m);
+                    writer.write("> \n" + m.getAlignmentAsString(name));
+                }
                 if (!printmatrices) {
                     m.emptyMatrices();
                 }
@@ -235,22 +246,28 @@ public class Main {
                 m.printAllCalculatedMatrices();
             }
             // System.out.print(". ");
-            if (i % 1200 == 0 && i > 0) {
-                System.out.println(i + " von " + r.pairs.size());
-            }
+//            if (i % 1200 == 0 && i > 0) {
+//                System.out.println(i + " von " + r.pairs.size());
+//            }
             // m.deleteCalculatedMatrixByName(ids[0], ids[1]);
+            if (!outputfile.isEmpty() && i % (r.pairs.size() / 1000) == 0) {
+                System.out.println(i / (r.pairs.size() / 1000));
+            }
+        }
+        if (!outputfile.isEmpty()) {
+            closeOutputFile();
         }
     }
-    
+
     public static void prepareOutputFile() throws IOException {
         Path p = FS.getPath(outputfile);
         writer = Files.newBufferedWriter(p, Charset.defaultCharset());
     }
-    
+
     public static void closeOutputFile() throws IOException {
         writer.close();
     }
-    
+
     public static void writeLinesToFile(String str) throws IOException {
         writer.write(str);
     }
