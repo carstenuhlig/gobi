@@ -12,14 +12,21 @@ package util;
 public class GenomicUtils {
 
     public static String convertToAA(String seq, String strand, int frame) {
-        String sequence = seq.substring(frame);
+        String sequence;
+        if (frame > 0) {
+            sequence = seq.substring(frame);
+        } else {
+            sequence = seq;
+        }
+
         if (strand.equals("-")) {
             sequence = convertToStrandPlus(sequence);
+        } else {
+            sequence = cleanString(sequence);
         }
 
         StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < (sequence.length()) / 3; i++) {
+        for (int i = 0; i < sequence.length() / 3; i++) {
             sb.append(AminoAcidType.get(sequence.substring(i * 3, i * 3 + 3)));
         }
 
@@ -45,8 +52,19 @@ public class GenomicUtils {
                     sb.append('C');
                     break;
                 default:
-                    System.err.print("fehler");
                     break;
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String cleanString(String seq) {
+        char[] chars = seq.toCharArray();
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : chars) {
+            if (c == 'A' || c == 'C' || c == 'T' || c == 'G') {
+                sb.append(c);
             }
         }
         return sb.toString();

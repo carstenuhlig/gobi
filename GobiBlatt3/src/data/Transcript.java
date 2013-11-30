@@ -3,13 +3,8 @@ package data;
 public class Transcript {
 
     Protein protein;
-    String chromosome,strand;
+    String chromosome;
 
-    public Transcript(Protein protein, String chromosome, String strand) {
-    	this.protein = protein;
-    	this.chromosome = chromosome;
-    	this.strand = strand;
-    }
     
     public Transcript(Protein protein, String chromosome) {
     	this.protein = protein;

@@ -47,11 +47,11 @@ public class GTFParser {
             if (!pieces[0].matches(regexchromosome)) {
                 continue;
             }
-            
+
             if (!pieces[2].equals("CDS")) {
                 continue;
             }
-            
+
             // save pieces
             seqname = pieces[0];
             source = pieces[1];
@@ -67,7 +67,7 @@ public class GTFParser {
             strand = pieces[6];
 
             frame = Integer.parseInt(pieces[7]);
-            
+
             for (int i = 8; i < pieces.length; i += 2) {
                 switch (pieces[i]) {
                     case "gene_id":
@@ -84,8 +84,10 @@ public class GTFParser {
                         break;
                 }
             }
-
-            genes.addGene(protein_id, gene_id, transcript_id, seqname, strand, start, end, frame);
+            if (protein_id != null) {
+                genes.addGene(protein_id, gene_id, transcript_id, seqname, strand, start, end, frame);
+            }
+            protein_id = null;
         }
         reader.close();
 

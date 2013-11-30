@@ -19,6 +19,5 @@ public class SimpleTest {
 
     public static void main(String[] args) {
         System.out.println(GenomicUtils.convertToAA(seq, strand, frame));
-
     }
 }

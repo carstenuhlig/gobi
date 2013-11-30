@@ -46,4 +46,39 @@ public class Genes {
     public HashMap<String, Gene> getGenes() {
         return genes;
     }
+
+    public int getHashMapSize() {
+        return genes.size();
+    }
+
+    public Transcript getTranscript(String transcript_id) {
+        for (Map.Entry<String, Gene> entry : genes.entrySet()) {
+            String gene_id = entry.getKey();
+            Gene gene = entry.getValue();
+            Transcript temp;
+            if ((temp = gene.getTranscript(transcript_id)) != null) {
+                return temp;
+            }
+        }
+        return null;
+    }
+
+    public Protein getProtein(String protein_id) {
+        for (Map.Entry<String, Gene> entry : genes.entrySet()) {
+            String gene_id = entry.getKey();
+            Gene gene = entry.getValue();
+            Protein temp;
+            HashMap<String, Transcript> transcripts = gene.getTranscripts();
+            for (Map.Entry<String, Transcript> entry1 : transcripts.entrySet()) {
+                String string = entry1.getKey();
+                Transcript transcript = entry1.getValue();
+                Protein protein = transcript.getProtein();
+                String protein_id2 = protein.getId();
+                if (protein_id2.equals(protein_id)) {
+                    return protein;
+                }
+            }
+        }
+        return null;
+    }
 }

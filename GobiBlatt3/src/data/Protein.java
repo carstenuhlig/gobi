@@ -8,7 +8,6 @@ public class Protein {
 
     String seq, id;
     List<Exon> exons;
-    int start, stop;
 
     public Protein() {
         exons = new ArrayList<>();
@@ -18,16 +17,6 @@ public class Protein {
         exons = new ArrayList<>();
         exons.add(exon);
         this.id = protein_id;
-    }
-
-    public Protein(Exon exon, int start, boolean is_start_codon) {
-        exons = new ArrayList<>();
-        exons.add(exon);
-        if (is_start_codon) {
-            this.start = start;
-        } else {
-            this.stop = stop;
-        }
     }
 
     public int getNrExons() {
@@ -62,4 +51,9 @@ public class Protein {
 
         return sb.toString();
     }
+
+    public String getId() {
+        return id;
+    }
+
 }

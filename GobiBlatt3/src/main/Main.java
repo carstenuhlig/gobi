@@ -19,14 +19,16 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        System.out.println(g.getProtein("ENSP00000380802"));
 //        System.out.println(g);
         
-        try {
-            FillSequences.fillSequences(g);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-       System.out.println(g);
+//        try {
+//            FillSequences.writeSequences(g,"res/seqlibfile.txt","res/pairsfile.txt","res/reference_sequences.txt");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        
+//       System.out.println(g);
     }
 }
