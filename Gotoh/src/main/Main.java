@@ -2,9 +2,6 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -17,214 +14,259 @@ import util.Type;
 
 import data.Matrix;
 import data.Raw;
+import java.io.BufferedWriter;
+import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
-	// Options
-	public static String seqlibfile;
-	public static String pairfile;
-	public static String matrixname;
-	public static int gapopen;
-	public static int gapextend;
-	public static Type mode;
-	public static boolean printalignment;
-	public static boolean printmatrices;
-	public static boolean checkscores;
-	public static Matrix m;
-	public static Raw r;
 
-	/**
-	 * Main method
-	 *
-	 * @param args
-	 * @throws ParseException
-	 *             when parsing of commandline arguments failed
-	 */
-	public static void main(String[] args) throws ParseException {
-		Options opt = new Options();
-		opt.addOption("", "seqlib", true, "<seqlibfile>");
-		opt.addOption("", "pairs", true, "<pairfile>");
-		opt.addOption("m", true, "substitutionmatrix");
-		opt.addOption("", "go", true, "gap open score (default:12)");
-		opt.addOption("", "ge", true, "gap extend score (default:1)");
-		opt.addOption("", "mode", true, "mode (local|global|freeshift)");
-		opt.addOption("", "printali", false, "print every alignment");
-		opt.addOption("", "printmatrices", false, "print all matrices");
-		opt.addOption("", "check", false, "validation (checkscores)");
+    // Options
+    public static String seqlibfile;
+    public static String pairfile;
+    public static String matrixname;
+    public static int gapopen;
+    public static int gapextend;
+    public static Type mode;
+    public static boolean printalignment;
+    public static boolean printmatrices;
+    public static boolean checkscores;
+    public static Matrix m;
+    public static Raw r;
+    public static String outputfile;
+    final static FileSystem FS = FileSystems.getDefault();
+    public static BufferedWriter writer;
 
-		CommandLineParser parser = new GnuParser();
-		CommandLine cmd = parser.parse(opt, args);
+    /**
+     * Main method
+     *
+     * @param args
+     * @throws ParseException when parsing of commandline arguments failed
+     */
+    public static void main(String[] args) throws ParseException {
+        Options opt = new Options();
+        opt.addOption("", "seqlib", true, "<seqlibfile>");
+        opt.addOption("", "pairs", true, "<pairfile>");
+        opt.addOption("m", true, "substitutionmatrix");
+        opt.addOption("", "go", true, "gap open score (default:12)");
+        opt.addOption("", "ge", true, "gap extend score (default:1)");
+        opt.addOption("", "mode", true, "mode (local|global|freeshift)");
+        opt.addOption("", "printali", false, "print every alignment");
+        opt.addOption("", "printmatrices", false, "print all matrices");
+        opt.addOption("", "check", false, "validation (checkscores)");
+        opt.addOption("", "output", true, "file to write in");
 
-		if (cmd.getOptionValues("seqlib") == null) {
-			System.exit(1);
-		} else {
-			seqlibfile = cmd.getOptionValues("seqlib")[0];
-		}
+        CommandLineParser parser = new GnuParser();
+        CommandLine cmd = parser.parse(opt, args);
 
-		if (cmd.getOptionValues("pairs") == null) {
-			System.exit(1);
-		} else {
-			pairfile = cmd.getOptionValues("pairs")[0];
-		}
+        if (cmd.getOptionValues("seqlib") == null) {
+            System.exit(1);
+        } else {
+            seqlibfile = cmd.getOptionValues("seqlib")[0];
+        }
 
-		if (cmd.getOptionValues("m") != null) {
-			matrixname = cmd.getOptionValues("m")[0];
-		} else
-			matrixname = "dayhoff";
+        if (cmd.getOptionValues("pairs") == null) {
+            System.exit(1);
+        } else {
+            pairfile = cmd.getOptionValues("pairs")[0];
+        }
 
-		if (cmd.getOptionValues("go") != null) {
-			gapopen = Integer.parseInt(cmd.getOptionValues("go")[0]);
-		} else
-			gapopen = -12;
+        if (cmd.getOptionValues("m") != null) {
+            matrixname = cmd.getOptionValues("m")[0];
+        } else {
+            matrixname = "dayhoff";
+        }
 
-		if (cmd.getOptionValues("ge") != null) {
-			gapextend = Integer.parseInt(cmd.getOptionValues("ge")[0]);
-		} else
-			gapextend = -1;
+        if (cmd.getOptionValues("go") != null) {
+            gapopen = Integer.parseInt(cmd.getOptionValues("go")[0]);
+        } else {
+            gapopen = -12;
+        }
 
-		if (cmd.getOptionValues("mode") != null) {
-			mode = Type.valueOf(cmd.getOptionValues("mode")[0].toUpperCase());
-		} else
-			mode = Type.FREESHIFT;
+        if (cmd.getOptionValues("ge") != null) {
+            gapextend = Integer.parseInt(cmd.getOptionValues("ge")[0]);
+        } else {
+            gapextend = -1;
+        }
 
-		if (cmd.hasOption("printali")) {
-			printalignment = true;
-		}
+        if (cmd.getOptionValues("mode") != null) {
+            mode = Type.valueOf(cmd.getOptionValues("mode")[0].toUpperCase());
+        } else {
+            mode = Type.FREESHIFT;
+        }
 
-		if (cmd.hasOption("printmatrices")) {
-			printmatrices = true;
-		}
+        if (cmd.hasOption("printali")) {
+            printalignment = true;
+        }
 
-		if (cmd.hasOption("check")) {
-			checkscores = true;
-		}
+        if (cmd.hasOption("printmatrices")) {
+            printmatrices = true;
+        }
 
-		try {
-			init();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        if (cmd.hasOption("check")) {
+            checkscores = true;
+        }
 
-	public static void init() throws IOException {
-		// Daten init
-		r = new Raw();
-		m = new Matrix();
+        if (cmd.getOptionValues("output") != null) {
+            outputfile = cmd.getOptionValues("output")[0];
+        } else {
+            outputfile = "";
+        }
 
-		// Import
-		importFiles();
-		doMatrices();
-		// scoreOnePairByIds("1j2xA00", "1wq2B00", Type.GLOBAL);
+        try {
+            init();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	}
+    public static void init() throws IOException {
+        // Daten init
+        r = new Raw();
+        m = new Matrix();
 
-	public static void doMatrices(String[] id1, String[] id2) {
+        // Import
+        importFiles();
+        doMatrices();
+        // scoreOnePairByIds("1j2xA00", "1wq2B00", Type.GLOBAL);
 
-		for (int i = 0; i < id1.length; i++) {
-			String as1 = r.getSequenceById(id1[i]);
-			String as2 = r.getSequenceById(id2[i]);
-			double[][] smatrix = m.getSubstitutionMatrix(matrixname);
-			char[] schars = m.getConvMat(matrixname);
-			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
-					mode, id1[i], id2[i]);
-			if (mode == Type.GLOBAL)
-				Computation.calcMatrices();
-			else
-				Computation.calcMatricesLocal();
-			Computation.saveMatrices(m);
-			m.printAllCalculatedMatrices();
-			m.deleteCalculatedMatrixByName(id1[i], id2[i]);
-		}
-	}
+    }
 
-	public static void scoreOnePairByIds(String id1, String id2, Type modus) {
-		String as1 = r.getSequenceById(id1);
-		String as2 = r.getSequenceById(id2);
-		double[][] smatrix = m.getSubstitutionMatrix(matrixname);
-		char[] schars = m.getConvMat(matrixname);
-		Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus,
-				id1, id2);
-		if (mode == Type.LOCAL)
-			Computation.calcMatricesLocal();
-		else
-			Computation.calcMatrices();
-		Computation.saveMatrices(m);
-		System.out.println(Computation.backtrack());
-		// m.printAllCalculatedMatrices();
-		m.deleteCalculatedMatrixByName(id1, id2);
-	}
+    public static void doMatrices(String[] id1, String[] id2) {
 
-	// default mit pairfile
-	public static void doMatrices() {
-		for (int i = 0; i < r.pairs.size(); i++) {
-			String[] ids = r.getPair(i);
-			String as1 = r.getSequenceById(ids[0]);
-			String as2 = r.getSequenceById(ids[1]);
-			String name = ids[0] + ":" + ids[1];
-			double[][] smatrix = m.getSubstitutionMatrix(matrixname);
-			char[] schars = m.getConvMat(matrixname);
-			Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
-					mode, ids[0], ids[1]);
-			if (mode == Type.LOCAL || mode == Type.FREESHIFT)
-				Computation.calcMatricesLocal();
-			else
-				Computation.calcMatrices();
+        for (int i = 0; i < id1.length; i++) {
+            String as1 = r.getSequenceById(id1[i]);
+            String as2 = r.getSequenceById(id2[i]);
+            double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+            char[] schars = m.getConvMat(matrixname);
+            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
+                    mode, id1[i], id2[i]);
+            if (mode == Type.GLOBAL) {
+                Computation.calcMatrices();
+            } else {
+                Computation.calcMatricesLocal();
+            }
+            Computation.saveMatrices(m);
+            m.printAllCalculatedMatrices();
+            m.deleteCalculatedMatrixByName(id1[i], id2[i]);
+        }
+    }
 
-			if (!printalignment)
-				System.out.println(ids[0]
-						+ " "
-						+ ids[1]
-						+ " "
-						+ util.MatrixHelper.formatDecimal(Computation
-								.backtrack()));
-			if (checkscores) {
-				Computation.backtrack();
+    public static void scoreOnePairByIds(String id1, String id2, Type modus) {
+        String as1 = r.getSequenceById(id1);
+        String as2 = r.getSequenceById(id2);
+        double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+        char[] schars = m.getConvMat(matrixname);
+        Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus,
+                id1, id2);
+        if (mode == Type.LOCAL) {
+            Computation.calcMatricesLocal();
+        } else {
+            Computation.calcMatrices();
+        }
+        Computation.saveMatrices(m);
+        System.out.println(Computation.backtrack());
+        // m.printAllCalculatedMatrices();
+        m.deleteCalculatedMatrixByName(id1, id2);
+    }
+
+    // default mit pairfile
+    public static void doMatrices() throws IOException {
+        for (int i = 0; i < r.pairs.size(); i++) {
+            String[] ids = r.getPair(i);
+            String as1 = r.getSequenceById(ids[0]);
+            String as2 = r.getSequenceById(ids[1]);
+            String name = ids[0] + ":" + ids[1];
+            double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+            char[] schars = m.getConvMat(matrixname);
+            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
+                    mode, ids[0], ids[1]);
+            if (mode == Type.LOCAL || mode == Type.FREESHIFT) {
+                Computation.calcMatricesLocal();
+            } else {
+                Computation.calcMatrices();
+            }
+
+            if (!printalignment) {
+                System.out.println(ids[0]
+                        + " "
+                        + ids[1]
+                        + " "
+                        + util.MatrixHelper.formatDecimal(Computation
+                                .backtrack()));
+            }
+            if (checkscores) {
+                Computation.backtrack();
 				// falls falsch durch check score fehler -> printAlignment wird
-				// durchgeführt
-				// PERFORMANCE Aufräumen...
-				if (!Computation.checkAlignment()) {
-					Computation.saveAlignment(m);
-					m.printAlignment(name);
-					m.emptyMatrices();
-				}
-			} else {
-				System.out.println(">"
-						+ ids[0]
-						+ " "
-						+ ids[1]
-						+ " "
-						+ util.MatrixHelper.formatDecimal(Computation
-								.backtrack()));
-				Computation.saveAlignment(m);
-				m.printAlignment(name);
-				if (!printmatrices)
-					m.emptyMatrices();
-			}
+                // durchgeführt
+                // PERFORMANCE Aufräumen...
+                if (!Computation.checkAlignment()) {
+                    Computation.saveAlignment(m);
+                    if (outputfile.isEmpty()) {
+                        m.printAlignment(name);
+                    } else
+                    {
+                        writeLinesToFile(m.getAlignmentAsString(name));
+                    }
+                    m.emptyMatrices();
+                }
+            } else {
+                System.out.println(">"
+                        + ids[0]
+                        + " "
+                        + ids[1]
+                        + " "
+                        + util.MatrixHelper.formatDecimal(Computation
+                                .backtrack()));
+                Computation.saveAlignment(m);
+                m.printAlignment(name);
+                if (!printmatrices) {
+                    m.emptyMatrices();
+                }
+            }
 
-			if (printmatrices && !printalignment) {
-				Computation.saveMatrices(m);
-				m.printAllCalculatedMatrices();
-				m.emptyMatrices();
-			} else if (printmatrices && printalignment) {
-				m.printAllCalculatedMatrices();
-			}
-			// System.out.print(". ");
-			if (i % 1200 == 0 && i > 0)
-				System.out.println(i + " von " + r.pairs.size());
-			// m.deleteCalculatedMatrixByName(ids[0], ids[1]);
-		}
-	}
+            if (printmatrices && !printalignment) {
+                Computation.saveMatrices(m);
+                m.printAllCalculatedMatrices();
+                m.emptyMatrices();
+            } else if (printmatrices && printalignment) {
+                m.printAllCalculatedMatrices();
+            }
+            // System.out.print(". ");
+            if (i % 1200 == 0 && i > 0) {
+                System.out.println(i + " von " + r.pairs.size());
+            }
+            // m.deleteCalculatedMatrixByName(ids[0], ids[1]);
+        }
+    }
+    
+    public static void prepareOutputFile() throws IOException {
+        Path p = FS.getPath(outputfile);
+        writer = Files.newBufferedWriter(p, Charset.defaultCharset());
+    }
+    
+    public static void closeOutputFile() throws IOException {
+        writer.close();
+    }
+    
+    public static void writeLinesToFile(String str) throws IOException {
+        writer.write(str);
+    }
 
-	public static void importFiles() throws IOException {
-		ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
-		ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
-		ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
-	}
-	
-	public static String getCurrentFolder() {
-		File f = new File(System.getProperty("java.class.path"));
-		File dir = f.getAbsoluteFile().getParentFile();
-		String dirString = dir.toString();
-		String[] strings = dirString.split(":");
-		return strings[0];
-	}
+    public static void importFiles() throws IOException {
+//		ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
+        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
+        ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
+        ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
+    }
+
+    public static String getCurrentFolder() {
+        File f = new File(System.getProperty("java.class.path"));
+        File dir = f.getAbsoluteFile().getParentFile();
+        String dirString = dir.toString();
+        String[] strings = dirString.split(":");
+        return strings[0];
+    }
 }
