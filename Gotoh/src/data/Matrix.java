@@ -159,7 +159,12 @@ public class Matrix {
         // sodass die eine "hälfte" der matrix unausgefüllt ist
         private boolean sym;
 
+        
+        //für faktor int matrix
         public int factor;
+        
+        //für getsmatrix score -> chars als hashmap... schneller
+        public HashMap<Character,Integer> charmap;
 
         // Strings mit Gaps
         public char[][] alignment;
@@ -174,6 +179,7 @@ public class Matrix {
             this.name = name;
             //TODO sollte merken für substitionswerte immer faktor 2
             this.mat = util.MatrixHelper.convertTo2DimInteger(matrix, 3);
+            this.charmap = util.StringHelper.convertCharArrayToHashMap(chars);
             this.chars = chars;
             this.factor = 3;
             t = Type.SUBSTITUTIONMATRIX;

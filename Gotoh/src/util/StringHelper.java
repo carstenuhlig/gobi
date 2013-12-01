@@ -1,5 +1,7 @@
 package util;
 
+import java.util.HashMap;
+
 public class StringHelper {
 
 	/**
@@ -22,12 +24,21 @@ public class StringHelper {
 	}
 
 	public static String processDoubleArrayToString(char[] chrs) {
-		String returnstr = "";
-
-		for (char a : chrs) {
-			returnstr += a;
+                StringBuilder sb = new StringBuilder();
+                for (char a : chrs) {
+			sb.append(a);
 		}
 
-		return returnstr;
+		return sb.toString();
 	}
+        
+        public static HashMap<Character,Integer> convertCharArrayToHashMap(char[] chars) {
+            HashMap<Character,Integer> map = new HashMap<>();
+            int bla = 0;
+            for (char c : chars) {
+                map.put(c, bla);
+                bla++;
+            }
+            return map;
+        }
 }

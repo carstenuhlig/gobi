@@ -20,6 +20,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.util.Iterator;
 
 public class Main {
 
@@ -38,6 +40,9 @@ public class Main {
     public static String outputfile;
     final static FileSystem FS = FileSystems.getDefault();
     public static BufferedWriter writer;
+    public static Boolean is_timer_on;
+    public static long time_start;
+    private static String tmp_time;
 
     /**
      * Main method
@@ -57,6 +62,7 @@ public class Main {
         opt.addOption("", "printmatrices", false, "print all matrices");
         opt.addOption("", "check", false, "validation (checkscores)");
         opt.addOption("", "output", true, "file to write in");
+        opt.addOption("", "time", false, "time");
 
         CommandLineParser parser = new GnuParser();
         CommandLine cmd = parser.parse(opt, args);
@@ -113,6 +119,10 @@ public class Main {
             outputfile = cmd.getOptionValues("output")[0];
         } else {
             outputfile = "";
+        }
+
+        if (cmd.hasOption("time")) {
+            is_timer_on = true;
         }
 
         try {
@@ -173,29 +183,43 @@ public class Main {
 
     // default mit pairfile
     public static void doMatrices() throws IOException {
+        if (is_timer_on) {
+            time_start = System.currentTimeMillis();
+            tmp_time = "";
+        }
+
+        DecimalFormat f = new DecimalFormat("#0.00");
+
+        int size = r.pairs.size();
+        int counter = 0;
+        
         if (!outputfile.isEmpty()) {
             prepareOutputFile();
         }
-        for (int i = 0; i < r.pairs.size(); i++) {
-            String[] ids = r.getPair(i);
+        
+        for (Iterator<String[]> it = r.pairs.iterator(); it.hasNext();) {
+            String[] ids = it.next();
+        
+            String as1 = r.getSequenceById(ids[0]);
+            String as2 = r.getSequenceById(ids[1]);
 
-            //damit nicht abbricht
-            //TODO dynamisch als option
-            if (ids[0].length() > 3000 && ids[1].length() > 3000) {
+            if (as1.length() > 8000 || as2.length() > 8000) {
                 continue;
             }
 
-            String as1 = r.getSequenceById(ids[0]);
-            String as2 = r.getSequenceById(ids[1]);
             String name = ids[0] + ":" + ids[1];
             int[][] smatrix = m.getSubstitutionMatrix(matrixname);
+            if (smatrix == null) {
+                System.err.println("No Substition Matrix found");
+                System.exit(1);
+            }
             char[] schars = m.getConvMat(matrixname);
-            
+
             if (as1 == null || as2 == null) {
                 System.err.println("Sequenz leer.");
                 continue;
             }
-            
+
             Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, mode, ids[0], ids[1], 3, m.getFactorOfSubstitionMatrix(matrixname));
             if (mode == Type.LOCAL || mode == Type.FREESHIFT) {
                 Computation.calcMatricesLocal();
@@ -254,9 +278,24 @@ public class Main {
 //                System.out.println(i + " von " + r.pairs.size());
 //            }
             // m.deleteCalculatedMatrixByName(ids[0], ids[1]);
-            if (!outputfile.isEmpty() && i % (r.pairs.size() / 1000) == 0) {
-                System.out.println(i / (r.pairs.size() / 1000));
+            if (!outputfile.isEmpty() && counter % (size / 300) == 0) {
+                StringBuilder bla = new StringBuilder();
+                for (int j = 0; j < tmp_time.length() + 1; j++) {
+                    bla.append("\b");
+                }
+                System.out.print(bla.toString());
+                if (is_timer_on && counter > 0) {
+                    long time_now = System.currentTimeMillis();
+                    long time_diff = time_now - time_start;
+
+                    double time = (time_diff / counter) * (size - counter) / 1000.0;
+                    tmp_time = (int) time / 60 + ":" + (int) (time % 60) + " min to go\t";
+                }
+                tmp_time += f.format(counter / (size / 100.0)) + "%";
+                System.out.print(tmp_time);
+                
             }
+            counter++;
         }
         if (!outputfile.isEmpty()) {
             closeOutputFile();

@@ -42,22 +42,22 @@ public class ImportTest {
 		}
 	}
 	
-	private void printPairs() {
-		System.out.println("pairs");
-		for (int i = 0; i < r.pairs.size(); i++) {
-			System.out.println("|" + r.getPair(i)[0] + "\t" + r.getPair(i)[1]
-					+ "|");
-		}
-
-	}
+//	private void printPairs() {
+//		System.out.println("pairs");
+//		for (int i = 0; i < r.pairs.size(); i++) {
+//			System.out.println("|" + r.getPair(i)[0] + "\t" + r.getPair(i)[1]
+//					+ "|");
+//		}
+//
+//	}
 	
-	private void printSeqLib() {
-		System.out.println("seqlib");
-		for (int j = 0; j < r.sequences.size(); j++) {
-			System.out.println("id = " + r.getSequenceByIndex(j)[0]
-					+ " AND sequence = " + r.getSequenceByIndex(j)[1]);
-		}
-	}
+//	private void printSeqLib() {
+//		System.out.println("seqlib");
+//		for (int j = 0; j < r.sequences.size(); j++) {
+//			System.out.println("id = " + r.getSequenceByIndex(j)[0]
+//					+ " AND sequence = " + r.getSequenceByIndex(j)[1]);
+//		}
+//	}
 	
 	private void printSubstitionMatrices() {
 		m.printAllSubstitionMatrices();

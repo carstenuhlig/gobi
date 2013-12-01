@@ -1,7 +1,7 @@
 package main;
 
 import data.Matrix;
-import util.MatrixHelper;
+import java.util.HashMap;
 import util.Type;
 
 public class Computation {
@@ -24,6 +24,7 @@ public class Computation {
     private static Type type;
 
     private static double score;
+    private static HashMap<Character, Integer> charmap;
 
     // matrix A,D,I;0,1,2 <- dyn. Programmierungs Matrix mit Matrix A,D und I
     private static int[][][] mat;
@@ -40,18 +41,16 @@ public class Computation {
         Computation.a = as1;
         Computation.b = as2;
         Computation.mat = new int[3][a.length() + 1][b.length() + 1];
-        Computation.ge = (int) (gapextend * (int)Math.pow(10, factor));
-        Computation.go = (int) (gapopen * (int)Math.pow(10, factor));
-        
-        if (factor == factor_smat) {
-            Computation.smat = smatrix;
-        } else {
-            Computation.smat = util.MatrixHelper.factor2DimInteger(smatrix, factor - factor_smat);
-        }
-        
+        Computation.ge = (int) (gapextend * (int) Math.pow(10, factor));
+        Computation.go = (int) (gapopen * (int) Math.pow(10, factor));
+
+        factorInit(factor_smat, smatrix);
+
         Computation.type = type;
         Computation.id_a = id1;
         Computation.id_b = id2;
+
+        Computation.charmap = util.StringHelper.convertCharArrayToHashMap(schars);
 
         //TODO schars als hashmap -> getsmatrixscore um einiges schneller
         Computation.schars = schars;
@@ -61,20 +60,32 @@ public class Computation {
 
         // bei local alignment mindestens wert von 0, d.h. so lassen wie bei
         // Initialisierung von Array
-        if (type != Type.LOCAL || type != Type.FREESHIFT) {
-            for (int row = 1; row < a.length() + 1; row++) {
+        if (type == Type.GLOBAL) {
+            calcInitMatricesGlobal();
+        }
+    }
+    
+    private static void factorInit(int factor_smat, int[][] smatrix) {
+        if (factor == factor_smat) {
+            Computation.smat = smatrix;
+        } else {
+            Computation.smat = util.MatrixHelper.factor2DimInteger(smatrix, factor - factor_smat);
+        }
+    }
+    
+    private static void calcInitMatricesGlobal() {
+        for (int row = 1; row < a.length() + 1; row++) {
                 // A0,k = g(k)
                 mat[0][row][0] = calcGapScore(row);
                 // Di,0 = -Inf
-                mat[1][row][0] = -Integer.MAX_VALUE/2;
+                mat[1][row][0] = -Integer.MAX_VALUE / 2;
             }
             for (int col = 1; col < b.length() + 1; col++) {
                 // Ak,0 = g(k)
                 mat[0][0][col] = calcGapScore(col);
                 // I0,j = -Inf
-                mat[2][0][col] = -Integer.MAX_VALUE/2;
+                mat[2][0][col] = -Integer.MAX_VALUE / 2;
             }
-        }
     }
 
     public static void calcMatrices() {
@@ -175,7 +186,7 @@ public class Computation {
                 int[] tmpintarray = getHighestScore();
                 row = tmpintarray[0];
                 col = tmpintarray[1];
-                score = mat[0][row][col] / (Math.pow(10,factor));
+                score = mat[0][row][col] / (Math.pow(10, factor));
 
                 for (int j = b.length() - 1; j >= col; j--) {
                     alignment[0][a.length() + b.length() - 1 - count] = '-';
@@ -252,7 +263,7 @@ public class Computation {
                 row = tmpintarray2[0];
                 col = tmpintarray2[1];
 
-                Computation.score = mat[0][row][col] / (Math.pow(10,factor));
+                Computation.score = mat[0][row][col] / (Math.pow(10, factor));
 
                 // Anfang: (gaps werden hinzugefügt)
                 for (int j = b.length() - 1; j >= col; j--) {
@@ -594,16 +605,25 @@ public class Computation {
 
     private static int getSMatrixScore(char a, char b) {
         // default position letzte position
-        int ai = smat.length - 1;
-        int bi = smat.length - 1;
-        for (int i = 0; i < schars.length; i++) {
-            if (schars[i] == a) {
-                ai = i;
-            }
-            if (schars[i] == b) {
-                bi = i;
-            }
+//        int ai = smat.length - 1;
+//        int bi = smat.length - 1;
+//        for (int i = 0; i < schars.length; i++) {
+//            if (schars[i] == a) {
+//                ai = i;
+//            }
+//            if (schars[i] == b) {
+//                bi = i;
+//            }
+//        }
+        int ai = 0;
+        int bi = 0;
+        try {
+            ai = charmap.get(a);
+            bi = charmap.get(b);
+        } catch (NullPointerException e) {
+            return 0;
         }
+
         if (smat[0].length != smat[1].length && ai < bi) {
             return smat[bi][ai];
         } else {
