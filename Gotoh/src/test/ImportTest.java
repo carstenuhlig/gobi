@@ -32,7 +32,7 @@ public class ImportTest {
 					m, r));
 //			assertTrue(ImportFile.readFile("res/matrix.txt",
 //					Type.SUBSTITUTIONMATRIX, m, r));
-			double[][] blahdouble = m.getSubstitutionMatrix("BLOSUM50");
+			int[][] blahdouble = m.getSubstitutionMatrix("BLOSUM50");
 
 			assertTrue(ImportFile.readDir("res/matrices", m, r));
 

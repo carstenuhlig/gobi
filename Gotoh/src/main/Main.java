@@ -139,10 +139,10 @@ public class Main {
         for (int i = 0; i < id1.length; i++) {
             String as1 = r.getSequenceById(id1[i]);
             String as2 = r.getSequenceById(id2[i]);
-            double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+            int[][] smatrix = m.getSubstitutionMatrix(matrixname);
             char[] schars = m.getConvMat(matrixname);
             Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
-                    mode, id1[i], id2[i]);
+                    mode, id1[i], id2[i], 3, m.getFactorOfSubstitionMatrix(matrixname));
             if (mode == Type.GLOBAL) {
                 Computation.calcMatrices();
             } else {
@@ -157,10 +157,9 @@ public class Main {
     public static void scoreOnePairByIds(String id1, String id2, Type modus) {
         String as1 = r.getSequenceById(id1);
         String as2 = r.getSequenceById(id2);
-        double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+        int[][] smatrix = m.getSubstitutionMatrix(matrixname);
         char[] schars = m.getConvMat(matrixname);
-        Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus,
-                id1, id2);
+        Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus, id1, id2, 3, m.getFactorOfSubstitionMatrix(matrixname));
         if (mode == Type.LOCAL) {
             Computation.calcMatricesLocal();
         } else {
@@ -179,20 +178,25 @@ public class Main {
         }
         for (int i = 0; i < r.pairs.size(); i++) {
             String[] ids = r.getPair(i);
-            
+
             //damit nicht abbricht
             //TODO dynamisch als option
             if (ids[0].length() > 3000 && ids[1].length() > 3000) {
-                continue; 
+                continue;
             }
-            
+
             String as1 = r.getSequenceById(ids[0]);
             String as2 = r.getSequenceById(ids[1]);
             String name = ids[0] + ":" + ids[1];
-            double[][] smatrix = m.getSubstitutionMatrix(matrixname);
+            int[][] smatrix = m.getSubstitutionMatrix(matrixname);
             char[] schars = m.getConvMat(matrixname);
-            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
-                    mode, ids[0], ids[1]);
+            
+            if (as1 == null || as2 == null) {
+                System.err.println("Sequenz leer.");
+                continue;
+            }
+            
+            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, mode, ids[0], ids[1], 3, m.getFactorOfSubstitionMatrix(matrixname));
             if (mode == Type.LOCAL || mode == Type.FREESHIFT) {
                 Computation.calcMatricesLocal();
             } else {
@@ -273,8 +277,9 @@ public class Main {
     }
 
     public static void importFiles() throws IOException {
-//		ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
-        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
+//        ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
+        ImportFile.readDir("res\\matrices", m, r);
+//        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
         ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
         ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
     }

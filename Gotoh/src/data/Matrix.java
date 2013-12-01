@@ -1,20 +1,22 @@
 package data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import util.Type;
-import util.MatrixHelper;
 
 public class Matrix {
 
-    private ArrayList<SMatrix> substitionmatrices = new ArrayList<SMatrix>();
+//    private ArrayList<SMatrix> substitionmatrices = new ArrayList<SMatrix>();
+    private HashMap<String, SMatrix> substitionmatrices = new HashMap<String, SMatrix>();
     private ArrayList<SMatrix> matrices = new ArrayList<SMatrix>();
 
-    public double[][][] getMatrices(String id1, String id2) {
+    public int[][][] getMatrices(String id1, String id2) {
         // return as 3 Matrices A = [0][][], D = [1][][], I = [2][][]
         for (SMatrix sm : matrices) {
             if (sm.name.equals(id1 + ":" + id2)
                     || sm.name.equals(id2 + ":" + id1)) {
-                double[][][] bigmatrix = new double[3][sm.matA.length][sm.matA.length];
+                int[][][] bigmatrix = new int[3][sm.matA.length][sm.matA.length];
                 bigmatrix[0] = sm.matA;
                 bigmatrix[1] = sm.matD;
                 bigmatrix[2] = sm.matI;
@@ -26,8 +28,8 @@ public class Matrix {
     }
 
     // TODO boolean return if succeeded (validate no duplicate)
-    public void addMatrix(String id1, String id2, double[][] matrixA,
-            double[][] matrixD, double[][] matrixI, Type type, String as1,
+    public void addMatrix(String id1, String id2, int[][] matrixA,
+            int[][] matrixD, int[][] matrixI, Type type, String as1,
             String as2) {
         matrices.add(new SMatrix(id1 + ":" + id2, matrixA, matrixD, matrixI,
                 type, as1, as2));
@@ -35,35 +37,40 @@ public class Matrix {
 
     public void addSubstitutionMatrix(String name, double[][] matrix,
             char[] chars) {
-        // double[][] new_matrix = new double[matrix.length][matrix.length];
+        // int[][] new_matrix = new int[matrix.length][matrix.length];
         // char[] new_chars = new char[chars.length];
         // System.arraycopy(matrix, 0, new_matrix, 0, matrix.length);
         // System.arraycopy(chars, 0, new_chars, 0, chars.length);
-        substitionmatrices.add(new SMatrix(name, matrix, chars));
+        substitionmatrices.put(name, new SMatrix(name, matrix, chars));
     }
 
     // TODO gucken ob alle substitionmatrizen gleich struktur.. bzw. gleiches
     // Alphabet und Reihenfolge haben
-    public double[][] getSubstitutionMatrix(String name) {
-        for (SMatrix sm : substitionmatrices) {
-            if (sm.name.equals(name)) {
-                return sm.mat;
-            }
+    public int[][] getSubstitutionMatrix(String name) {
+        if (substitionmatrices.containsKey(name)) {
+            return substitionmatrices.get(name).mat;
         }
         return null;
     }
+    
+    public int getFactorOfSubstitionMatrix(String name) {
+        if (substitionmatrices.containsKey(name)) {
+            return substitionmatrices.get(name).factor;
+        }
+        return -Integer.MAX_VALUE;
+    }
 
     public char[] getConvMat(String name) {
-        for (SMatrix sm : substitionmatrices) {
-            if (sm.name.equals(name)) {
-                return sm.chars;
-            }
+        if (substitionmatrices.containsKey(name)) {
+            return substitionmatrices.get(name).chars;
         }
         return null;
     }
 
     public void printAllSubstitionMatrices() {
-        for (SMatrix sm : substitionmatrices) {
+        for (Map.Entry<String, SMatrix> entry : substitionmatrices.entrySet()) {
+            String name = entry.getKey();
+            SMatrix sm = entry.getValue();
             System.out.println(sm.toString());
         }
     }
@@ -75,7 +82,7 @@ public class Matrix {
     }
 
     public void addAlignment(String id1, String id2, String a, String b,
-            char[][] alignment, double score, Type type, double[][][] matrix) {
+            char[][] alignment, double score, Type type, int[][][] matrix) {
         for (SMatrix sm : matrices) {
             if (sm.name.equals(id1 + ":" + id2)) {
                 sm.score = score;
@@ -92,10 +99,8 @@ public class Matrix {
     }
 
     public void printSubstitutionMatrixByName(String name) {
-        for (SMatrix sm : substitionmatrices) {
-            if (sm.name.equals(name)) {
-                System.out.println(sm);
-            }
+        if (substitionmatrices.containsKey(name)) {
+            System.out.println(substitionmatrices.get(name).toString());
         }
     }
 
@@ -119,16 +124,16 @@ public class Matrix {
             }
         }
     }
-    
+
     public String getAlignmentAsString(String name) {
         StringBuilder sb = new StringBuilder();
-        
+
         for (SMatrix sm : matrices) {
             if (sm.name.equals(name)) {
-                sb.append(sm.writeAlignmentToFile());
+                sb.append(sm.getAlignmentAsString());
             }
         }
-        
+
         return sb.toString();
     }
 
@@ -143,16 +148,18 @@ public class Matrix {
         public String name; // like id or hash
 
         // matrices in [row|I|Y][column|J|X]-format
-        public double[][] mat;
-        public double[][] matA;
-        public double[][] matI;
-        public double[][] matD;
+        public int[][] mat;
+        public int[][] matA;
+        public int[][] matI;
+        public int[][] matD;
         public String a;
         public String b;
         public Type t;
         // für Substitionsmatrix wenn sie symmetrisch ist
         // sodass die eine "hälfte" der matrix unausgefüllt ist
         private boolean sym;
+
+        public int factor;
 
         // Strings mit Gaps
         public char[][] alignment;
@@ -165,10 +172,12 @@ public class Matrix {
         // substitionmatrix
         public SMatrix(String name, double[][] matrix, char[] chars) {
             this.name = name;
-            this.mat = matrix;
+            //TODO sollte merken für substitionswerte immer faktor 2
+            this.mat = util.MatrixHelper.convertTo2DimInteger(matrix, 3);
             this.chars = chars;
+            this.factor = 3;
             t = Type.SUBSTITUTIONMATRIX;
-            if (matrix[0].length != matrix[1].length) {
+            if (this.mat[0].length != this.mat[1].length) {
                 sym = true;
             } else {
                 sym = false;
@@ -177,8 +186,8 @@ public class Matrix {
 
         // calculated matrix
         // TODO fehlende Werte einfügen
-        public SMatrix(String name, double[][] matrixA, double[][] matrixD,
-                double[][] matrixI, Type type, String as1, String as2) {
+        public SMatrix(String name, int[][] matrixA, int[][] matrixD,
+                int[][] matrixI, Type type, String as1, String as2) {
             this.name = name;
             this.matA = matrixA;
             this.matD = matrixD;
@@ -189,7 +198,7 @@ public class Matrix {
         }
 
         public SMatrix(String name, String a, String b, char[][] alignment,
-                double score, Type type, double[][][] matrix) {
+                double score, Type type, int[][][] matrix) {
             this.name = name;
             this.matA = matrix[0];
             this.matD = matrix[1];
@@ -212,14 +221,14 @@ public class Matrix {
             System.out.println(ids[1] + ": " + b_align);
         }
 
-        private String writeAlignmentToFile() {
+        private String getAlignmentAsString() {
             StringBuilder sb = new StringBuilder();
 
             String a_align = util.StringHelper
                     .processDoubleArrayToString(this.alignment[0]);
             String b_align = util.StringHelper
                     .processDoubleArrayToString(this.alignment[1]);
-            
+
             String[] ids = this.name.split(":");
             sb.append(ids[0]);
             sb.append(": ");
@@ -286,7 +295,7 @@ public class Matrix {
                     returnstr += "\n";
                     for (int row = 0; row < chars.length; row++) {
                         returnstr += chars[row];
-                        for (double d : mat[row]) {
+                        for (int d : mat[row]) {
                             returnstr += "\t"
                                     + util.MatrixHelper.formatDecimal(d, 1, 3);
                         }

@@ -11,33 +11,34 @@ import data.Matrix;
 import data.Raw;
 
 public class ComputationTest {
-	Matrix m;
-	Raw r;
 
-	@Before
-	public void init() {
-		m = new Matrix();
-		r = new Raw();
+    Matrix m;
+    Raw r;
 
-		ImportFile.readDir("res/matrices", m, r);
-	}
+    @Before
+    public void init() {
+        m = new Matrix();
+        r = new Raw();
 
-	@Test
-	public void test() {
-		Computation.init("WTHA", "WTHGQA", m.getSubstitutionMatrix("BLOSUM50"),
-				m.getConvMat("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
-				"Gobiepraesentation1", "Gobiepraesentation2");
-		m.printSubstitutionMatrixByName("BLOSUM50");
-		Computation.calcMatrices();
-		// m.printAllSubstitionMatrices();
+        ImportFile.readDir("res/matrices", m, r);
+    }
 
-		System.out.println("nun großer Test");
+    @Test
+    public void test() {
+        Computation.init("WTHA", "WTHGQA", m.getSubstitutionMatrix("BLOSUM50"),
+                m.getConvMat("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
+                "Gobiepraesentation1", "Gobiepraesentation2", 2, 2);
+        m.printSubstitutionMatrixByName("BLOSUM50");
+        Computation.calcMatrices();
+        // m.printAllSubstitionMatrices();
 
-		System.out.println();
+        System.out.println("nun großer Test");
 
-		Computation.saveMatrices(m);
+        System.out.println();
 
-		m.printAllCalculatedMatrices();
-		// test commit
-	}
+        Computation.saveMatrices(m);
+
+        m.printAllCalculatedMatrices();
+        // test commit
+    }
 }
