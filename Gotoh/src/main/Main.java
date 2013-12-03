@@ -15,6 +15,7 @@ import util.Type;
 import data.Matrix;
 import data.Raw;
 import java.io.BufferedWriter;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -50,7 +51,7 @@ public class Main {
      * @param args
      * @throws ParseException when parsing of commandline arguments failed
      */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, URISyntaxException {
         Options opt = new Options();
         opt.addOption("", "seqlib", true, "<seqlibfile>");
         opt.addOption("", "pairs", true, "<pairfile>");
@@ -105,14 +106,20 @@ public class Main {
 
         if (cmd.hasOption("printali")) {
             printalignment = true;
+        } else {
+            printalignment = false;
         }
 
         if (cmd.hasOption("printmatrices")) {
             printmatrices = true;
+        } else {
+            printmatrices = false;
         }
 
         if (cmd.hasOption("check")) {
             checkscores = true;
+        } else {
+            checkscores = false;
         }
 
         if (cmd.getOptionValues("output") != null) {
@@ -123,6 +130,8 @@ public class Main {
 
         if (cmd.hasOption("time")) {
             is_timer_on = true;
+        } else {
+            is_timer_on = false;
         }
 
         try {
@@ -132,7 +141,7 @@ public class Main {
         }
     }
 
-    public static void init() throws IOException {
+    public static void init() throws IOException, URISyntaxException {
         // Daten init
         r = new Raw();
         m = new Matrix();
@@ -141,17 +150,15 @@ public class Main {
         importFiles();
         doMatrices();
         // scoreOnePairByIds("1j2xA00", "1wq2B00", Type.GLOBAL);
-
     }
 
     public static void doMatrices(String[] id1, String[] id2) {
-
         for (int i = 0; i < id1.length; i++) {
             String as1 = r.getSequenceById(id1[i]);
             String as2 = r.getSequenceById(id2[i]);
             int[][] smatrix = m.getSubstitutionMatrix(matrixname);
-            char[] schars = m.getConvMat(matrixname);
-            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend,
+//            char[] schars = m.getConvMat(matrixname);
+            Computation.init(as1, as2, smatrix, m.getCharMap(matrixname), gapopen, gapextend,
                     mode, id1[i], id2[i], 3, m.getFactorOfSubstitionMatrix(matrixname));
             if (mode == Type.GLOBAL) {
                 Computation.calcMatrices();
@@ -168,8 +175,9 @@ public class Main {
         String as1 = r.getSequenceById(id1);
         String as2 = r.getSequenceById(id2);
         int[][] smatrix = m.getSubstitutionMatrix(matrixname);
+        //TODO deprecated m.getConvMat
         char[] schars = m.getConvMat(matrixname);
-        Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, modus, id1, id2, 3, m.getFactorOfSubstitionMatrix(matrixname));
+        Computation.init(as1, as2, smatrix, m.getCharMap(matrixname), gapopen, gapextend, modus, id1, id2, 3, m.getFactorOfSubstitionMatrix(matrixname));
         if (mode == Type.LOCAL) {
             Computation.calcMatricesLocal();
         } else {
@@ -188,18 +196,18 @@ public class Main {
             tmp_time = "";
         }
 
-        DecimalFormat f = new DecimalFormat("#0.00");
+        DecimalFormat f = new DecimalFormat("#0,00");
 
         int size = r.pairs.size();
         int counter = 0;
-        
+
         if (!outputfile.isEmpty()) {
             prepareOutputFile();
         }
-        
+
         for (Iterator<String[]> it = r.pairs.iterator(); it.hasNext();) {
             String[] ids = it.next();
-        
+
             String as1 = r.getSequenceById(ids[0]);
             String as2 = r.getSequenceById(ids[1]);
 
@@ -220,7 +228,7 @@ public class Main {
                 continue;
             }
 
-            Computation.init(as1, as2, smatrix, schars, gapopen, gapextend, mode, ids[0], ids[1], 3, m.getFactorOfSubstitionMatrix(matrixname));
+            Computation.init(as1, as2, smatrix, m.getCharMap(matrixname), gapopen, gapextend, mode, ids[0], ids[1], 3, m.getFactorOfSubstitionMatrix(matrixname));
             if (mode == Type.LOCAL || mode == Type.FREESHIFT) {
                 Computation.calcMatricesLocal();
             } else {
@@ -257,9 +265,18 @@ public class Main {
                     Computation.saveAlignment(m);
                     m.printAlignment(name);
                 } else {
-                    Computation.backtrack();
+                    double ergebnis = Computation.backtrack();
                     Computation.saveAlignment(m);
-                    writer.write("> \n" + m.getAlignmentAsString(name));
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(">");
+                    sb.append(ids[0]);
+                    sb.append(" ");
+                    sb.append(ids[1]);
+                    sb.append(" ");
+                    sb.append(f.format(ergebnis));
+                    sb.append("\n");
+                    sb.append(m.getAlignmentAsString(name));
+                    writer.write(sb.toString());
                 }
                 if (!printmatrices) {
                     m.emptyMatrices();
@@ -291,9 +308,9 @@ public class Main {
                     double time = (time_diff / counter) * (size - counter) / 1000.0;
                     tmp_time = (int) time / 60 + ":" + (int) (time % 60) + " min to go\t";
                 }
-                tmp_time += f.format(counter / (size / 100.0)) + "%";
+                tmp_time += f.format(counter / (float) size * 100.0) + "\n" + counter + "/" + size;
                 System.out.print(tmp_time);
-                
+
             }
             counter++;
         }
@@ -315,9 +332,14 @@ public class Main {
         writer.write(str);
     }
 
-    public static void importFiles() throws IOException {
-//        ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
-        ImportFile.readDir("res\\matrices", m, r);
+    public static void importFiles() throws IOException, URISyntaxException {
+//        if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+//            ImportFile.readDir(getCurrentFolder() + "\\res\\matrices", m, r);
+//        } else {
+//            ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
+//        }
+        ImportFile.readMatricesFromResources(m, r);
+//        ImportFile.readDir("res\\matrices", m, r);
 //        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
         ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
         ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);

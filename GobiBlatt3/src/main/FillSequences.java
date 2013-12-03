@@ -105,27 +105,32 @@ public class FillSequences {
                     }
 
                     int size_exons = transcript.getProtein().getNrExons();
-                    if (!is_strand_neg) {
-                        for (int i = 0; i < size_exons; i++) {
-                            CDS tmp = transcript.getProtein().getExon(i).getCDS();
-                            if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
-                                String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
-                                sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
-                            }
-                        }
-                    } else {
-                        for (int i = size_exons-1; i >= 0; i--) {
-                            CDS tmp = transcript.getProtein().getExon(i).getCDS();
-                            if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
-                                String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
-                                sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
-                            }
+//                    if (!is_strand_neg) {
+                    for (int i = 0; i < size_exons; i++) {
+                        CDS tmp = transcript.getProtein().getExon(i).getCDS();
+                        if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
+                            String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
+                            sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
                         }
                     }
+//                    } else {
+//                        for (int i = size_exons-1; i >= 0; i--) {
+//                            CDS tmp = transcript.getProtein().getExon(i).getCDS();
+//                            if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
+//                                String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
+//                                sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
+//                            }
+//                        }
+//                    }
 
                     if (sb.length() > 0) {
-                        writer1.write(protein_id + "D:" + sb.toString() + "\n");
-                        writer2.write(protein_id + " " + protein_id + "D\n");
+                        if (transcript.getProtein().getExon(0).getCDS().getStrand().equals("-")) {
+                            writer1.write(protein_id + "-:" + sb.toString() + "\n");
+                            writer2.write(protein_id + " " + protein_id + "-\n");
+                        } else {
+                            writer1.write(protein_id + "D:" + sb.toString() + "\n");
+                            writer2.write(protein_id + " " + protein_id + "D\n");
+                        }
                     }
                 }
             }

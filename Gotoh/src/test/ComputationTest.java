@@ -20,14 +20,14 @@ public class ComputationTest {
         m = new Matrix();
         r = new Raw();
 
-        ImportFile.readDir("res/matrices", m, r);
+        ImportFile.readDir("res\\matrices", m, r);
     }
 
     @Test
     public void test() {
         Computation.init("WTHA", "WTHGQA", m.getSubstitutionMatrix("BLOSUM50"),
-                m.getConvMat("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
-                "Gobiepraesentation1", "Gobiepraesentation2", 2, 2);
+                m.getCharMap("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
+                "Gobiepraesentation1", "Gobiepraesentation2", 3, 3);
         m.printSubstitutionMatrixByName("BLOSUM50");
         Computation.calcMatrices();
         // m.printAllSubstitionMatrices();

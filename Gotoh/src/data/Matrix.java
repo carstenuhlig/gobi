@@ -27,6 +27,10 @@ public class Matrix {
         return null;
     }
 
+    public HashMap<Character, Integer> getCharMap(String name) {
+        return substitionmatrices.get(name).charmap;
+    }
+
     // TODO boolean return if succeeded (validate no duplicate)
     public void addMatrix(String id1, String id2, int[][] matrixA,
             int[][] matrixD, int[][] matrixI, Type type, String as1,
@@ -52,7 +56,7 @@ public class Matrix {
         }
         return null;
     }
-    
+
     public int getFactorOfSubstitionMatrix(String name) {
         if (substitionmatrices.containsKey(name)) {
             return substitionmatrices.get(name).factor;
@@ -159,12 +163,11 @@ public class Matrix {
         // sodass die eine "hälfte" der matrix unausgefüllt ist
         private boolean sym;
 
-        
         //für faktor int matrix
         public int factor;
-        
+
         //für getsmatrix score -> chars als hashmap... schneller
-        public HashMap<Character,Integer> charmap;
+        public HashMap<Character, Integer> charmap;
 
         // Strings mit Gaps
         public char[][] alignment;
@@ -276,116 +279,132 @@ public class Matrix {
 
         @Override
         public String toString() {
-            String returnstr = "";
-            returnstr += "Name:\t" + name + "\n";
-            returnstr += "Type:\t" + t + "\n";
+            StringBuilder sb = new StringBuilder();
+            sb.append("Name:\t");
+            sb.append(name);
+            sb.append("\n");
+            sb.append("Type:\t");
+            sb.append(t);
+            sb.append("\n");
             if (t == Type.SUBSTITUTIONMATRIX) {
                 if (sym == false) {
-                    returnstr += "\t";
+                    sb.append("\t");
                     for (int xtmp = 0; xtmp < mat.length; xtmp++) {
-                        returnstr += (xtmp + 1) + "\t";
+                        sb.append((xtmp + 1));
+                        sb.append("\t");
                     }
-                    returnstr += "\n";
+                    sb.append("\n");
                     for (int y = 0; y < mat.length; y++) {
-                        returnstr += (y + 1) + "\t";
+                        sb.append((y + 1));
+                        sb.append("\t");
                         for (int x = 0; x < mat.length; x++) {
-                            returnstr += util.MatrixHelper.formatDecimal(
-                                    mat[y][x], 1, 3) + "\t";
+                            sb.append(util.MatrixHelper.formatDecimal(mat[y][x], 1, 3));
+                            sb.append("\t");
                         }
-                        returnstr += "\n";
+                        sb.append("\n");
                     }
                 } else {
                     for (int col = 0; col < chars.length; col++) {
-                        returnstr += "\t" + chars[col];
+                        sb.append("\t");
+                        sb.append(chars[col]);
                     }
-                    returnstr += "\n";
+                    sb.append("\n");
                     for (int row = 0; row < chars.length; row++) {
-                        returnstr += chars[row];
+                        sb.append(chars[row]);
                         for (int d : mat[row]) {
-                            returnstr += "\t"
-                                    + util.MatrixHelper.formatDecimal(d, 1, 3);
+                            sb.append("\t");
+                            sb.append(util.MatrixHelper.formatDecimal(d, 1, 3));
                         }
-                        returnstr += "\n";
+                        sb.append("\n");
                     }
                 }
             } else {
                 // TODO Performance: tab vor xtmp, etc.
                 // TODO Check
-                returnstr += "Matrix:\tA\n\t";
+                sb.append("Matrix:\tA\n\t");
                 for (int xtmp = 0; xtmp < matA[0].length; xtmp++) {
                     if (xtmp > 0) {
-                        returnstr += b.charAt(xtmp - 1) + "\t";
+                        sb.append(b.charAt(xtmp - 1));
+                        sb.append("\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                 }
-                returnstr += "\n";
+                sb.append("\n");
                 for (int y = 0; y < matA.length; y++) {
                     if (y > 0) {
-                        returnstr += a.charAt(y - 1) + "\t";
+                        sb.append(a.charAt(y - 1));
+                        sb.append("\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                     for (int x = 0; x < matA[0].length; x++) {
-                        returnstr += util.MatrixHelper.formatDecimal(
-                                matA[y][x], 1, 3) + "\t";
+                        if (matA[y][x] == -Integer.MAX_VALUE / 2) {
+                            sb.append("-Inf");
+                        } else {
+                            sb.append(util.MatrixHelper.formatDecimal(matA[y][x], 1, 3));
+                        }
+                        sb.append("\t");
                     }
-                    returnstr += "\n\n";
+                    sb.append("\n\n");
                 }
 
-                returnstr += "Matrix:\tD\n\t";
+                sb.append("Matrix:\tD\n\t");
                 for (int xtmp = 0; xtmp < matD[0].length; xtmp++) {
                     if (xtmp > 0) {
-                        returnstr += b.charAt(xtmp - 1) + "\t";
+                        sb.append(b.charAt(xtmp - 1));
+                        sb.append("\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                 }
-                returnstr += "\n";
+                sb.append("\n");
                 for (int y = 0; y < matD.length; y++) {
                     if (y > 0) {
-                        returnstr += a.charAt(y - 1) + "\t";
+                        sb.append(a.charAt(y - 1) + "\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                     for (int x = 0; x < matD[0].length; x++) {
-                        if (matD[y][x] == -Double.MAX_VALUE) {
-                            returnstr += "-Inf\t";
+                        if (matD[y][x] == -Integer.MAX_VALUE/2) {
+                            sb.append("-Inf\t");
                         } else {
-                            returnstr += util.MatrixHelper.formatDecimal(
-                                    matD[y][x], 1, 3) + "\t";
+                            sb.append(util.MatrixHelper.formatDecimal(matD[y][x], 1, 3));
+                            sb.append("\t");
                         }
                     }
-                    returnstr += "\n\n";
+                    sb.append("\n\n");
                 }
 
-                returnstr += "Matrix:\tI\n\t";
+                sb.append("Matrix:\tI\n\t");
                 for (int xtmp = 0; xtmp < matI[0].length; xtmp++) {
                     if (xtmp > 0) {
-                        returnstr += b.charAt(xtmp - 1) + "\t";
+                        sb.append(b.charAt(xtmp - 1));
+                        sb.append("\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                 }
-                returnstr += "\n";
+                sb.append("\n");
                 for (int y = 0; y < matI.length; y++) {
                     if (y > 0) {
-                        returnstr += a.charAt(y - 1) + "\t";
+                        sb.append(a.charAt(y - 1));
+                        sb.append("\t");
                     } else {
-                        returnstr += " \t";
+                        sb.append(" \t");
                     }
                     for (int x = 0; x < matI[0].length; x++) {
-                        if (matI[y][x] == -Double.MAX_VALUE) {
-                            returnstr += "-Inf\t";
+                        if (matI[y][x] == -Integer.MAX_VALUE/2) {
+                            sb.append("-Inf\t");
                         } else {
-                            returnstr += util.MatrixHelper.formatDecimal(
-                                    matI[y][x], 1, 3) + "\t";
+                            sb.append(util.MatrixHelper.formatDecimal(matI[y][x], 1, 3));
+                            sb.append("\t");
                         }
                     }
-                    returnstr += "\n\n";
+                    sb.append("\n\n");
                 }
             }
-            return returnstr;
+            return sb.toString();
         }
     }
 }

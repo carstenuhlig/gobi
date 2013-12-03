@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Raw {
-	//PERFORMANCE HashMap for Sequences
 //	public ArrayList<Seq> sequences = new ArrayList<Seq>();
-	//PERFORMANCE LinkedList
 //	public ArrayList<DoubleID> pairs =	 new ArrayList<DoubleID>();
         public HashMap<String,String> sequences = new HashMap<String, String>();
         public LinkedList<String[]> pairs = new LinkedList<String[]>();

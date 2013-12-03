@@ -1,7 +1,9 @@
 package main;
 
 import data.Matrix;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import util.Type;
 
 public class Computation {
@@ -36,7 +38,7 @@ public class Computation {
     private static String id_b;
 
     public static void init(String as1, String as2, int[][] smatrix,
-            char[] schars, double gapopen, double gapextend, Type type,
+            HashMap<Character,Integer> charmap, double gapopen, double gapextend, Type type,
             String id1, String id2, int factor, int factor_smat) {
         Computation.a = as1;
         Computation.b = as2;
@@ -50,7 +52,7 @@ public class Computation {
         Computation.id_a = id1;
         Computation.id_b = id2;
 
-        Computation.charmap = util.StringHelper.convertCharArrayToHashMap(schars);
+        Computation.charmap = charmap;
 
         //TODO schars als hashmap -> getsmatrixscore um einiges schneller
         Computation.schars = schars;
@@ -598,7 +600,7 @@ public class Computation {
     public static void saveAlignment(Matrix m) {
         // check ob matrizen schon gespeichert sind
         if (m.getMatrices(id_a, id_b) == null) {
-            saveMatrices(m);
+            saveMatrices(m); 
         }
         m.addAlignment(id_a, id_b, a, b, backtrack, score, type, mat);
     }
@@ -689,5 +691,52 @@ public class Computation {
         // System.out.println();
         // }
         return returnint;
+    }
+
+    public static String toStringDebug() {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(id_a);
+        sb.append(":");
+        sb.append(a);
+        sb.append("\n");
+        
+        sb.append(id_b);
+        sb.append(":");
+        sb.append(b);
+        sb.append("\n");
+        
+        if (backtrack != null) {
+            sb.append(Arrays.deepToString(backtrack));
+        }
+        
+        sb.append("\n");
+        
+        sb.append(charmap.toString());
+        sb.append("\n");
+        sb.append("Faktor|gap_open|gap_extend: ");
+        sb.append(factor);
+        sb.append("|");
+        sb.append(go);
+        sb.append("|");
+        sb.append(ge);
+        sb.append("\n");
+        for (Character key : charmap.keySet()) {
+            sb.append(key);
+            sb.append("\t");
+        }
+        sb.append("\n");
+        for (int[] is : smat) {
+            for (int i : is) {
+                sb.append(i);
+                sb.append("\t");
+            }
+            sb.append("\n");
+        }
+        
+        sb.append("Score = ");
+        sb.append(score);
+        
+        return sb.toString();
     }
 }

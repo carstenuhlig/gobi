@@ -158,7 +158,7 @@ public class MatrixHelper {
 
         for (int i = 0; i < mat.length; i++) {
             for (int j = 0; j < mat[0].length; j++) {
-                mat[i][j] = (int) (mat[i][j] * (10 ^ fac));
+                mat[i][j] = (int) (mat[i][j] * Math.pow(10, fac));
             }
         }
 
