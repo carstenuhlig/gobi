@@ -10,3 +10,17 @@
 *.ear
 /GobiBlatt3/nbproject/private/
 /GobiBlatt3/build/
+/Gotoh/nbproject/private/
+/JavaApplication1/nbproject/private/
+/JavaApplication1/build/
+/Gotoh/build/
+/Gotoh/dist/
+/GobiBlatt3/dist/
+/TestApplication/nbproject/private/
+/TestApplication/build/
+/TestApplication/dist/
+/Gotoh/src/res/matrices/blosum50.mat
+/Gotoh/src/res/matrices/dayhoff.mat
+/Gotoh/src/res/matrices/BlakeCohenMatrix.mat
+/Gotoh/src/res/matrices/pam250.mat
+/Gotoh/src/res/matrices/THREADERSimilarityMatrix.mat
