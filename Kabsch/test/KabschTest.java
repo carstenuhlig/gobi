@@ -1,6 +1,7 @@
 
 import data.Database;
 import java.io.IOException;
+import kabsch.Kabsch;
 import util.Import;
 
 /*
@@ -18,6 +19,11 @@ public class KabschTest {
         Database d = new Database();
         d.addMatrix("1r5ra00", Import.readSampleFile("res/1r5ra00.backbone"));
 //        System.out.println(d.viewMatrix("1r5ra00"));
+        Kabsch k = new Kabsch(d.getRandomMatrix(),d.getRandomMatrix());
+        System.out.println(k.getP().toString());
+        k.main();
+        System.out.println(k.getP().toString());
+//        System.out.println(k);
     }
 
 }
