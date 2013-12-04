@@ -97,15 +97,7 @@ public class FillSequences {
                 if (findGene(protein_id)) {
                     StringBuilder sb = new StringBuilder();
 
-                    Boolean is_strand_neg;
-                    if (transcript.getProtein().getExon(0).getCDS().getStrand().equals("+")) {
-                        is_strand_neg = false;
-                    } else {
-                        is_strand_neg = true;
-                    }
-
                     int size_exons = transcript.getProtein().getNrExons();
-//                    if (!is_strand_neg) {
                     for (int i = 0; i < size_exons; i++) {
                         CDS tmp = transcript.getProtein().getExon(i).getCDS();
                         if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
@@ -113,15 +105,6 @@ public class FillSequences {
                             sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
                         }
                     }
-//                    } else {
-//                        for (int i = size_exons-1; i >= 0; i--) {
-//                            CDS tmp = transcript.getProtein().getExon(i).getCDS();
-//                            if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
-//                                String seq = GenomeSequenceExtractor.easySearch(transcript.getChromsome(), tmp.getStart(), tmp.getStop());
-//                                sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
-//                            }
-//                        }
-//                    }
 
                     if (sb.length() > 0) {
                         if (transcript.getProtein().getExon(0).getCDS().getStrand().equals("-")) {
