@@ -5,6 +5,11 @@
  */
 package kabsch;
 
+import cern.colt.matrix.DoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import static kabsch.Kabsch.F;
+
 /**
  *
  * @author uhligc
@@ -54,6 +59,19 @@ public class Scores {
         }
 
         return (p1 + p2 + p4 + p8 / (4 * ((sizea + sizeb) / 2.)));
+    }
+    
+    public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
+        DenseDoubleMatrix2D tmp = (DenseDoubleMatrix2D)a.clone();
+        tmp.assign(b, F.minus);
+        tmp.assign(F.square);
+        int rows = tmp.rows();
+                
+        double result = tmp.zSum();
+        
+        result = Math.sqrt(result/rows);
+        
+        return result;
     }
 
     public static double getDistance(double[] a, double[] b) {

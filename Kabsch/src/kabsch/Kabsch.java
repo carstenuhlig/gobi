@@ -10,6 +10,7 @@ import cern.colt.matrix.DoubleMatrix2D;
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import cern.colt.matrix.linalg.Algebra;
+import cern.colt.matrix.linalg.SingularValueDecomposition;
 import cern.jet.math.Functions;
 
 /**
@@ -19,12 +20,13 @@ import cern.jet.math.Functions;
 public class Kabsch {
 
     DenseDoubleMatrix2D p, q;
-    DoubleMatrix2D a;
+    DoubleMatrix2D a, s, v, u, r, t;
     DenseDoubleMatrix1D cP, cQ;
 
-    double e0;
+    double e0, esvd;
 
     final static Functions F = Functions.functions;
+    final static Algebra A = new Algebra();
 
     public Kabsch(double[][] matrixA, double[][] matrixB) {
         init(matrixA, matrixB);
@@ -47,25 +49,49 @@ public class Kabsch {
         //e0 fehler berechnen (summe über alle koordinaten quadriert)
         e0 = calcInitError(p, q);
     }
-    
+
     private void calcCovarianceMatrix() {
-        Algebra algebra = new Algebra();
         //transpose
         DoubleMatrix2D tcP = p.viewDice();
         //multiplikation der beiden matrizen
-        a = algebra.mult(tcP, q);
+        a = A.mult(tcP, q);
     }
-    
+
     private void calcRotation() {
-        
+        //svd calculate
+        SingularValueDecomposition svd = new SingularValueDecomposition(a);
+        s = svd.getS();
+        v = svd.getV();
+        u = svd.getU();
+
+        //check right handed coord system
+        double d = A.det(v) * A.det(u);
+        double[][] dmatrix = {{1, 0, 0}, {0, 1, 0}, {0, 0, d}};
+        DoubleMatrix2D dmat = new DenseDoubleMatrix2D(dmatrix);
+
+        //s und u multipliziert mit 1,0,0 0,1,0 0,0,d
+        s = A.mult(s, dmat);
+        u = A.mult(u, dmat);
+
+        //error von s ausrechnen... keine ahnung was das sein soll.
+        esvd = calcSVDError(s);
+
+        //rotation matrix berechnen
+        r = A.mult(u, A.transpose(v));
     }
 
     public void main() {
         //P-> cP; Q-> cQ
         translate();
-        
+
         //A = P^T * Q
         calcCovarianceMatrix();
+
+        //rotationsmatrix bestimmen
+        calcRotation();
+        
+        //proteinstrukturen rotieren
+        rotateStructures();
     }
 
     public static DenseDoubleMatrix2D applyVector(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
@@ -74,7 +100,33 @@ public class Kabsch {
         if (cols != vector.size()) {
             return null;
         }
+        
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
+//                matrix.assign(F.minus.apply(matrix.get(i, j), vector.get(j)));
+                matrix.set(i, j, matrix.get(i, j) - vector.get(j));
+            }
+        }
 
+        return matrix;
+    }
+    
+    public static DenseDoubleMatrix2D applyVectorFast(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
+        int rows = matrix.rows();
+        int cols = matrix.columns();
+        if (cols != vector.size()) {
+            return null;
+        }
+        
+        DoubleMatrix2D tmp2 = matrix.like();
+        
+        for ( int i = 0; i<vector.size();i++) {
+            DoubleMatrix1D tmp = matrix.viewColumn(i);
+            tmp.assign(F.minus(vector.get(i)));
+//            tmp2.
+        }
+        
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
@@ -86,8 +138,18 @@ public class Kabsch {
         return matrix;
     }
 
+    private void rotateStructures() {
+//        (A.mult(A.transpose(r),c))
+    }
+
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
-        return p.aggregate(F.plus, F.square) + q.aggregate(F.plus,F.square);
+        return p.aggregate(F.plus, F.square) + q.aggregate(F.plus, F.square);
+    }
+
+    public static double calcSVDError(DoubleMatrix2D s) {
+        double result = s.get(0, 0);
+        result += s.get(1, 1);
+        return result + s.get(2, 2);
     }
 
     public void init(double[][] matrixA, double[][] matrixB) {
