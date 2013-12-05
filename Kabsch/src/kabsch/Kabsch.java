@@ -20,10 +20,11 @@ import cern.jet.math.Functions;
 public class Kabsch {
 
     DenseDoubleMatrix2D p, q;
-    DoubleMatrix2D a, s, v, u, r, t;
+    DoubleMatrix2D a, s, v, u, r;
+    DoubleMatrix1D t;
     DenseDoubleMatrix1D cP, cQ;
 
-    double e0, esvd;
+    double e0, esvd, rmsd, ermsd;
 
     final static Functions F = Functions.functions;
     final static Algebra A = new Algebra();
@@ -75,6 +76,7 @@ public class Kabsch {
 
         //error von s ausrechnen... keine ahnung was das sein soll.
         esvd = calcSVDError(s);
+        calcRMSDError();
 
         //rotation matrix berechnen
         r = A.mult(u, A.transpose(v));
@@ -89,9 +91,12 @@ public class Kabsch {
 
         //rotationsmatrix bestimmen
         calcRotation();
-        
+
         //proteinstrukturen rotieren
         rotateStructures();
+
+        //rmsd berechnen
+        calcRMSD();
     }
 
     public static DenseDoubleMatrix2D applyVector(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
@@ -100,46 +105,41 @@ public class Kabsch {
         if (cols != vector.size()) {
             return null;
         }
-        
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
-//                matrix.assign(F.minus.apply(matrix.get(i, j), vector.get(j)));
                 matrix.set(i, j, matrix.get(i, j) - vector.get(j));
             }
         }
 
         return matrix;
     }
-    
+
     public static DenseDoubleMatrix2D applyVectorFast(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
-        int rows = matrix.rows();
         int cols = matrix.columns();
         if (cols != vector.size()) {
             return null;
         }
-        
-        DoubleMatrix2D tmp2 = matrix.like();
-        
-        for ( int i = 0; i<vector.size();i++) {
-            DoubleMatrix1D tmp = matrix.viewColumn(i);
-            tmp.assign(F.minus(vector.get(i)));
-//            tmp2.
-        }
-        
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
-//                matrix.assign(F.minus.apply(matrix.get(i, j), vector.get(j)));
-                matrix.set(i, j, matrix.get(i, j) - vector.get(j));
-            }
+
+        for (int i = 0; i < vector.size(); i++) {
+            matrix.viewColumn(i).assign(F.minus(vector.get(i)));
         }
 
         return matrix;
     }
 
+    private void calcRMSDError() {
+        ermsd = Math.sqrt((Math.abs(e0-2*esvd)/((p.rows()+q.rows())/2)));
+    }
+
     private void rotateStructures() {
-//        (A.mult(A.transpose(r),c))
+        cQ.assign(F.neg);
+        t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
+        int rows = q.rows();
+
+        for (int i = 0; i < rows; i++) {
+            q.viewRow(i).assign((A.mult(r, q.viewRow(i))).assign(t, F.plus));
+        }
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
@@ -155,6 +155,10 @@ public class Kabsch {
     public void init(double[][] matrixA, double[][] matrixB) {
         this.p = new DenseDoubleMatrix2D(matrixA);
         this.q = new DenseDoubleMatrix2D(matrixB);
+    }
+
+    private void calcRMSD() {
+        rmsd = Scores.getRMSD(p, q);
     }
 
     public static DenseDoubleMatrix1D getOriginVector(DenseDoubleMatrix2D matrix) {
@@ -176,9 +180,6 @@ public class Kabsch {
         result[1] = y.zSum() / rows;
         result[2] = z.zSum() / rows;
 
-//        for (int i = 0; i < cols; i++) {
-//            result[i] = result[i] / rows;
-//        }
         DenseDoubleMatrix1D resultmatrix = new DenseDoubleMatrix1D(result);
         return resultmatrix;
     }
@@ -208,6 +209,14 @@ public class Kabsch {
         return q;
     }
 
+    public double getRmsd() {
+        return rmsd;
+    }
+
+    public double getErmsd() {
+        return ermsd;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
