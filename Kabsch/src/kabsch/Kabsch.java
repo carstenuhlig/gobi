@@ -135,6 +135,10 @@ public class Kabsch {
         ermsd = Math.sqrt((Math.abs(e0 - 2 * esvd) / ((p.rows() + q.rows()) / 2)));
     }
 
+    private void calcRMSDError() {
+        ermsd = Math.sqrt((Math.abs(e0-2*esvd)/((p.rows()+q.rows())/2)));
+    }
+
     private void rotateStructures() {
         cQ.assign(F.neg);
         t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
@@ -158,6 +162,10 @@ public class Kabsch {
     public void init(double[][] matrixA, double[][] matrixB) {
         this.p = new DenseDoubleMatrix2D(matrixA);
         this.q = new DenseDoubleMatrix2D(matrixB);
+    }
+
+    private void calcRMSD() {
+        rmsd = Scores.getRMSD(p, q);
     }
 
     private void calcRMSD() {
