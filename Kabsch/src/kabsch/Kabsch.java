@@ -19,11 +19,13 @@ import cern.jet.math.Functions;
  */
 public class Kabsch {
 
-    DenseDoubleMatrix2D p, q;
-    DoubleMatrix2D a, s, v, u, r, t;
+    //p und q origin stehen für unberührte koordinaten für spätere rmsd berechnung
+    DenseDoubleMatrix2D p, q, pOrigin, qOrigin;
+    DoubleMatrix2D a, s, v, u, r;
+    DoubleMatrix1D t;
     DenseDoubleMatrix1D cP, cQ;
 
-    double e0, esvd;
+    double e0, esvd, rmsd, ermsd;
 
     final static Functions F = Functions.functions;
     final static Algebra A = new Algebra();
@@ -35,6 +37,8 @@ public class Kabsch {
     public Kabsch(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
         this.p = p;
         this.q = q;
+        pOrigin = (DenseDoubleMatrix2D) this.p.copy();
+        qOrigin = (DenseDoubleMatrix2D) this.q.copy();
     }
 
     private void translate() {
@@ -75,6 +79,7 @@ public class Kabsch {
 
         //error von s ausrechnen... keine ahnung was das sein soll.
         esvd = calcSVDError(s);
+        calcRMSDError();
 
         //rotation matrix berechnen
         r = A.mult(u, A.transpose(v));
@@ -89,9 +94,12 @@ public class Kabsch {
 
         //rotationsmatrix bestimmen
         calcRotation();
-        
+
         //proteinstrukturen rotieren
         rotateStructures();
+
+        //rmsd berechnen
+        calcRMSD();
     }
 
     public static DenseDoubleMatrix2D applyVector(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
@@ -100,46 +108,41 @@ public class Kabsch {
         if (cols != vector.size()) {
             return null;
         }
-        
+
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
-//                matrix.assign(F.minus.apply(matrix.get(i, j), vector.get(j)));
                 matrix.set(i, j, matrix.get(i, j) - vector.get(j));
             }
         }
 
         return matrix;
     }
-    
-    public static DenseDoubleMatrix2D applyVectorFast(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
-        int rows = matrix.rows();
+
+    public static void applyVectorFast(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
         int cols = matrix.columns();
         if (cols != vector.size()) {
-            return null;
-        }
-        
-        DoubleMatrix2D tmp2 = matrix.like();
-        
-        for ( int i = 0; i<vector.size();i++) {
-            DoubleMatrix1D tmp = matrix.viewColumn(i);
-            tmp.assign(F.minus(vector.get(i)));
-//            tmp2.
-        }
-        
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                //TODO mit integrierten Funktionen machen (FactoryFunctions) --> keinen blassen schimmer wie das geht.
-//                matrix.assign(F.minus.apply(matrix.get(i, j), vector.get(j)));
-                matrix.set(i, j, matrix.get(i, j) - vector.get(j));
-            }
+            return;
         }
 
-        return matrix;
+        for (int i = 0; i < vector.size(); i++) {
+            matrix.viewColumn(i).assign(F.minus(vector.get(i)));
+        }
+
+//        return matrix;
+    }
+
+    private void calcRMSDError() {
+        ermsd = Math.sqrt((Math.abs(e0 - 2 * esvd) / ((p.rows() + q.rows()) / 2)));
     }
 
     private void rotateStructures() {
-//        (A.mult(A.transpose(r),c))
+        cQ.assign(F.neg);
+        t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
+        int rows = q.rows();
+
+        for (int i = 0; i < rows; i++) {
+            qOrigin.viewRow(i).assign((A.mult(r, qOrigin.viewRow(i))).assign(t, F.plus));
+        }
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
@@ -157,16 +160,15 @@ public class Kabsch {
         this.q = new DenseDoubleMatrix2D(matrixB);
     }
 
+    private void calcRMSD() {
+        rmsd = Scores.getRMSD(pOrigin, qOrigin);
+    }
+
     public static DenseDoubleMatrix1D getOriginVector(DenseDoubleMatrix2D matrix) {
         int rows = matrix.rows();
         int cols = matrix.columns();
 
         double[] result = new double[cols];
-//        for (int i = 0; i < rows; i++) {
-//            for (int j = 0; j < cols; j++) {
-//                result[j] += matrix.getQuick(i, j);
-//            }
-//        }
 
         DoubleMatrix1D x = matrix.viewColumn(0);
         DoubleMatrix1D y = matrix.viewColumn(1);
@@ -176,9 +178,6 @@ public class Kabsch {
         result[1] = y.zSum() / rows;
         result[2] = z.zSum() / rows;
 
-//        for (int i = 0; i < cols; i++) {
-//            result[i] = result[i] / rows;
-//        }
         DenseDoubleMatrix1D resultmatrix = new DenseDoubleMatrix1D(result);
         return resultmatrix;
     }
@@ -206,6 +205,14 @@ public class Kabsch {
 
     public DenseDoubleMatrix2D getQ() {
         return q;
+    }
+
+    public double getRmsd() {
+        return rmsd;
+    }
+
+    public double getErmsd() {
+        return ermsd;
     }
 
     @Override

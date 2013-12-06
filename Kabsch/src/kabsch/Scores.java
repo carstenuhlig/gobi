@@ -60,17 +60,19 @@ public class Scores {
 
         return (p1 + p2 + p4 + p8 / (4 * ((sizea + sizeb) / 2.)));
     }
-    
+
     public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
-        DenseDoubleMatrix2D tmp = (DenseDoubleMatrix2D)a.clone();
+        //copy schritt kann weggelassen werden falls keine nachstehenden operation an a mehr gibt
+        
+        DenseDoubleMatrix2D tmp = (DenseDoubleMatrix2D) a.copy();
         tmp.assign(b, F.minus);
         tmp.assign(F.square);
         int rows = tmp.rows();
-                
+
         double result = tmp.zSum();
-        
-        result = Math.sqrt(result/rows);
-        
+
+        result = Math.sqrt(result / rows);
+
         return result;
     }
 

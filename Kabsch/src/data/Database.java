@@ -38,7 +38,7 @@ public class Database {
     public DenseDoubleMatrix2D getRandomMatrix() {
         double random = Math.random();
         int size = matrices.size();
-        int nr = (int)(size*random);
+        int nr = (int) (size * random);
         int counter = 0;
         for (Map.Entry<String, DenseDoubleMatrix2D> entry : matrices.entrySet()) {
             String string = entry.getKey();
@@ -49,5 +49,18 @@ public class Database {
             counter++;
         }
         return null;
+    }
+
+    public DoubleMatrix2D getMatrixPiece(String id, int start, int length) throws NullPointerException, IndexOutOfBoundsException {
+//        if (!matrices.containsKey(id)) {
+//            return null;
+//        }
+        DoubleMatrix2D tmp = matrices.get(id).viewPart(start, 0, length, 3).copy();
+
+        return tmp;
+    }
+
+    public int getLengthOfId(String id) {
+        return matrices.get(id).rows();
     }
 }
