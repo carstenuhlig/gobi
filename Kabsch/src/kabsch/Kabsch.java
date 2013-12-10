@@ -96,7 +96,8 @@ public class Kabsch {
         calcRotation();
 
         //proteinstrukturen rotieren
-        rotateStructures();
+//        rotateStructures();
+        manuelRotateStructures();
 
         //rmsd berechnen
         calcRMSD();
@@ -135,10 +136,6 @@ public class Kabsch {
         ermsd = Math.sqrt((Math.abs(e0 - 2 * esvd) / ((p.rows() + q.rows()) / 2)));
     }
 
-    private void calcRMSDError() {
-        ermsd = Math.sqrt((Math.abs(e0-2*esvd)/((p.rows()+q.rows())/2)));
-    }
-
     private void rotateStructures() {
         cQ.assign(F.neg);
         t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
@@ -147,6 +144,28 @@ public class Kabsch {
         for (int i = 0; i < rows; i++) {
             qOrigin.viewRow(i).assign((A.mult(r, qOrigin.viewRow(i))).assign(t, F.plus));
         }
+    }
+    
+    private void manuelRotateStructures() {
+    	// tx= x * R[0][0]+ y * R[1][0] + z * R[2][0] +T[0] ty= x * R[0][1]+ y * R[1][1] + z * R[2][1] +T[1] tz= x * R[0][2]+ y * R[1][2] + z * R[2][2] +T[2]
+    	//x
+    	cQ.assign(F.neg);
+    	t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
+    	int rows = qOrigin.rows();
+    	
+    	for (int i = 0; i<rows;i++) {
+    		double x = qOrigin.get(i,0);
+    		double y = qOrigin.get(i,1);
+    		double z = qOrigin.get(i,2);
+    		
+    		double tx = x*r.get(0, 0) + y*r.get(1,0) + z* r.get(2,0) + t.get(0);
+    		double ty = x*r.get(0, 1) + y*r.get(1,1) + z* r.get(2,1) + t.get(1);
+    		double tz = x*r.get(0, 2) + y*r.get(1,2) + z* r.get(2,2) + t.get(2);
+    		
+    		qOrigin.set(i, 0, tx);
+    		qOrigin.set(i, 1, ty);
+    		qOrigin.set(i, 2, tz);
+    	}
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
@@ -164,9 +183,9 @@ public class Kabsch {
         this.q = new DenseDoubleMatrix2D(matrixB);
     }
 
-    private void calcRMSD() {
-        rmsd = Scores.getRMSD(p, q);
-    }
+//    private void calcRMSD() {
+//        rmsd = Scores.getRMSD(p, q);
+//    }
 
     private void calcRMSD() {
         rmsd = Scores.getRMSD(pOrigin, qOrigin);

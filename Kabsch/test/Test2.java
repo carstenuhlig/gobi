@@ -34,12 +34,17 @@ public class Test2 {
         Kabsch k;
         String result = "";
         String result2 = "";
+        double res = 0;
+        double res2 = 0;
         StringBuilder sb = new StringBuilder();
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat f = new DecimalFormat("#.####",dfs);
 
+        double totaldiff = 0;
+        
         int length = d.getLengthOfId(id);
+        int counter = 0;
 
         for (int i = 0; i < length - 11; i++) {
             for (int j = i + 1; j < length - 10; j++) {
@@ -47,16 +52,23 @@ public class Test2 {
                 second = (DenseDoubleMatrix2D) d.getMatrixPiece(id, j, 10);
                 k = new Kabsch(first, second);
                 k.main();
-                result = f.format(k.getErmsd());
-                result2 = f.format(k.getRmsd());
+                res = k.getErmsd();
+                res2 = k.getRmsd();
+                result = f.format(res);
+                result2 = f.format(res2);
                 sb.append(i + "-" + (i + 10) + "\t" + j + "-" + (j + 10) + "\t");
                 sb.append(result);
                 sb.append("\t");
                 sb.append(result2);
-                sb.append("(10)\n");
+                sb.append("(10) und Diff: ");
+                totaldiff+=Math.abs(res-res2);
+                sb.append(f.format(Math.abs(res-res2)));
+                sb.append("\n");
+                counter++;
             }
         }
-
+//        sb.append(totaldiff/counter);
+        
         System.out.println(sb.toString());
     }
 }

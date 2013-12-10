@@ -64,14 +64,19 @@ public class Scores {
     public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
         //copy schritt kann weggelassen werden falls keine nachstehenden operation an a mehr gibt
         
+    	//tmp ist a nur nochmal kopiert
+    	//a - b
         DenseDoubleMatrix2D tmp = (DenseDoubleMatrix2D) a.copy();
+        //2 2dimensionale matrizen
+        //a und b
+        //enthalten je
         tmp.assign(b, F.minus);
-        tmp.assign(F.square);
+        tmp.assign(F.square); //hoch 2
         int rows = tmp.rows();
+        
+        double result = tmp.zSum(); //summe über alle elemente in matrix
 
-        double result = tmp.zSum();
-
-        result = Math.sqrt(result / rows);
+        result = Math.sqrt(result / rows); //wurzel von (summe über alle elemente / anzahl aminosäuren)
 
         return result;
     }
