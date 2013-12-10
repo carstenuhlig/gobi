@@ -67,7 +67,7 @@ public class Test2 {
                 counter++;
             }
         }
-//        sb.append(totaldiff/counter);
+        sb.append(totaldiff/counter);
         
         System.out.println(sb.toString());
     }

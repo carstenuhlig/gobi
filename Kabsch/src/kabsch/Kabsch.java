@@ -20,7 +20,7 @@ import cern.jet.math.Functions;
 public class Kabsch {
 
     //p und q origin stehen für unberührte koordinaten für spätere rmsd berechnung
-    DenseDoubleMatrix2D p, q, pOrigin, qOrigin;
+    DenseDoubleMatrix2D p, q, pDasOriginal, qDasOriginal;
     DoubleMatrix2D a, s, v, u, r;
     DoubleMatrix1D t;
     DenseDoubleMatrix1D cP, cQ;
@@ -37,8 +37,8 @@ public class Kabsch {
     public Kabsch(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
         this.p = p;
         this.q = q;
-        pOrigin = (DenseDoubleMatrix2D) this.p.copy();
-        qOrigin = (DenseDoubleMatrix2D) this.q.copy();
+        pDasOriginal = (DenseDoubleMatrix2D) this.p.copy();
+        qDasOriginal = (DenseDoubleMatrix2D) this.q.copy();
     }
 
     private void translate() {
@@ -97,7 +97,7 @@ public class Kabsch {
 
         //proteinstrukturen rotieren
 //        rotateStructures();
-        manuelRotateStructures();
+        manualRotateStructures();
 
         //rmsd berechnen
         calcRMSD();
@@ -142,30 +142,36 @@ public class Kabsch {
         int rows = q.rows();
 
         for (int i = 0; i < rows; i++) {
-            qOrigin.viewRow(i).assign((A.mult(r, qOrigin.viewRow(i))).assign(t, F.plus));
+            qDasOriginal.viewRow(i).assign((A.mult(r, qDasOriginal.viewRow(i))).assign(t, F.plus));
         }
     }
-    
-    private void manuelRotateStructures() {
-    	// tx= x * R[0][0]+ y * R[1][0] + z * R[2][0] +T[0] ty= x * R[0][1]+ y * R[1][1] + z * R[2][1] +T[1] tz= x * R[0][2]+ y * R[1][2] + z * R[2][2] +T[2]
-    	//x
-    	cQ.assign(F.neg);
-    	t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
-    	int rows = qOrigin.rows();
-    	
-    	for (int i = 0; i<rows;i++) {
-    		double x = qOrigin.get(i,0);
-    		double y = qOrigin.get(i,1);
-    		double z = qOrigin.get(i,2);
-    		
-    		double tx = x*r.get(0, 0) + y*r.get(1,0) + z* r.get(2,0) + t.get(0);
-    		double ty = x*r.get(0, 1) + y*r.get(1,1) + z* r.get(2,1) + t.get(1);
-    		double tz = x*r.get(0, 2) + y*r.get(1,2) + z* r.get(2,2) + t.get(2);
-    		
-    		qOrigin.set(i, 0, tx);
-    		qOrigin.set(i, 1, ty);
-    		qOrigin.set(i, 2, tz);
-    	}
+
+    private void manualRotateStructures() {
+        //TODO implement easy version ( rotateStructures())
+        DoubleMatrix1D tmp = A.mult(r, cQ);
+        
+        tmp.assign(F.neg);
+        
+        tmp.assign(cP,F.plus);
+        
+//        cP.assign(t, F.min);
+        int rows = qDasOriginal.rows();
+
+        r = r.viewDice();
+
+        for (int i = 0; i < rows; i++) {
+            double x = qDasOriginal.get(i, 0);
+            double y = qDasOriginal.get(i, 1);
+            double z = qDasOriginal.get(i, 2);
+
+            double tx = x * r.get(0, 0) + y * r.get(1, 0) + z * r.get(2, 0) + tmp.get(0);
+            double ty = x * r.get(0, 1) + y * r.get(1, 1) + z * r.get(2, 1) + tmp.get(1);
+            double tz = x * r.get(0, 2) + y * r.get(1, 2) + z * r.get(2, 2) + tmp.get(2);
+
+            qDasOriginal.set(i, 0, tx);
+            qDasOriginal.set(i, 1, ty);
+            qDasOriginal.set(i, 2, tz);
+        }
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
@@ -186,9 +192,8 @@ public class Kabsch {
 //    private void calcRMSD() {
 //        rmsd = Scores.getRMSD(p, q);
 //    }
-
     private void calcRMSD() {
-        rmsd = Scores.getRMSD(pOrigin, qOrigin);
+        rmsd = Scores.getRMSD(pDasOriginal, qDasOriginal);
     }
 
     public static DenseDoubleMatrix1D getOriginVector(DenseDoubleMatrix2D matrix) {
