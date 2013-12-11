@@ -229,13 +229,13 @@ public class Main {
             }
 
             Computation.init(as1, as2, smatrix, m.getCharMap(matrixname), gapopen, gapextend, mode, ids[0], ids[1], 3, m.getFactorOfSubstitionMatrix(matrixname));
-            if (mode == Type.LOCAL || mode == Type.FREESHIFT) {
+            if (mode == util.Type.LOCAL) {
                 Computation.calcMatricesLocal();
             } else {
                 Computation.calcMatrices();
             }
 
-            if (!printalignment) {
+            if (!printalignment && !printmatrices) {
                 System.out.println(ids[0]
                         + " "
                         + ids[1]
@@ -243,6 +243,7 @@ public class Main {
                         + util.MatrixHelper.formatDecimal(Computation
                                 .backtrack()));
             }
+
             if (checkscores) {
                 Computation.backtrack();
                 // falls falsch durch check score fehler -> printAlignment wird
@@ -254,7 +255,7 @@ public class Main {
                     m.emptyMatrices();
                 }
             } else {
-                if (outputfile.isEmpty()) {
+                if (outputfile.isEmpty() && printalignment && !printmatrices) {
                     System.out.println(">"
                             + ids[0]
                             + " "
@@ -264,7 +265,7 @@ public class Main {
                                     .backtrack()));
                     Computation.saveAlignment(m);
                     m.printAlignment(name);
-                } else {
+                } else if (printalignment && !printmatrices) {
                     double ergebnis = Computation.backtrack();
                     Computation.saveAlignment(m);
                     StringBuilder sb = new StringBuilder();
@@ -338,9 +339,9 @@ public class Main {
 //        } else {
 //            ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
 //        }
-        ImportFile.readMatricesFromResources(m, r);
+//        ImportFile.readMatricesFromResources(m, r);
 //        ImportFile.readDir("res\\matrices", m, r);
-//        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
+        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
         ImportFile.readFile(pairfile, Type.PAIRFILE, m, r);
         ImportFile.readFile(seqlibfile, Type.SEQLIBFILE, m, r);
     }

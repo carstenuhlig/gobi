@@ -3,7 +3,6 @@ package main;
 import data.Matrix;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import util.Type;
 
 public class Computation {
@@ -38,7 +37,7 @@ public class Computation {
     private static String id_b;
 
     public static void init(String as1, String as2, int[][] smatrix,
-            HashMap<Character,Integer> charmap, double gapopen, double gapextend, Type type,
+            HashMap<Character, Integer> charmap, double gapopen, double gapextend, Type type,
             String id1, String id2, int factor, int factor_smat) {
         Computation.a = as1;
         Computation.b = as2;
@@ -46,7 +45,7 @@ public class Computation {
         Computation.ge = (int) (gapextend * (int) Math.pow(10, factor));
         Computation.go = (int) (gapopen * (int) Math.pow(10, factor));
 
-        factorInit(factor_smat, smatrix);
+        factorInit(factor_smat, smatrix, factor);
 
         Computation.type = type;
         Computation.id_a = id1;
@@ -60,34 +59,49 @@ public class Computation {
         Computation.score = -Double.MAX_VALUE;
         Computation.factor = factor;
 
-        // bei local alignment mindestens wert von 0, d.h. so lassen wie bei
+        // bei local alignment und freeshift mindestens wert von 0, d.h. so lassen wie bei
         // Initialisierung von Array
         if (type == Type.GLOBAL) {
             calcInitMatricesGlobal();
+        } else {
+            calcInitMatricesLocalOrFreeshift();
         }
     }
-    
-    private static void factorInit(int factor_smat, int[][] smatrix) {
+
+    private static void factorInit(int factor_smat, int[][] smatrix, int factor) {
         if (factor == factor_smat) {
             Computation.smat = smatrix;
         } else {
             Computation.smat = util.MatrixHelper.factor2DimInteger(smatrix, factor - factor_smat);
         }
     }
-    
+
     private static void calcInitMatricesGlobal() {
         for (int row = 1; row < a.length() + 1; row++) {
-                // A0,k = g(k)
-                mat[0][row][0] = calcGapScore(row);
-                // Di,0 = -Inf
-                mat[1][row][0] = -Integer.MAX_VALUE / 2;
-            }
-            for (int col = 1; col < b.length() + 1; col++) {
-                // Ak,0 = g(k)
-                mat[0][0][col] = calcGapScore(col);
-                // I0,j = -Inf
-                mat[2][0][col] = -Integer.MAX_VALUE / 2;
-            }
+            // A0,k = g(k)
+            mat[0][row][0] = calcGapScore(row);
+            // Di,0 = -Inf
+            mat[1][row][0] = -Integer.MAX_VALUE / 2;
+        }
+        for (int col = 1; col < b.length() + 1; col++) {
+            // Ak,0 = g(k)
+            mat[0][0][col] = calcGapScore(col);
+            // I0,j = -Inf
+            mat[2][0][col] = -Integer.MAX_VALUE / 2;
+        }
+    }
+    
+    private static void calcInitMatricesLocalOrFreeshift() {
+        for (int row = 1; row < a.length() + 1; row++) {
+            // A0,k = g(k)
+            // Di,0 = -Inf
+            mat[1][row][0] = -Integer.MAX_VALUE / 2;
+        }
+        for (int col = 1; col < b.length() + 1; col++) {
+            // Ak,0 = g(k)
+            // I0,j = -Inf
+            mat[2][0][col] = -Integer.MAX_VALUE / 2;
+        }
     }
 
     public static void calcMatrices() {
@@ -600,7 +614,7 @@ public class Computation {
     public static void saveAlignment(Matrix m) {
         // check ob matrizen schon gespeichert sind
         if (m.getMatrices(id_a, id_b) == null) {
-            saveMatrices(m); 
+            saveMatrices(m);
         }
         m.addAlignment(id_a, id_b, a, b, backtrack, score, type, mat);
     }
@@ -695,23 +709,23 @@ public class Computation {
 
     public static String toStringDebug() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append(id_a);
         sb.append(":");
         sb.append(a);
         sb.append("\n");
-        
+
         sb.append(id_b);
         sb.append(":");
         sb.append(b);
         sb.append("\n");
-        
+
         if (backtrack != null) {
             sb.append(Arrays.deepToString(backtrack));
         }
-        
+
         sb.append("\n");
-        
+
         sb.append(charmap.toString());
         sb.append("\n");
         sb.append("Faktor|gap_open|gap_extend: ");
@@ -733,10 +747,10 @@ public class Computation {
             }
             sb.append("\n");
         }
-        
+
         sb.append("Score = ");
         sb.append(score);
-        
+
         return sb.toString();
     }
 }

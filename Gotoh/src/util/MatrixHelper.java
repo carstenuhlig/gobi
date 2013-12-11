@@ -2,6 +2,7 @@ package util;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 public class MatrixHelper {
@@ -76,13 +77,19 @@ public class MatrixHelper {
     }
 
     public static String formatDecimal(double d) {
-        NumberFormat df = DecimalFormat.getInstance();
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat f = new DecimalFormat("0.000", dfs);
+        f.setGroupingUsed(false);
+        
+//        NumberFormat df = DecimalFormat.getInstance();
+//        df.setGroupingUsed(false);
+        
+//        df.setMinimumFractionDigits(3);
+//        df.setMaximumFractionDigits(3);
+//        df.setRoundingMode(RoundingMode.HALF_EVEN);
 
-        df.setMinimumFractionDigits(3);
-        df.setMaximumFractionDigits(3);
-        df.setRoundingMode(RoundingMode.HALF_EVEN);
-
-        return df.format(d);
+        return f.format(d);
     }
 
     public static String formatDecimal(double d, int min, int max) {
@@ -127,7 +134,7 @@ public class MatrixHelper {
             } else {
                 for (int i = 0; i < returnmatrix.length; i++) {
                     for (int j = 0; j < returnmatrix[i].length; j++) {
-                        returnmatrix[i][j] = (int) (matrix[i][j] * (int)Math.pow(10., max));
+                        returnmatrix[i][j] = (int) (matrix[i][j] * (int) Math.pow(10., max));
                     }
                 }
             }
@@ -145,7 +152,7 @@ public class MatrixHelper {
         } else {
             for (int i = 0; i < returnmatrix.length; i++) {
                 for (int j = 0; j < returnmatrix[i].length; j++) {
-                    returnmatrix[i][j] = (int) (matrix[i][j] * (int)Math.pow(10, factor));
+                    returnmatrix[i][j] = (int) (matrix[i][j] * (int) Math.pow(10, factor));
                 }
             }
         }
