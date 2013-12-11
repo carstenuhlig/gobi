@@ -17,9 +17,19 @@ import java.util.Map;
 public class Database {
 
     HashMap<String, DenseDoubleMatrix2D> matrices;
+    HashMap<String, String> sequences;
 
     public Database() {
         matrices = new HashMap<String, DenseDoubleMatrix2D>();
+        sequences = new HashMap<>();
+    }
+
+    public void addSequence(String id, String seq) {
+        sequences.put(id, seq);
+    }
+
+    public String getSequenceByID(String id) {
+        return sequences.get(id);
     }
 
     public void addMatrix(String id, DenseDoubleMatrix2D inputmatrix) {

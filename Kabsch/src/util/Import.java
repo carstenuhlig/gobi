@@ -6,14 +6,20 @@
 package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import data.Database;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,11 +29,62 @@ import java.util.regex.Pattern;
  */
 public class Import {
 
+    //HashMaps für Übersetzung der 3 letter codes von Aminosäuren
+    final static HashMap<String, Character> lts = new HashMap<String, Character>(); // abk für: longToShort
+
+    static {
+        lts.put("ALA", 'A');
+        lts.put("ARG", 'R');
+        lts.put("ASN", 'N');
+        lts.put("ASP", 'D');
+        lts.put("CYS", 'C');
+        lts.put("GLN", 'Q');
+        lts.put("GLU", 'E');
+        lts.put("GLY", 'G');
+        lts.put("HIS", 'H');
+        lts.put("ILE", 'I');
+        lts.put("LEU", 'L');
+        lts.put("LYS", 'K');
+        lts.put("MET", 'M');
+        lts.put("PHE", 'F');
+        lts.put("PRO", 'P');
+        lts.put("SER", 'S');
+        lts.put("THR", 'T');
+        lts.put("TRP", 'W');
+        lts.put("TYR", 'Y');
+        lts.put("VAL", 'V');
+    }
+
+    final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
+
+    static {
+        stl.put('A', "ALA");
+        stl.put('R', "ARG");
+        stl.put('N', "ASN");
+        stl.put('D', "ASP");
+        stl.put('C', "CYS");
+        stl.put('Q', "GLN");
+        stl.put('E', "GLU");
+        stl.put('G', "GLY");
+        stl.put('H', "HIS");
+        stl.put('I', "ILE");
+        stl.put('L', "LEU");
+        stl.put('K', "LYS");
+        stl.put('M', "MET");
+        stl.put('F', "PHE");
+        stl.put('P', "PRO");
+        stl.put('S', "SER");
+        stl.put('T', "THR");
+        stl.put('W', "TRP");
+        stl.put('Y', "TYR");
+        stl.put('V', "VAL");
+    }
+
     final static FileSystem FS = FileSystems.getDefault();
 
     public static DenseDoubleMatrix2D readSampleFile(String stringpath) throws IOException {
         Path p = Paths.get(stringpath);
-        
+
         List<String> strings = Files.readAllLines(p, Charset.defaultCharset());
         double[][] result = new double[strings.size()][3];
 
@@ -42,7 +99,7 @@ public class Import {
                 double x1 = Double.parseDouble(matcher.replaceAll("$2"));
                 double x2 = Double.parseDouble(matcher.replaceAll("$3"));
                 double x3 = Double.parseDouble(matcher.replaceAll("$4"));
-                
+
                 result[pos][0] = x1;
                 result[pos][1] = x2;
                 result[pos][2] = x3;
@@ -51,5 +108,62 @@ public class Import {
         DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
         resultmatrix.trimToSize();
         return resultmatrix;
+    }
+
+    public static void readPDBFile(String stringpath, String pdbid, Database d) {
+        Path path = FS.getPath(stringpath);
+        String along, xx, yy, zz, nr;
+        char ashort;
+        double x, y, z;
+        int i,max = 0;
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            StringBuilder aa = new StringBuilder();
+            double[][] result = new double[lines.size() / 4][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            for (String line : lines) {
+                if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
+                    if (line.substring(0, 4).equals("ATOM")) {
+                        if (line.substring(13, 15).equals("CA")) {
+                            //einlesen nach content format pdf files v3.3
+                            along = line.substring(17, 20);
+                            xx = line.substring(31, 38).replace(" ", "");
+                            yy = line.substring(39, 46).replace(" ", "");
+                            zz = line.substring(47, 54).replace(" ", "");
+                            nr = line.substring(23, 26).replace(" ", "");
+
+                            //parse und valueof
+                            x = Double.parseDouble(xx);
+                            y = Double.parseDouble(yy);
+                            z = Double.parseDouble(zz);
+                            i = Integer.parseInt(nr);
+
+                            //aminosäure konvertieren
+                            ashort = lts.get(along);
+
+                        //einspeichern
+                            //rotationmatrix
+                            result[i][0] = x;
+                            result[i][1] = y;
+                            result[i][2] = z;
+
+                            //aminosequence
+                            aa.append(ashort);
+                            max++;
+                        }
+                    }
+                }
+            }
+            //trimtosize doublematrix
+            DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
+            resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, max, 3);
+            resultmatrix.trimToSize();
+
+            //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //save to database
+            d.addMatrix(pdbid, resultmatrix);
+            d.addSequence(pdbid, aa.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(Import.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
