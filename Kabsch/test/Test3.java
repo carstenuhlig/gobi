@@ -16,5 +16,6 @@ public class Test3 {
         Database d = new Database();
         Import.readPDBFile("/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/1jb7B00.pdb", "1jb7B00", d);
         System.out.println(d.getMatrix("1jb7B00"));
+        System.out.println(d.getSequenceByID("1jb7B00"));
     }
 }

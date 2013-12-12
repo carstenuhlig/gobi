@@ -8,7 +8,10 @@ package data;
 import cern.colt.matrix.*;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -18,18 +21,35 @@ public class Database {
 
     HashMap<String, DenseDoubleMatrix2D> matrices;
     HashMap<String, String> sequences;
+    LinkedList<String> pairs;
+    LinkedList<String> pdbids;
 
     public Database() {
-        matrices = new HashMap<String, DenseDoubleMatrix2D>();
+        matrices = new HashMap<>();
         sequences = new HashMap<>();
+//        pdbids = new HashSet<>(); //kommt bei setten durch import von cathscop file
+//        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }
 
     public void addSequence(String id, String seq) {
         sequences.put(id, seq);
     }
+    
+    public void addPair(String pair) {
+        pairs.add(pair);
+    }
 
+    //performance iterator über pairs mit linkedlist
+    public LinkedList<String> getPairs() {
+        return pairs;
+    }
+    
     public String getSequenceByID(String id) {
         return sequences.get(id);
+    }
+    
+    public void setPairs(List<String> strings) {
+        pairs = new LinkedList(strings);
     }
 
     public void addMatrix(String id, DenseDoubleMatrix2D inputmatrix) {
@@ -44,7 +64,11 @@ public class Database {
         DenseDoubleMatrix2D matrix = matrices.get(id);
         return matrix.toString();
     }
-
+    
+    public void setPdbids(Set<String> list) {
+        pdbids = new LinkedList<>(list);
+    }
+    
     public DenseDoubleMatrix2D getRandomMatrix() {
         double random = Math.random();
         int size = matrices.size();

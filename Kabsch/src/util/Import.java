@@ -15,9 +15,11 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -164,6 +166,32 @@ public class Import {
             d.addSequence(pdbid, aa.toString());
         } catch (IOException ex) {
             Logger.getLogger(Import.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void importCathScop(String stringpath, Database d) {
+        Path path = FS.getPath(stringpath);
+        List<String> raw = new LinkedList<>();
+        List<String> pairs = new LinkedList<>();
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            for (String line : lines) {
+                String[] dang = line.split(" ");
+                //wenn spalte 3 gleich 4 dann speichere paar von pdbids und die pdbids einzeln in liste
+                if (dang[2].equals(dang[3])) {
+                    raw.add(dang[0]);
+                    raw.add(dang[1]);
+                    pairs.add(dang[0] + " " + dang[1]);
+                }
+            }
+            
+            //liste von einzelnen pdbids wird in set umgewandelt -> unique pdbids
+            Set<String> unique = new HashSet<String>(raw);
+            d.setPairs(pairs);
+            d.setPdbids(unique);
+        } catch (IOException ex) {
+            Logger.getLogger(Import.class.getName()).log(Level.SEVERE, null, ex);
+//            ex.printStackTrace();
         }
     }
 }
