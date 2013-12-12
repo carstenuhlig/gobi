@@ -1,6 +1,6 @@
 
 import data.Database;
-import util.Import;
+import util.IO;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,7 +17,7 @@ public class Test4 {
     public static void main (String[] args) {
         Database d = new Database();
         String cathscop = "res\\cathscop.inpairs";
-        Import.importCathScop(cathscop, d);
+        IO.importCathScop(cathscop, d);
         System.out.println("FINITO");
     }
 }

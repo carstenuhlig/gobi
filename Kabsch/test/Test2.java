@@ -7,7 +7,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import kabsch.Kabsch;
-import util.Import;
+import util.IO;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -24,7 +24,7 @@ public class Test2 {
         Database d = new Database();
         String id = "1r5ra00";
         try {
-            d.addMatrix(id, Import.readSampleFile("res/1r5ra00.backbone"));
+            d.addMatrix(id, IO.readSampleFile("res/1r5ra00.backbone"));
         } catch (IOException ex) {
             Logger.getLogger(Test2.class.getName()).log(Level.SEVERE, null, ex);
         }

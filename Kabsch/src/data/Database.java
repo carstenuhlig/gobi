@@ -35,6 +35,14 @@ public class Database {
         sequences.put(id, seq);
     }
     
+    public HashMap<String,String> getSequences() {
+        return sequences;
+    }
+    
+    public LinkedList<String> getPdbids() {
+        return pdbids;
+    }
+    
     public void addPair(String pair) {
         pairs.add(pair);
     }

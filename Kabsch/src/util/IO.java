@@ -7,6 +7,7 @@ package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import data.Database;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -17,8 +18,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +32,7 @@ import java.util.regex.Pattern;
  *
  * @author uhligc
  */
-public class Import {
+public class IO {
 
     //HashMaps für Übersetzung der 3 letter codes von Aminosäuren
     final static HashMap<String, Character> lts = new HashMap<String, Character>(); // abk für: longToShort
@@ -56,6 +59,8 @@ public class Import {
         lts.put("TYR", 'Y');
         lts.put("VAL", 'V');
     }
+
+    final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
 
     final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
 
@@ -117,7 +122,7 @@ public class Import {
         String along, xx, yy, zz, nr;
         char ashort;
         double x, y, z;
-        int i,max = 0;
+        int i, max = 0;
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
             StringBuilder aa = new StringBuilder();
@@ -142,7 +147,7 @@ public class Import {
                             //aminosäure konvertieren
                             ashort = lts.get(along);
 
-                        //einspeichern
+                            //einspeichern
                             //rotationmatrix
                             result[i][0] = x;
                             result[i][1] = y;
@@ -165,10 +170,10 @@ public class Import {
             d.addMatrix(pdbid, resultmatrix);
             d.addSequence(pdbid, aa.toString());
         } catch (IOException ex) {
-            Logger.getLogger(Import.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static void importCathScop(String stringpath, Database d) {
         Path path = FS.getPath(stringpath);
         List<String> raw = new LinkedList<>();
@@ -184,14 +189,50 @@ public class Import {
                     pairs.add(dang[0] + " " + dang[1]);
                 }
             }
-            
+
             //liste von einzelnen pdbids wird in set umgewandelt -> unique pdbids
             Set<String> unique = new HashSet<String>(raw);
             d.setPairs(pairs);
             d.setPdbids(unique);
         } catch (IOException ex) {
-            Logger.getLogger(Import.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
 //            ex.printStackTrace();
         }
+    }
+
+    public static void importListOfPDBIds(Database d) {
+        List<String> list = d.getPdbids();
+        for (Iterator<String> it = list.iterator(); it.hasNext();) {
+            StringBuilder sb = new StringBuilder(path_to_pdbfiles);
+            String pdbid = it.next();
+            sb.append(pdbid);
+            sb.append(".pdb");
+            readPDBFile(sb.toString(), pdbid, d);
+        }
+    }
+
+    public static void exportForGotoh(String stringpathpairs, String stringpathseqlib, Database d) throws IOException {
+        //init path und kram
+        Path pairsp = FS.getPath(stringpathpairs);
+        Path seqlibp = FS.getPath(stringpathseqlib);
+        BufferedWriter pairs = new BufferedWriter(Files.newBufferedWriter(pairsp, StandardCharsets.UTF_8));
+        BufferedWriter seqlib = new BufferedWriter(Files.newBufferedWriter(seqlibp, StandardCharsets.UTF_8));
+
+        //hauptteil
+        LinkedList<String> liste = d.getPairs();
+        HashMap<String, String> sequences = d.getSequences();
+
+        //pairs write
+        for (Iterator<String> it = liste.iterator(); it.hasNext();) {
+            pairs.write(it.next() + "\n");
+        }
+        pairs.close();
+
+        for (Map.Entry<String, String> entry : sequences.entrySet()) {
+            String pdbid = entry.getKey();
+            String seq = entry.getValue();
+            seqlib.write(pdbid + ":" + seq + "\n");
+        }
+        seqlib.close();
     }
 }

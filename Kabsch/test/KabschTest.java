@@ -2,7 +2,7 @@
 import data.Database;
 import java.io.IOException;
 import kabsch.Kabsch;
-import util.Import;
+import util.IO;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,7 +17,7 @@ public class KabschTest {
 
     public static void main(String[] args) throws IOException {
         Database d = new Database();
-        d.addMatrix("1r5ra00", Import.readSampleFile("res/1r5ra00.backbone"));
+        d.addMatrix("1r5ra00", IO.readSampleFile("res/1r5ra00.backbone"));
 //        System.out.println(d.viewMatrix("1r5ra00"));
         Kabsch k = new Kabsch(d.getRandomMatrix(),d.getRandomMatrix());
         System.out.println(k.getP().toString());

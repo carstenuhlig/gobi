@@ -6,12 +6,19 @@
 
 package main;
 
+import data.Database;
+import java.io.IOException;
+import util.IO;
+
 /**
  *
  * @author uhligc
  */
 public class Main {
-    public static void main(String[] args ){
-        //TODO hauptcode
+    public static void main(String[] args ) throws IOException{
+        Database d = new Database();
+        IO.importCathScop(args[0], d);
+        IO.importListOfPDBIds(d);
+        IO.exportForGotoh(args[1], args[2], d); 
     }
 }
