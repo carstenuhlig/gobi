@@ -7,6 +7,7 @@ package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import data.Database;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,6 +17,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import kabsch.Kabsch;
 
 /**
  *
@@ -133,9 +137,9 @@ public class IO {
                         if (line.substring(13, 15).equals("CA")) {
                             //einlesen nach content format pdf files v3.3
                             along = line.substring(17, 20);
-                            xx = line.substring(31, 38).replace(" ", "");
-                            yy = line.substring(39, 46).replace(" ", "");
-                            zz = line.substring(47, 54).replace(" ", "");
+                            xx = line.substring(30, 38).replace(" ", "");
+                            yy = line.substring(38, 46).replace(" ", "");
+                            zz = line.substring(46, Math.min(55,line.length())).replace(" ", "");
                             nr = line.substring(23, 26).replace(" ", "");
 
                             //parse und valueof
@@ -234,5 +238,70 @@ public class IO {
             seqlib.write(pdbid + ":" + seq + "\n");
         }
         seqlib.close();
+    }
+
+    public static void processAlignmentFile(String stringpathin, String stringpathout, Database d) throws IOException {
+        Path path = FS.getPath(stringpathin);
+        Path pathout = FS.getPath(stringpathout);
+
+        BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+        BufferedWriter writer = Files.newBufferedWriter(pathout, StandardCharsets.UTF_8);
+        
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("#0.00000000000000000", dfs);
+        
+        String regex = "^(\\S+)\\:\\s(\\S+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher("");
+
+        String pdbid1 = null, pdbid2 = null, seq1 = null, seq2 = null;
+        double rmsd, gdt, identity;
+
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            if (!line.startsWith(">")) {
+                matcher.reset(line);
+                if (pdbid1 == null) {
+                    pdbid1 = matcher.replaceAll("$1");
+                    seq1 = matcher.replaceAll("$2");
+                } else {
+                    pdbid2 = matcher.replaceAll("$1");
+                    seq2 = matcher.replaceAll("$2");
+                }
+            } else {
+                if (pdbid1 != null) {
+                    DenseDoubleMatrix2D a = d.getMatrix(pdbid1);
+                    DenseDoubleMatrix2D b = d.getMatrix(pdbid2);
+
+                    //get reduced matrices
+                    DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2);
+
+                    Kabsch k = new Kabsch(reducedMatrices[0], reducedMatrices[1]);
+                    k.main();
+                    rmsd = k.getErmsd();
+                    gdt = k.getGdt();
+                    identity = Matrix.calcSequenceIdentity(seq1, seq2);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(pdbid1);
+                    sb.append("\t");
+                    sb.append(pdbid2);
+                    sb.append("\t");
+                    sb.append(df.format(identity));
+                    sb.append("\t");
+                    sb.append(df.format(rmsd));
+                    sb.append("\t");
+                    sb.append(df.format(gdt));
+                    sb.append("\n");
+
+                    writer.write(sb.toString());
+
+                    pdbid1 = null;
+                }
+            }
+        }
+        reader.close();
+        writer.close();
     }
 }

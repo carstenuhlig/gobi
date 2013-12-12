@@ -44,7 +44,7 @@ public class Scores {
             }
         }
 
-        return (p1 + p2 + p4 + p8 / (4. * size));
+        return ((p1 + p2 + p4 + p8) / (4. * size));
     }
 
     public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
