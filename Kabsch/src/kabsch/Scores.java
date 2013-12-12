@@ -16,29 +16,17 @@ import static kabsch.Kabsch.F;
  */
 public class Scores {
 
-    public static double calcGDT(double[][] matrixa, double[][] matrixb, int sizea, int sizeb) {
-        if (matrixa.length != matrixb.length) {
-            return -Double.MAX_VALUE;
-        }
-
-        //matrix enthält 4 spalten --> 1.spalte = wenn 1 dann aligniert wenn 0 dann nix
+    public static double calcGDT(DenseDoubleMatrix2D matrixa, DenseDoubleMatrix2D matrixb) {
         int p1 = 0;
         int p2 = 0;
         int p4 = 0;
         int p8 = 0;
 
-        int size = matrixa.length;
-        double tmp = 0;
+        int size = matrixa.rows();
+        double tmp;
 
         for (int i = 0; i < size; i++) {
-            if (matrixa[i][0] == 0) {
-                continue;
-            }
-            if (matrixb[i][0] == 0) {
-                continue;
-            }
-
-            tmp = getDistance(matrixa[i], matrixb[i]);
+            tmp = getDistance(matrixa.viewRow(i), matrixb.viewRow(i));
             if (tmp <= 1) {
                 p1++;
                 p2++;
@@ -53,12 +41,10 @@ public class Scores {
                 p8++;
             } else if (tmp <= 8) {
                 p8++;
-            } else {
-                //nix...
             }
         }
 
-        return (p1 + p2 + p4 + p8 / (4 * ((sizea + sizeb) / 2.)));
+        return (p1 + p2 + p4 + p8 / (4. * size));
     }
 
     public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
@@ -81,20 +67,9 @@ public class Scores {
         return result;
     }
 
-    public static double getDistance(double[] a, double[] b) {
-        //TODO mit Exception behandeln
-        if (a.length != b.length) {
-            return -Double.MAX_VALUE;
-        }
-
-        double result = 0.;
-
-        for (int i = 1; i < a.length; i++) {
-            result += Math.pow(a[i] - b[i], 2);
-        }
-
-        result = Math.sqrt(result);
-
-        return result;
+    public static double getDistance(DoubleMatrix1D a, DoubleMatrix1D b) {
+        DoubleMatrix1D tmp = a.copy();
+        tmp.assign(b, F.minus);
+        return Math.sqrt(tmp.aggregate(F.plus, F.square));
     }
 }
