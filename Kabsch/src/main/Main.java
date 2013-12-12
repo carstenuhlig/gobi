@@ -17,8 +17,10 @@ import util.IO;
 public class Main {
     public static void main(String[] args ) throws IOException{
         Database d = new Database();
-        IO.importCathScop(args[0], d);
+        String stringcathscop = "/home/proj/biosoft/praktikum/genprakt-ws13/assignment1/cathscop.inpairs";
+        IO.importCathScop(stringcathscop, d);
         IO.importListOfPDBIds(d);
-        IO.exportForGotoh(args[1], args[2], d); 
+//        IO.exportForGotoh(args[0], args[1], d);
+        IO.processAlignmentFile(args[0], args[1], d);
     }
 }

@@ -42,18 +42,33 @@ public class Matrix {
         DenseDoubleMatrix2D[] new_matrices = new DenseDoubleMatrix2D[2];
         DenseDoubleMatrix2D acopy = (DenseDoubleMatrix2D) a.copy();
         DenseDoubleMatrix2D bcopy = (DenseDoubleMatrix2D) b.copy();
-        
+
         for (int i = 0; i < pos_array[0].length; i++) {
-            new_matrices[0].viewRow(i).assign(acopy.viewColumn(pos_array[0][i]));
-            new_matrices[1].viewRow(i).assign(bcopy.viewColumn(pos_array[1][i]));
+            new_matrices[0].viewRow(i).assign(acopy.viewRow(pos_array[0][i]));
+            new_matrices[1].viewRow(i).assign(bcopy.viewRow(pos_array[1][i]));
         }
-        
+
         return new_matrices;
     }
-    
-    public static DenseDoubleMatrix2D[] processMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, char[][] alignment) {
+
+    public static DenseDoubleMatrix2D[] processMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, String astring, String bstring) {
+        char[][] alignment = new char[2][astring.length()];
+        alignment[0] = astring.toCharArray();
+        alignment[1] = bstring.toCharArray();
+
         int[][] tmpint = getPositionArray(alignment);
         DenseDoubleMatrix2D[] tmpdmatrix = getReducedMatrices(a, b, tmpint);
         return tmpdmatrix;
+    }
+
+    public static double calcSequenceIdentity(String astring, String bstring) {
+        int counter = 0;
+        int size = astring.length();
+        for (int i = 0; i < astring.length(); i++) {
+            if (astring.charAt(i) == bstring.charAt(i)) {
+                counter++;
+            }
+        }
+        return (double) size / counter;
     }
 }

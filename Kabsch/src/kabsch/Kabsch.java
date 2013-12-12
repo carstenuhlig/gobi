@@ -25,7 +25,7 @@ public class Kabsch {
     DoubleMatrix1D t;
     DenseDoubleMatrix1D cP, cQ;
 
-    double e0, esvd, rmsd, ermsd;
+    double e0, esvd, rmsd, ermsd, gdt;
 
     final static Functions F = Functions.functions;
     final static Algebra A = new Algebra();
@@ -118,6 +118,10 @@ public class Kabsch {
 
         return matrix;
     }
+    
+    private void calcGDT() {
+        gdt = Scores.calcGDT(pDasOriginal, qDasOriginal);
+    }
 
     public static void applyVectorFast(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
         int cols = matrix.columns();
@@ -144,6 +148,11 @@ public class Kabsch {
         for (int i = 0; i < rows; i++) {
             qDasOriginal.viewRow(i).assign((A.mult(r, qDasOriginal.viewRow(i))).assign(t, F.plus));
         }
+    }
+
+    public double getGdt() {
+        calcGDT();
+        return gdt;
     }
 
     private void manualRotateStructures() {

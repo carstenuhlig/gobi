@@ -7,6 +7,7 @@ package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import data.Database;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import kabsch.Kabsch;
 
 /**
  *
@@ -234,5 +236,64 @@ public class IO {
             seqlib.write(pdbid + ":" + seq + "\n");
         }
         seqlib.close();
+    }
+
+    public static void processAlignmentFile(String stringpathin, String stringpathout, Database d) throws IOException {
+        Path path = FS.getPath(stringpathin);
+        Path pathout = FS.getPath(stringpathout);
+
+        BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+        BufferedWriter writer = Files.newBufferedWriter(pathout, StandardCharsets.UTF_8);
+        String regex = "^(\\S+)\\:\\s(\\S+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher("");
+
+        String pdbid1 = null, pdbid2 = null, seq1 = null, seq2 = null;
+        double rmsd, gdt, identity;
+
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            if (!line.startsWith(">")) {
+                matcher.reset(line);
+                if (pdbid1 == null) {
+                    pdbid1 = matcher.replaceAll("$1");
+                    seq1 = matcher.replaceAll("$2");
+                } else {
+                    pdbid2 = matcher.replaceAll("$1");
+                    seq2 = matcher.replaceAll("$2");
+                }
+            } else {
+                if (pdbid1 != null) {
+                    DenseDoubleMatrix2D a = d.getMatrix(pdbid1);
+                    DenseDoubleMatrix2D b = d.getMatrix(pdbid2);
+
+                    //get reduced matrices
+                    DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2);
+
+                    Kabsch k = new Kabsch(reducedMatrices[0], reducedMatrices[1]);
+                    rmsd = k.getErmsd();
+                    gdt = k.getGdt();
+                    identity = Matrix.calcSequenceIdentity(seq1, seq2);
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(pdbid1);
+                    sb.append("\t");
+                    sb.append(pdbid2);
+                    sb.append("\t");
+                    sb.append(identity);
+                    sb.append("\t");
+                    sb.append(rmsd);
+                    sb.append("\t");
+                    sb.append(gdt);
+                    sb.append("\n");
+
+                    writer.write(sb.toString());
+
+                    pdbid1 = null;
+                }
+            }
+        }
+        reader.close();
+        writer.close();
     }
 }
