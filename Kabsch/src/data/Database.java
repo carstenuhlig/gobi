@@ -94,9 +94,6 @@ public class Database {
     }
 
     public DoubleMatrix2D getMatrixPiece(String id, int start, int length) throws NullPointerException, IndexOutOfBoundsException {
-//        if (!matrices.containsKey(id)) {
-//            return null;
-//        }
         DoubleMatrix2D tmp = matrices.get(id).viewPart(start, 0, length, 3).copy();
 
         return tmp;

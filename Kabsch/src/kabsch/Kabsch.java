@@ -140,6 +140,7 @@ public class Kabsch {
         ermsd = Math.sqrt((Math.abs(e0 - 2 * esvd) / ((p.rows() + q.rows()) / 2)));
     }
 
+    //deprecated
     private void rotateStructures() {
         cQ.assign(F.neg);
         t = (A.mult(r.viewDice(), cQ)).assign(cP, F.plus);
