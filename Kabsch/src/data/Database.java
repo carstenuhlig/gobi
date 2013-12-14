@@ -20,6 +20,7 @@ import java.util.Set;
 public class Database {
 
     HashMap<String, DenseDoubleMatrix2D> matrices;
+    HashMap<String, DenseDoubleMatrix2D> bigmatrices; //sollen matrizen mit anderen zusätzlichen Atomen darstellen
     HashMap<String, String> sequences;
     LinkedList<String> pairs;
     LinkedList<String> pdbids;
@@ -27,22 +28,33 @@ public class Database {
     public Database() {
         matrices = new HashMap<>();
         sequences = new HashMap<>();
+        bigmatrices = new HashMap<>();
 //        pdbids = new HashSet<>(); //kommt bei setten durch import von cathscop file
 //        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }
 
     public void addSequence(String id, String seq) {
+        
         sequences.put(id, seq);
     }
     
-    public HashMap<String,String> getSequences() {
-        return sequences;
+    public void addBigMatrix(String pdbid, DenseDoubleMatrix2D a) {
+        bigmatrices.put(pdbid, a);
     }
     
+    public DenseDoubleMatrix2D getBigMatrix(String pdbid) {
+        DenseDoubleMatrix2D bla = bigmatrices.get(pdbid);
+        return (DenseDoubleMatrix2D) bla.copy();
+    }
+
+    public HashMap<String, String> getSequences() {
+        return sequences;
+    }
+
     public LinkedList<String> getPdbids() {
         return pdbids;
     }
-    
+
     public void addPair(String pair) {
         pairs.add(pair);
     }
@@ -51,11 +63,11 @@ public class Database {
     public LinkedList<String> getPairs() {
         return pairs;
     }
-    
+
     public String getSequenceByID(String id) {
         return sequences.get(id);
     }
-    
+
     public void setPairs(List<String> strings) {
         pairs = new LinkedList(strings);
     }
@@ -72,11 +84,11 @@ public class Database {
         DenseDoubleMatrix2D matrix = matrices.get(id);
         return matrix.toString();
     }
-    
+
     public void setPdbids(Set<String> list) {
         pdbids = new LinkedList<>(list);
     }
-    
+
     public DenseDoubleMatrix2D getRandomMatrix() {
         double random = Math.random();
         int size = matrices.size();

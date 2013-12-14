@@ -22,6 +22,10 @@ public class PatternTest {
         
         System.out.println(matcher.reset(input).matches());
 
+        String nix = "babababab abababa";
+        String a = nix.replaceAll(nix, "\\w+\\s(\\w+)");
+        
+        
         int pos = Integer.parseInt(matcher.replaceFirst("$1"));
         double x1 = Double.parseDouble(matcher.replaceAll("$2"));
         double x2 = Double.parseDouble(matcher.replaceAll("$3"));

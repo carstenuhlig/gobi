@@ -20,7 +20,7 @@ import cern.jet.math.Functions;
 public class Kabsch {
 
     //p und q origin stehen für unberührte koordinaten für spätere rmsd berechnung
-    DenseDoubleMatrix2D p, q, pDasOriginal, qDasOriginal;
+    DenseDoubleMatrix2D p, q, pDasOriginal, qDasOriginal, qBig;
     DoubleMatrix2D a, s, v, u, r;
     DoubleMatrix1D t;
     DenseDoubleMatrix1D cP, cQ;
@@ -59,6 +59,14 @@ public class Kabsch {
         DoubleMatrix2D tcP = p.viewDice();
         //multiplikation der beiden matrizen
         a = A.mult(tcP, q);
+    }
+    
+    private void importBigMatrices(DenseDoubleMatrix2D big) {
+        qBig = big;
+    }
+
+    public DenseDoubleMatrix2D getqBig() {
+        return qBig;
     }
 
     private void calcRotation() {
@@ -118,7 +126,7 @@ public class Kabsch {
 
         return matrix;
     }
-    
+
     private void calcGDT() {
         gdt = Scores.calcGDT(pDasOriginal, qDasOriginal);
     }
@@ -158,12 +166,12 @@ public class Kabsch {
 
     private void manualRotateStructures() {
         //TODO implement easy version ( rotateStructures())
-        DoubleMatrix1D tmp = A.mult(r, cQ);
-        
-        tmp.assign(F.neg);
-        
-        tmp.assign(cP,F.plus);
-        
+        t = A.mult(r, cQ);
+
+        t.assign(F.neg);
+
+        t.assign(cP, F.plus);
+
 //        cP.assign(t, F.min);
         int rows = qDasOriginal.rows();
 
@@ -174,14 +182,36 @@ public class Kabsch {
             double y = qDasOriginal.get(i, 1);
             double z = qDasOriginal.get(i, 2);
 
-            double tx = x * r.get(0, 0) + y * r.get(1, 0) + z * r.get(2, 0) + tmp.get(0);
-            double ty = x * r.get(0, 1) + y * r.get(1, 1) + z * r.get(2, 1) + tmp.get(1);
-            double tz = x * r.get(0, 2) + y * r.get(1, 2) + z * r.get(2, 2) + tmp.get(2);
+            double tx = x * r.get(0, 0) + y * r.get(1, 0) + z * r.get(2, 0) + t.get(0);
+            double ty = x * r.get(0, 1) + y * r.get(1, 1) + z * r.get(2, 1) + t.get(1);
+            double tz = x * r.get(0, 2) + y * r.get(1, 2) + z * r.get(2, 2) + t.get(2);
 
             qDasOriginal.set(i, 0, tx);
             qDasOriginal.set(i, 1, ty);
             qDasOriginal.set(i, 2, tz);
         }
+    }
+    
+    private void maunalCalcBigMatrices() {
+        int rows = qBig.rows();
+        for (int i = 0; i < rows; i++) {
+            double x = qBig.get(i, 0);
+            double y = qBig.get(i, 1);
+            double z = qBig.get(i, 2);
+
+            double tx = x * r.get(0, 0) + y * r.get(1, 0) + z * r.get(2, 0) + t.get(0);
+            double ty = x * r.get(0, 1) + y * r.get(1, 1) + z * r.get(2, 1) + t.get(1);
+            double tz = x * r.get(0, 2) + y * r.get(1, 2) + z * r.get(2, 2) + t.get(2);
+
+            qBig.set(i, 0, tx);
+            qBig.set(i, 1, ty);
+            qBig.set(i, 2, tz);
+        }
+    }
+    
+    public void processWholeStructure(DenseDoubleMatrix2D a){
+        importBigMatrices(a);
+        maunalCalcBigMatrices();
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {

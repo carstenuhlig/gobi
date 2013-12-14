@@ -139,7 +139,64 @@ public class IO {
                             along = line.substring(17, 20);
                             xx = line.substring(30, 38).replace(" ", "");
                             yy = line.substring(38, 46).replace(" ", "");
-                            zz = line.substring(46, Math.min(55,line.length())).replace(" ", "");
+                            zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
+                            nr = line.substring(23, 26).replace(" ", "");
+
+                            //parse und valueof
+                            x = Double.parseDouble(xx);
+                            y = Double.parseDouble(yy);
+                            z = Double.parseDouble(zz);
+                            i = Integer.parseInt(nr);
+
+                            //aminosäure konvertieren
+                            ashort = lts.get(along);
+
+                            //einspeichern
+                            //rotationmatrix
+                            result[i][0] = x;
+                            result[i][1] = y;
+                            result[i][2] = z;
+
+                            //aminosequence
+                            aa.append(ashort);
+                            max++;
+                        }
+                    }
+                }
+            }
+            //trimtosize doublematrix
+            DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
+            resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, max, 3);
+            resultmatrix.trimToSize();
+
+            //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //save to database
+            d.addMatrix(pdbid, resultmatrix);
+            d.addSequence(pdbid, aa.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void readPDBFile(String pdbid, Database d) {
+        Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
+        String along, xx, yy, zz, nr;
+        char ashort;
+        double x, y, z;
+        int i, max = 0;
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            StringBuilder aa = new StringBuilder();
+            double[][] result = new double[lines.size() / 4][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            for (String line : lines) {
+                if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
+                    if (line.substring(0, 4).equals("ATOM")) {
+                        if (line.substring(13, 15).equals("CA")) {
+                            //einlesen nach content format pdf files v3.3
+                            along = line.substring(17, 20);
+                            xx = line.substring(30, 38).replace(" ", "");
+                            yy = line.substring(38, 46).replace(" ", "");
+                            zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
                             nr = line.substring(23, 26).replace(" ", "");
 
                             //parse und valueof
@@ -178,6 +235,54 @@ public class IO {
         }
     }
 
+    public static void readPDBFileWhole(String pdbid, Database d) {
+        Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
+        String xx, yy, zz, nr;
+        double x, y, z;
+        int i = 0;
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            double[][] result = new double[lines.size()][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            for (String line : lines) {
+                if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
+                    if (line.substring(0, 4).equals("ATOM")) {
+                        //einlesen nach content format pdf files v3.3
+                        xx = line.substring(30, 38).replace(" ", "");
+                        yy = line.substring(38, 46).replace(" ", "");
+                        zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
+                        nr = line.substring(23, 26).replace(" ", "");
+
+                        //parse und valueof
+                        x = Double.parseDouble(xx);
+                        y = Double.parseDouble(yy);
+                        z = Double.parseDouble(zz);
+
+                        //einspeichern
+                        //rotationmatrix
+                        result[i][0] = x;
+                        result[i][1] = y;
+                        result[i][2] = z;
+
+                        //aminosequence
+                        i++;
+                    }
+                }
+            }
+            //trimtosize doublematrix
+            DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
+            resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, i, 3);
+            resultmatrix.trimToSize();
+
+        //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //save to database
+            d.addBigMatrix(pdbid, resultmatrix);
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    
+
     public static void importCathScop(String stringpath, Database d) {
         Path path = FS.getPath(stringpath);
         List<String> raw = new LinkedList<>();
@@ -198,8 +303,10 @@ public class IO {
             Set<String> unique = new HashSet<String>(raw);
             d.setPairs(pairs);
             d.setPdbids(unique);
+
         } catch (IOException ex) {
-            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(IO.class
+                    .getName()).log(Level.SEVERE, null, ex);
 //            ex.printStackTrace();
         }
     }
@@ -246,11 +353,11 @@ public class IO {
 
         BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
         BufferedWriter writer = Files.newBufferedWriter(pathout, StandardCharsets.UTF_8);
-        
+
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat("#0.00000000000000000", dfs);
-        
+
         String regex = "^(\\S+)\\:\\s(\\S+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher("");
@@ -273,7 +380,7 @@ public class IO {
                 if (pdbid1 != null) {
                     DenseDoubleMatrix2D a = d.getMatrix(pdbid1);
                     DenseDoubleMatrix2D b = d.getMatrix(pdbid2);
-
+                    
                     //get reduced matrices
                     DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2);
 
