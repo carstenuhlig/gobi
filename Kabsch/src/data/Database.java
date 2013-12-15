@@ -21,6 +21,8 @@ public class Database {
 
     HashMap<String, DenseDoubleMatrix2D> matrices;
     HashMap<String, DenseDoubleMatrix2D> bigmatrices; //sollen matrizen mit anderen zusätzlichen Atomen darstellen
+    HashMap<String, LinkedList<String>> atom_types;
+    HashMap<String, LinkedList<Character>> chains;
     HashMap<String, String> sequences;
     LinkedList<String> pairs;
     LinkedList<String> pdbids;
@@ -29,22 +31,39 @@ public class Database {
         matrices = new HashMap<>();
         sequences = new HashMap<>();
         bigmatrices = new HashMap<>();
+        atom_types = new HashMap<>();
+        chains = new HashMap<>();
 //        pdbids = new HashSet<>(); //kommt bei setten durch import von cathscop file
 //        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }
 
     public void addSequence(String id, String seq) {
-        
         sequences.put(id, seq);
     }
-    
+
+    public void addChain(String pdbid, LinkedList<Character> chain_list) {
+        chains.put(pdbid, chain_list);
+    }
+
+    public LinkedList<Character> getChainFromPDBDID(String pdbid) {
+        return chains.get(this);
+    }
+
     public void addBigMatrix(String pdbid, DenseDoubleMatrix2D a) {
         bigmatrices.put(pdbid, a);
     }
-    
+
     public DenseDoubleMatrix2D getBigMatrix(String pdbid) {
         DenseDoubleMatrix2D bla = bigmatrices.get(pdbid);
         return (DenseDoubleMatrix2D) bla.copy();
+    }
+
+    public void addAtomTypeList(String pdbid, LinkedList<String> atom_type_list) {
+        atom_types.put(pdbid, atom_type_list);
+    }
+
+    public LinkedList<String> getAtomListBypdbid(String pdbid) {
+        return atom_types.get(pdbid);
     }
 
     public HashMap<String, String> getSequences() {

@@ -237,12 +237,15 @@ public class IO {
 
     public static void readPDBFileWhole(String pdbid, Database d) {
         Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
-        String xx, yy, zz, nr;
+        String xx, yy, zz, nr, atom_type;
+        char chain;
         double x, y, z;
         int i = 0;
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
             double[][] result = new double[lines.size()][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            LinkedList<String> atom_types = new LinkedList<>();
+            LinkedList<Character> chains = new LinkedList<>();
             for (String line : lines) {
                 if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
                     if (line.substring(0, 4).equals("ATOM")) {
@@ -251,7 +254,9 @@ public class IO {
                         yy = line.substring(38, 46).replace(" ", "");
                         zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
                         nr = line.substring(23, 26).replace(" ", "");
-
+                        atom_type = line.substring(13,16);
+                        chain = line.charAt(21);
+                        
                         //parse und valueof
                         x = Double.parseDouble(xx);
                         y = Double.parseDouble(yy);
@@ -262,7 +267,9 @@ public class IO {
                         result[i][0] = x;
                         result[i][1] = y;
                         result[i][2] = z;
-
+                        atom_types.add(atom_type);
+                        chains.add(chain);
+                        
                         //aminosequence
                         i++;
                     }
@@ -276,6 +283,9 @@ public class IO {
         //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
             //save to database
             d.addBigMatrix(pdbid, resultmatrix);
+            d.addAtomTypeList(pdbid, atom_types);
+            d.addChain(pdbid, chains);
+            
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -322,6 +332,27 @@ public class IO {
         }
     }
 
+    public static void exportToPDB(Database d, String pdbid, String stringpath) {
+        Path path = FS.getPath(stringpath);
+        DenseDoubleMatrix2D tmp = d.getBigMatrix(pdbid);
+        int size = tmp.rows();
+        List<String> atom_type = d.getAtomListBypdbid(pdbid);
+        LinkedList<Character> chains = d.getChainFromPDBDID(pdbid);
+        
+        
+        
+        try {
+            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public static String fixedLength(String string, int length) {
+        return String.format("%1$"+length+ "s", string);
+    }
+    
     public static void exportForGotoh(String stringpathpairs, String stringpathseqlib, Database d) throws IOException {
         //init path und kram
         Path pairsp = FS.getPath(stringpathpairs);
@@ -329,11 +360,11 @@ public class IO {
         BufferedWriter pairs = new BufferedWriter(Files.newBufferedWriter(pairsp, StandardCharsets.UTF_8));
         BufferedWriter seqlib = new BufferedWriter(Files.newBufferedWriter(seqlibp, StandardCharsets.UTF_8));
 
-        //hauptteil
+        //Hauptteil
         LinkedList<String> liste = d.getPairs();
         HashMap<String, String> sequences = d.getSequences();
 
-        //pairs write
+        //Pairs write
         for (Iterator<String> it = liste.iterator(); it.hasNext();) {
             pairs.write(it.next() + "\n");
         }

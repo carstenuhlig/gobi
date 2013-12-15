@@ -24,6 +24,9 @@ public class PatternTest {
 
         String nix = "babababab abababa";
         String a = nix.replaceAll(nix, "\\w+\\s(\\w+)");
+        if ( nix.matches(regex)) {
+            System.out.println("geht");
+        }
         
         
         int pos = Integer.parseInt(matcher.replaceFirst("$1"));

@@ -5,17 +5,12 @@ import kabsch.Kabsch;
 import util.IO;
 import util.Matrix;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author uhligc
  */
 public class Test5 {
+
     public static void main(String[] args) {
         Database d = new Database();
         String first = "1tfxC00";
@@ -28,12 +23,14 @@ public class Test5 {
         IO.readPDBFile(second, d);
         IO.readPDBFileWhole(first, d);
         IO.readPDBFileWhole(second, d);
-        
+
         DenseDoubleMatrix2D[] dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
         Kabsch k = new Kabsch(dada[0], dada[1]);
         k.main();
-        k.processWholeStructure(d.getBigMatrix(second));
-        
-        System.out.println(k.getqBig());
+        DenseDoubleMatrix2D secondprotein = k.processWholeStructure(d.getBigMatrix(second));
+        dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
+        k = new Kabsch(dada[0], dada[1]);
+        k.main();
+        DenseDoubleMatrix2D fourthprotein = k.processWholeStructure(d.getBigMatrix(fourth));
     }
 }

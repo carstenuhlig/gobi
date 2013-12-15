@@ -192,7 +192,7 @@ public class Kabsch {
         }
     }
     
-    private void maunalCalcBigMatrices() {
+    private void manualCalcBigMatrices() {
         int rows = qBig.rows();
         for (int i = 0; i < rows; i++) {
             double x = qBig.get(i, 0);
@@ -209,9 +209,10 @@ public class Kabsch {
         }
     }
     
-    public void processWholeStructure(DenseDoubleMatrix2D a){
+    public DenseDoubleMatrix2D processWholeStructure(DenseDoubleMatrix2D a){
         importBigMatrices(a);
-        maunalCalcBigMatrices();
+        manualCalcBigMatrices();
+        return qBig;
     }
 
     public static double calcInitError(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
