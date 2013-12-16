@@ -358,7 +358,7 @@ public class IO {
             sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
             sb.append(" ");
             sb.append(chain);
-            sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+            sb.append(fixedLength(String.valueOf(counterCalpha), 4));
             sb.append("    ");
             sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
             sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
@@ -414,7 +414,7 @@ public class IO {
                 sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
                 sb.append(" ");
                 sb.append(chain);
-                sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+                sb.append(fixedLength(String.valueOf(counterCalpha), 4));
                 sb.append("    ");
                 sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
                 sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
@@ -427,7 +427,8 @@ public class IO {
                 }
                 counter++;
             }
-            bw.write("TER\n");
+            
+            bw.write("ENDMODEL\n");
             bw.close();
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
