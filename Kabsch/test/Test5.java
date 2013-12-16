@@ -27,10 +27,14 @@ public class Test5 {
         DenseDoubleMatrix2D[] dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
         Kabsch k = new Kabsch(dada[0], dada[1]);
         k.main();
+        
+//        IO.exportToPDB(d, first, first + ".pdb");
         DenseDoubleMatrix2D secondprotein = k.processWholeStructure(d.getBigMatrix(second));
-        dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
-        k = new Kabsch(dada[0], dada[1]);
-        k.main();
-        DenseDoubleMatrix2D fourthprotein = k.processWholeStructure(d.getBigMatrix(fourth));
+        IO.exportToPDB(d, second, second + ".pdb", secondprotein);
+        
+//        dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
+//        k = new Kabsch(dada[0], dada[1]);
+//        k.main();
+//        DenseDoubleMatrix2D fourthprotein = k.processWholeStructure(d.getBigMatrix(fourth));
     }
 }

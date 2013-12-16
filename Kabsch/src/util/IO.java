@@ -177,7 +177,7 @@ public class IO {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public static void readPDBFile(String pdbid, Database d) {
         Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
         String along, xx, yy, zz, nr;
@@ -254,9 +254,9 @@ public class IO {
                         yy = line.substring(38, 46).replace(" ", "");
                         zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
                         nr = line.substring(23, 26).replace(" ", "");
-                        atom_type = line.substring(13,16);
+                        atom_type = line.substring(13, 16);
                         chain = line.charAt(21);
-                        
+
                         //parse und valueof
                         x = Double.parseDouble(xx);
                         y = Double.parseDouble(yy);
@@ -269,7 +269,7 @@ public class IO {
                         result[i][2] = z;
                         atom_types.add(atom_type);
                         chains.add(chain);
-                        
+
                         //aminosequence
                         i++;
                     }
@@ -280,18 +280,16 @@ public class IO {
             resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, i, 3);
             resultmatrix.trimToSize();
 
-        //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
             //save to database
             d.addBigMatrix(pdbid, resultmatrix);
             d.addAtomTypeList(pdbid, atom_types);
             d.addChain(pdbid, chains);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    
 
     public static void importCathScop(String stringpath, Database d) {
         Path path = FS.getPath(stringpath);
@@ -336,23 +334,110 @@ public class IO {
         Path path = FS.getPath(stringpath);
         DenseDoubleMatrix2D tmp = d.getBigMatrix(pdbid);
         int size = tmp.rows();
-        List<String> atom_type = d.getAtomListBypdbid(pdbid);
+        LinkedList<String> atom_types = d.getAtomListBypdbid(pdbid);
         LinkedList<Character> chains = d.getChainFromPDBDID(pdbid);
-        
-        
-        
+        String aa = d.getSequenceByID(pdbid);
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("0.000", dfs);
+
+        int counter = 0;
+        int counterCalpha = 0;
+        Iterator<String> itatom_types = atom_types.iterator();
+        Iterator<Character> itchains = chains.iterator();
+
+        StringBuilder sb = new StringBuilder();
+
+        while (itatom_types.hasNext()) {
+            String atom_type = itatom_types.next();
+            char chain = itchains.next();
+            sb.append("ATOM  ");
+            sb.append(fixedLength(String.valueOf(counter), 5));
+            sb.append(atom_type);
+            sb.append(" ");
+            sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
+            sb.append(" ");
+            sb.append(chain);
+            sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+            sb.append("    ");
+            sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
+            sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
+            sb.append(fixedLength(df.format(tmp.get(counter, 2)), 8));
+            sb.append("\n");
+
+            if (atom_type.equals("CA ") && counterCalpha < aa.length() - 1) {
+                counterCalpha++;
+            }
+            counter++;
+        }
+
         try {
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+            bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
+            bw.write(sb.toString());
+            bw.write("TER\n");
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
+    public static void exportToPDB(Database d, String pdbid, String stringpath, DenseDoubleMatrix2D tmp) {
+        Path path = FS.getPath(stringpath);
+        int size = tmp.rows();
+        LinkedList<String> atom_types = d.getAtomListBypdbid(pdbid);
+        LinkedList<Character> chains = d.getChainFromPDBDID(pdbid);
+        String aa = d.getSequenceByID(pdbid);
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("0.000", dfs);
+
+        int counter = 0;
+        int counterCalpha = 0;
+        Iterator<String> itatom_types = atom_types.iterator();
+        Iterator<Character> itchains = chains.iterator();
+
+        try {
+            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+            bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
+            while (itatom_types.hasNext()) {
+                String atom_type = itatom_types.next();
+                char chain = itchains.next();
+                
+                StringBuilder sb = new StringBuilder();
+                
+                sb.append("ATOM  ");
+                sb.append(fixedLength(String.valueOf(counter), 5));
+                sb.append("  ");
+                sb.append(atom_type);
+                sb.append(" ");
+                sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
+                sb.append(" ");
+                sb.append(chain);
+                sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+                sb.append("    ");
+                sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
+                sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
+                sb.append(fixedLength(df.format(tmp.get(counter, 2)), 8));
+                sb.append("\n");
+                
+                bw.write(sb.toString());
+                if (atom_type.equals("CA ") && counterCalpha < aa.length() - 1) {
+                    counterCalpha++;
+                }
+                counter++;
+            }
+            bw.write("TER\n");
+            bw.close();
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static String fixedLength(String string, int length) {
-        return String.format("%1$"+length+ "s", string);
+        return String.format("%1$" + length + "s", string);
     }
-    
+
     public static void exportForGotoh(String stringpathpairs, String stringpathseqlib, Database d) throws IOException {
         //init path und kram
         Path pairsp = FS.getPath(stringpathpairs);
@@ -411,7 +496,7 @@ public class IO {
                 if (pdbid1 != null) {
                     DenseDoubleMatrix2D a = d.getMatrix(pdbid1);
                     DenseDoubleMatrix2D b = d.getMatrix(pdbid2);
-                    
+
                     //get reduced matrices
                     DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2);
 

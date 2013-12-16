@@ -46,7 +46,7 @@ public class Database {
     }
 
     public LinkedList<Character> getChainFromPDBDID(String pdbid) {
-        return chains.get(this);
+        return chains.get(pdbid);
     }
 
     public void addBigMatrix(String pdbid, DenseDoubleMatrix2D a) {
