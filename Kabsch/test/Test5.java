@@ -24,14 +24,16 @@ public class Test5 {
         IO.readPDBFileWhole(first, d);
         IO.readPDBFileWhole(second, d);
 
-        DenseDoubleMatrix2D[] dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
+        DenseDoubleMatrix2D[] dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali, d, first, second);
         Kabsch k = new Kabsch(dada[0], dada[1]);
         k.main();
-        
+
 //        IO.exportToPDB(d, first, first + ".pdb");
         DenseDoubleMatrix2D secondprotein = k.processWholeStructure(d.getBigMatrix(second));
-        IO.exportToPDB(d, second, second + ".pdb", secondprotein);
-        
+        IO.exportToPDB(d, second, second + ".pdb", secondprotein, first + " " + second, 2);
+        DenseDoubleMatrix2D firstprotein = d.getBigMatrix(first);
+        IO.exportToPDB(d, first, first + ".pdb", firstprotein, first + " " + second, 1);
+
 //        dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
 //        k = new Kabsch(dada[0], dada[1]);
 //        k.main();

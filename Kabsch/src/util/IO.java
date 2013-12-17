@@ -240,12 +240,14 @@ public class IO {
         String xx, yy, zz, nr, atom_type;
         char chain;
         double x, y, z;
-        int i = 0;
+        int i = 0, position, residue;
         try {
             List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
             double[][] result = new double[lines.size()][3]; //durch 4 da min 4 atomarten gibt (glycin)
             LinkedList<String> atom_types = new LinkedList<>();
             LinkedList<Character> chains = new LinkedList<>();
+            LinkedList<Integer> positions = new LinkedList<>();
+            LinkedList<Integer> residues = new LinkedList<>();
             for (String line : lines) {
                 if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
                     if (line.substring(0, 4).equals("ATOM")) {
@@ -256,6 +258,8 @@ public class IO {
                         nr = line.substring(23, 26).replace(" ", "");
                         atom_type = line.substring(13, 16);
                         chain = line.charAt(21);
+                        position = Integer.parseInt(line.substring(6, 11).replace(" ", ""));
+                        residue = Integer.parseInt(line.substring(22, 26).replace(" ", ""));
 
                         //parse und valueof
                         x = Double.parseDouble(xx);
@@ -269,6 +273,8 @@ public class IO {
                         result[i][2] = z;
                         atom_types.add(atom_type);
                         chains.add(chain);
+                        positions.add(position);
+                        residues.add(residue);
 
                         //aminosequence
                         i++;
@@ -285,6 +291,8 @@ public class IO {
             d.addBigMatrix(pdbid, resultmatrix);
             d.addAtomTypeList(pdbid, atom_types);
             d.addChain(pdbid, chains);
+            d.addAtomPositionList(pdbid, positions);
+            d.addResiduePosList(pdbid, residues);
 
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
@@ -358,7 +366,7 @@ public class IO {
             sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
             sb.append(" ");
             sb.append(chain);
-            sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+            sb.append(fixedLength(String.valueOf(counterCalpha), 4));
             sb.append("    ");
             sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
             sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
@@ -382,18 +390,28 @@ public class IO {
 
     }
 
-    public static void exportToPDB(Database d, String pdbid, String stringpath, DenseDoubleMatrix2D tmp) {
+    public static void exportToPDB(Database d, String pdbid, String stringpath, DenseDoubleMatrix2D tmp, String pdbid_pair, int pdbidcount) {
         Path path = FS.getPath(stringpath);
         int size = tmp.rows();
         LinkedList<String> atom_types = d.getAtomListBypdbid(pdbid);
         LinkedList<Character> chains = d.getChainFromPDBDID(pdbid);
+        LinkedList<Integer> positions = d.getAtomPositionList(pdbid);
+        LinkedList<Integer> residues = d.getResiduePosList(pdbid);
+        int[][] dbl_pos_array = d.getPositionalArray(pdbid_pair);
+        int[] pos_array;
+        if (pdbidcount == 1) {
+            pos_array = dbl_pos_array[0];
+        } else {
+            pos_array = dbl_pos_array[1];
+        }
         String aa = d.getSequenceByID(pdbid);
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat("0.000", dfs);
 
         int counter = 0;
-        int counterCalpha = 0;
+        int counterCalpha = -1;
+        int counterReduced = 0;
         Iterator<String> itatom_types = atom_types.iterator();
         Iterator<Character> itchains = chains.iterator();
 
@@ -401,33 +419,43 @@ public class IO {
             BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
             bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
             while (itatom_types.hasNext()) {
+
                 String atom_type = itatom_types.next();
                 char chain = itchains.next();
-                
+
                 StringBuilder sb = new StringBuilder();
-                
+
+                if (atom_type.equals("N  ") && counterCalpha < aa.length() - 1) {
+                    counterCalpha++;
+                    if (pos_array[counterReduced] == counterCalpha) {
+                        counterReduced++;
+                    }
+                }
                 sb.append("ATOM  ");
-                sb.append(fixedLength(String.valueOf(counter), 5));
+                sb.append(fixedLength(String.valueOf(positions.get(counter)), 5));
                 sb.append("  ");
                 sb.append(atom_type);
                 sb.append(" ");
                 sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
                 sb.append(" ");
-                sb.append(chain);
-                sb.append(fixedLength(String.valueOf(counterCalpha), 3));
+                if (pos_array[counterReduced] == counterCalpha) {
+                    sb.append('Z');
+                } else {
+                    sb.append(chain);
+                }
+                sb.append(fixedLength(String.valueOf(residues.get(counter)), 4));
                 sb.append("    ");
                 sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
                 sb.append(fixedLength(df.format(tmp.get(counter, 1)), 8));
                 sb.append(fixedLength(df.format(tmp.get(counter, 2)), 8));
                 sb.append("\n");
-                
+
                 bw.write(sb.toString());
-                if (atom_type.equals("CA ") && counterCalpha < aa.length() - 1) {
-                    counterCalpha++;
-                }
+
                 counter++;
             }
-            bw.write("TER\n");
+
+            bw.write("ENDMODEL\n");
             bw.close();
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
@@ -498,7 +526,7 @@ public class IO {
                     DenseDoubleMatrix2D b = d.getMatrix(pdbid2);
 
                     //get reduced matrices
-                    DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2);
+                    DenseDoubleMatrix2D[] reducedMatrices = Matrix.processMatrices(a, b, seq1, seq2, d, pdbid1, pdbid2);
 
                     Kabsch k = new Kabsch(reducedMatrices[0], reducedMatrices[1]);
                     k.main();

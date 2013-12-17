@@ -23,7 +23,10 @@ public class Database {
     HashMap<String, DenseDoubleMatrix2D> bigmatrices; //sollen matrizen mit anderen zusätzlichen Atomen darstellen
     HashMap<String, LinkedList<String>> atom_types;
     HashMap<String, LinkedList<Character>> chains;
+    HashMap<String, LinkedList<Integer>> residues;
+    HashMap<String, LinkedList<Integer>> positions;
     HashMap<String, String> sequences;
+    HashMap<String, int[][]> positional_array;
     LinkedList<String> pairs;
     LinkedList<String> pdbids;
 
@@ -33,12 +36,39 @@ public class Database {
         bigmatrices = new HashMap<>();
         atom_types = new HashMap<>();
         chains = new HashMap<>();
+        positions = new HashMap<>();
+        residues = new HashMap<>();
+        positional_array = new HashMap<>();
 //        pdbids = new HashSet<>(); //kommt bei setten durch import von cathscop file
 //        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }
 
     public void addSequence(String id, String seq) {
         sequences.put(id, seq);
+    }
+    
+    public int[][] getPositionalArray(String pdbid_pair) {
+        return positional_array.get(pdbid_pair);
+    }
+
+    public void addPositionalArray(String pdbid_pair, int[][] pos_array) {
+        positional_array.put(pdbid_pair,pos_array);
+    }
+
+    public void addAtomPositionList(String id, LinkedList<Integer> liste) {
+        positions.put(id, liste);
+    }
+
+    public LinkedList<Integer> getAtomPositionList(String pdbid) {
+        return positions.get(pdbid);
+    }
+
+    public void addResiduePosList(String pdbid, LinkedList<Integer> residueposlist) {
+        residues.put(pdbid, residueposlist);
+    }
+
+    public LinkedList<Integer> getResiduePosList(String pdbid) {
+        return residues.get(pdbid);
     }
 
     public void addChain(String pdbid, LinkedList<Character> chain_list) {

@@ -6,6 +6,7 @@
 package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import data.Database;
 
 /**
  *
@@ -53,12 +54,13 @@ public class Matrix {
         return new_matrices;
     }
 
-    public static DenseDoubleMatrix2D[] processMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, String astring, String bstring) {
+    public static DenseDoubleMatrix2D[] processMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, String astring, String bstring, Database d, String pdbid1, String pdbid2) {
         char[][] alignment = new char[2][astring.length()];
         alignment[0] = astring.toCharArray();
         alignment[1] = bstring.toCharArray();
 
         int[][] tmpint = getPositionArray(alignment);
+        d.addPositionalArray(pdbid1 + " " + pdbid2, tmpint);
         DenseDoubleMatrix2D[] tmpdmatrix = getReducedMatrices(a, b, tmpint);
         return tmpdmatrix;
     }
