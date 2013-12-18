@@ -7,6 +7,7 @@ package util;
 
 import data.Protein;
 import data.Transcript;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -18,9 +19,16 @@ public class Isoform {
 
     Transcript t1, t2;
     Protein p1, p2;
+
     HashSet<Long> i1 = new HashSet<Long>();
+    HashSet<Long> i1_aa = new HashSet<Long>();
     HashSet<Long> i2 = new HashSet<Long>();
-    String aa = "";
+    HashSet<Long> i2_aa = new HashSet<Long>();
+
+    String aa1 = "";
+    String aa2 = "";
+    String nseq1 = "";
+    String nseq2 = "";
 
     HashSet<Long> combined = new HashSet<Long>();
     HashSet<Long> deletions = new HashSet<Long>();
@@ -61,7 +69,7 @@ public class Isoform {
 
         exonsanzahl = p2.getNrExons();
         for (int i = 0; i < exonsanzahl; i++) {
-            int frame = p1.getExon(i).getCDS().getFrame();
+            int frame = p2.getExon(i).getCDS().getFrame();
             long start = p2.getExon(i).getCDS().getStart();
             long stop = p2.getExon(i).getCDS().getStop();
             if (start < stop) {
@@ -86,22 +94,82 @@ public class Isoform {
         all.addAll(i2);
     }
 
+//    public void getSequence() throws IOException {
+//        long start = 0;
+//        long stop = 0;
+//        String chromosome = 
+//
+//        StringBuilder nucleotide_seq = new StringBuilder();
+//        TreeSet<Long> positions = new TreeSet<>(i1);
+//
+//        for (Long pos : positions) {
+//            if (pos == stop + 1) {
+//                stop = pos;
+//            } else {
+//                //hier altes exon erst speichern
+//                nucleotide_seq.append(GenomeSequenceExtractor.easySearch(nseq1, start, stop));
+//                //und dann start neu setzten sowie stop ... irgendwie
+//                
+//            }
+//        }
+//    }
+    public void processToAAseq() {
+        int counter = 0;
+        TreeSet<Long> tree = new TreeSet<>(i1);
+
+        for (Long pos : tree) {
+            if (counter % 3 == 0) {
+                i1_aa.add(pos);
+            }
+            counter++;
+        }
+
+        counter = 0;
+        tree = new TreeSet<>(i2);
+
+        for (Long pos : tree) {
+            if (counter % 3 == 0) {
+                i2_aa.add(pos);
+            }
+            counter++;
+        }
+    }
+
     @Override
     public String toString() {
         TreeSet<Long> output = new TreeSet<Long>();
         output.addAll(all);
+        TreeSet<Long> output2 = new TreeSet<Long>();
+        
+        output2.addAll(i1_aa);
+        output2.addAll(i2_aa);
+        
         StringBuilder dna_output = new StringBuilder();
         StringBuilder aa_output = new StringBuilder();
+        
         for (Long pos : output) {
-            if (combined.contains(pos)) {
+            if (i1.contains(pos) && i2.contains(pos)) {
                 dna_output.append("*");
-            } else if (insertions.contains(pos)) {
-                dna_output.append("I");
-            } else if (deletions.contains(pos)) {
+            } else if (i1.contains(pos)) {
                 dna_output.append("D");
+            } else if (i2.contains(pos)) {
+                dna_output.append("I");
             } else {
                 dna_output.append(" ");
             }
+        }
+
+        for (Long pos : output2) {
+            if (i1_aa.contains(pos) && i2_aa.contains(pos)) {
+                aa_output.append("*");
+            } else if (i1_aa.contains(pos)) {
+                aa_output.append("D");
+            } else if (i2_aa.contains(pos)) {
+                aa_output.append("I");
+            } else {
+                aa_output.append(" ");
+            }
+            aa_output.append("  ");
         }
         return dna_output.toString() + "\n" + aa_output.toString();
     }

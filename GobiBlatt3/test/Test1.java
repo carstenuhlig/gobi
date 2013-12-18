@@ -6,6 +6,7 @@ import data.Gene;
 import data.Protein;
 import data.Transcript;
 import java.util.HashMap;
+import util.GenomeSequenceExtractor;
 import util.Isoform;
 
 /*
@@ -28,13 +29,13 @@ public class Test1 {
         String path = "/home/proj/biosoft/GENOMIC/HUMAN/Homo_sapiens.GRCh37.63.gtf";
 
         GTFParser.readFile(path, g);
-
+        
         Gene gene = g.get(geneid);
 //        gene.getTranscript(proteinid1);
         HashMap<String, Transcript> map = gene.getTranscripts();
         Protein p1 = g.getProtein(proteinid1);
         Protein p2 = g.getProtein(proteinid2);
-
+        
 //        Transcript t1 = null, t2 = null;
 //        for (Map.Entry<String, Transcript> entry : map.entrySet()) {
 //            String transcript_id = entry.getKey();
@@ -48,6 +49,7 @@ public class Test1 {
 //        }
         Isoform isoform = new Isoform(p1, p2);
         isoform.fillSets();
+        isoform.processToAAseq();
         System.out.println(isoform);
     }
 }
