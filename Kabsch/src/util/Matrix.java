@@ -75,4 +75,13 @@ public class Matrix {
         }
         return (double) counter / size;
     }
+    
+    public static boolean checkContainsInteger(int[] array, int search) {
+        for ( int i = 0; i<array.length; i++) {
+            if ( array[i] == search) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

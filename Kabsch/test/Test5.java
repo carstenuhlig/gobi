@@ -19,11 +19,19 @@ public class Test5 {
         String fourth = "1k9cA00";
         String firstali = "KPDFCFLEEDPGICRGYITRYFYNNQTKQCERFKYGGCLGNMNNFETLEECKNICEDG";
         String secondali = "--EVCSEQAETGPCRAMISRWYFDVTEGKCAPFFYGGCGGNRNNFDTEEYCMAVCG--";
+        String thirdali = "PVNPSREIEDPEDQKPEDWDERPKIPDPDAVKPDDWNEDAPAKIPDEEATKPDGWLDDEPEYVPDPDAEKPEDWDEDMDGEWEAPQIANPKCESAPGCGVWQRPMIDNPNYKGKWKPPMIDNPNYQGIWKPRKIPNPDFFEDLEPF";
+        String fourthali = "----SKKIKDPDAAKPEDWDERAKIDDPTDSKPEDW---------------------DKPEHIPDPDAKKPEDWDEEMDGEWEP-------------------PVIQNPEYKGEWKPR----------------------------";
+        
         IO.readPDBFile(first, d);
         IO.readPDBFile(second, d);
+        IO.readPDBFile(third, d);
+        IO.readPDBFile(fourth, d);
         IO.readPDBFileWhole(first, d);
         IO.readPDBFileWhole(second, d);
+        IO.readPDBFileWhole(third, d);
+        IO.readPDBFileWhole(fourth, d);
 
+        // erstes Paar
         DenseDoubleMatrix2D[] dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali, d, first, second);
         Kabsch k = new Kabsch(dada[0], dada[1]);
         k.main();
@@ -34,9 +42,16 @@ public class Test5 {
         DenseDoubleMatrix2D firstprotein = d.getBigMatrix(first);
         IO.exportToPDB(d, first, first + ".pdb", firstprotein, first + " " + second, 1);
 
-//        dada = Matrix.processMatrices(d.getMatrix(first), d.getMatrix(second), firstali, secondali);
-//        k = new Kabsch(dada[0], dada[1]);
-//        k.main();
-//        DenseDoubleMatrix2D fourthprotein = k.processWholeStructure(d.getBigMatrix(fourth));
+        // zweites Paar
+        dada = Matrix.processMatrices(d.getMatrix(third), d.getMatrix(fourth), thirdali, fourthali, d, third, fourth);
+        k = new Kabsch(dada[0], dada[1]);
+        k.main();
+
+//        IO.exportToPDB(d, first, first + ".pdb");
+        DenseDoubleMatrix2D fourthprotein = k.processWholeStructure(d.getBigMatrix(fourth));
+        IO.exportToPDB(d, fourth, fourth + ".pdb", fourthprotein, third + " " + fourth, 2);
+        DenseDoubleMatrix2D thirdprotein = d.getBigMatrix(third);
+        IO.exportToPDB(d, third, third + ".pdb", thirdprotein, third + " " + fourth, 1);
+        
     }
 }

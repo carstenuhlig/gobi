@@ -411,7 +411,7 @@ public class IO {
 
         int counter = 0;
         int counterCalpha = -1;
-        int counterReduced = 0;
+//        int counterReduced = -1;
         Iterator<String> itatom_types = atom_types.iterator();
         Iterator<Character> itchains = chains.iterator();
 
@@ -427,9 +427,11 @@ public class IO {
 
                 if (atom_type.equals("N  ") && counterCalpha < aa.length() - 1) {
                     counterCalpha++;
-                    if (pos_array[counterReduced] == counterCalpha) {
-                        counterReduced++;
-                    }
+//                    if (counterReduced < pos_array.length) {
+//                        if (pos_array[counterReduced] == counterCalpha) {
+//                            counterReduced++;
+//                        }
+//                    }
                 }
                 sb.append("ATOM  ");
                 sb.append(fixedLength(String.valueOf(positions.get(counter)), 5));
@@ -438,11 +440,16 @@ public class IO {
                 sb.append(" ");
                 sb.append(stl.get(aa.charAt(counterCalpha))); //AMINOACID
                 sb.append(" ");
-                if (pos_array[counterReduced] == counterCalpha) {
+//                if (counterReduced < pos_array.length) {
+                if (Matrix.checkContainsInteger(pos_array, counterCalpha)) {
                     sb.append('Z');
                 } else {
                     sb.append(chain);
                 }
+//                } else {
+//                    sb.append(chain);
+//                }
+
                 sb.append(fixedLength(String.valueOf(residues.get(counter)), 4));
                 sb.append("    ");
                 sb.append(fixedLength(df.format(tmp.get(counter, 0)), 8));
