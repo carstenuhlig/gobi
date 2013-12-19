@@ -188,6 +188,47 @@ public class Isoform {
         }
     }
 
+//    public void getSequence() throws IOException {
+//        long start = 0;
+//        long stop = 0;
+//        String chromosome = 
+//
+//        StringBuilder nucleotide_seq = new StringBuilder();
+//        TreeSet<Long> positions = new TreeSet<>(i1);
+//
+//        for (Long pos : positions) {
+//            if (pos == stop + 1) {
+//                stop = pos;
+//            } else {
+//                //hier altes exon erst speichern
+//                nucleotide_seq.append(GenomeSequenceExtractor.easySearch(nseq1, start, stop));
+//                //und dann start neu setzten sowie stop ... irgendwie
+//                
+//            }
+//        }
+//    }
+    public void processToAAseq() {
+        int counter = 0;
+        TreeSet<Long> tree = new TreeSet<>(i1);
+
+        for (Long pos : tree) {
+            if (counter % 3 == 0) {
+                i1_aa.add(pos);
+            }
+            counter++;
+        }
+
+        counter = 0;
+        tree = new TreeSet<>(i2);
+
+        for (Long pos : tree) {
+            if (counter % 3 == 0) {
+                i2_aa.add(pos);
+            }
+            counter++;
+        }
+    }
+
     @Override
     public String toString() {
         TreeSet<Long> output = new TreeSet<Long>();
