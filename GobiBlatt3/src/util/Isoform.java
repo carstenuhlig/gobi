@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -56,7 +57,53 @@ public class Isoform {
     }
 
     public void dnaAlignment() {
-        int size = Math.max()
+        //Temporäre Exons
+        Exon last1 = null;
+        Exon last2 = null;
+
+        //StringBuilder
+        StringBuilder sb = new StringBuilder();
+
+        //Temporary Counter
+        long begin = 0;
+        long end = 0;
+        long middle = 0;
+
+        //Iterator
+        Iterator<Exon> i1_iterator = i1_exons_hashset.iterator();
+        Iterator<Exon> i2_iterator = i2_exons_hashset.iterator();
+
+        while (i1_iterator.hasNext() || i2_iterator.hasNext()) {
+            if (last1 != null && i1_iterator.hasNext()) {
+                last1 = i1_iterator.next();
+            }
+            if (last2 != null && i2_iterator.hasNext()) {
+                last2 = i2_iterator.next();
+            }
+            if (last1 != null && last2 != null) {
+                if (checkCut(last1, last2)) {
+                    if (checkSameFrame(last1, last2)) {
+                        begin = Math.abs(last1.getCDS().getStart() - last2.getCDS().getStart());
+                    }
+                }
+            } else if (last1 != null) {
+                addCharsTimes(sb, 'D', last1.getCDS().getStop() - last1.getCDS().getStart());
+            } else {
+                addCharsTimes(sb, 'I', last2.getCDS().getStop() - last2.getCDS().getStart());
+            }
+        }
+    }
+
+    public void addCharsTimes(StringBuilder sb, char c, long times) {
+        for (int i = 0; i < times; i++) {
+            sb.append(c);
+        }
+    }
+
+    public void addStringTimes(StringBuilder sb, String str, long times) {
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
     }
 
     public void fillSets() {
@@ -77,6 +124,7 @@ public class Isoform {
         for (int i = 0; i < exonanzahl; i++) {
             i2_exons_hashset.add(p2.getExon(i));
         }
+    }
 
 //        //isoform1
 //        int exonanzahl = p1.getNrExons();
@@ -122,10 +170,16 @@ public class Isoform {
 //
 //        all.addAll(i1);
 //        all.addAll(i2);
-    }
-
     public boolean checkSameFrame(int firstexon, int secondexon) {
         if (p1.getExon(firstexon).getCDS().getFrame() == p2.getExon(secondexon).getCDS().getFrame()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkSameFrame(Exon firstexon, Exon secondexon) {
+        if (firstexon.getCDS().getFrame() == secondexon.getCDS().getFrame()) {
             return true;
         } else {
             return false;
@@ -136,10 +190,21 @@ public class Isoform {
         TreeSet<Long> tmp1 = new TreeSet<Long>(firstexon);
         TreeSet<Long> tmp2 = new TreeSet<Long>(secondexon);
 
-        long start = Math.max(tmp1.first(), tmp1.first());
-        long stop = Math.min(tmp1.last(), tmp1.last());
+        long start = Math.max(tmp1.first(), tmp2.first());
+        long stop = Math.min(tmp1.last(), tmp2.last());
 
         if (stop - start > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean checkCut(Exon firstexon, Exon secondexon) {
+        long start = Math.max(firstexon.getCDS().getStart(), secondexon.getCDS().getStart());
+        long stop = Math.min(firstexon.getCDS().getStop(), secondexon.getCDS().getStop());
+
+        if (stop > start) {
             return true;
         } else {
             return false;
@@ -207,28 +272,27 @@ public class Isoform {
 //            }
 //        }
 //    }
-    public void processToAAseq() {
-        int counter = 0;
-        TreeSet<Long> tree = new TreeSet<>(i1);
-
-        for (Long pos : tree) {
-            if (counter % 3 == 0) {
-                i1_aa.add(pos);
-            }
-            counter++;
-        }
-
-        counter = 0;
-        tree = new TreeSet<>(i2);
-
-        for (Long pos : tree) {
-            if (counter % 3 == 0) {
-                i2_aa.add(pos);
-            }
-            counter++;
-        }
-    }
-
+//    public void processToAAseq() {
+//        int counter = 0;
+//        TreeSet<Long> tree = new TreeSet<>(i1);
+//
+//        for (Long pos : tree) {
+//            if (counter % 3 == 0) {
+//                i1_aa.add(pos);
+//            }
+//            counter++;
+//        }
+//
+//        counter = 0;
+//        tree = new TreeSet<>(i2);
+//
+//        for (Long pos : tree) {
+//            if (counter % 3 == 0) {
+//                i2_aa.add(pos);
+//            }
+//            counter++;
+//        }
+//    }
     @Override
     public String toString() {
         TreeSet<Long> output = new TreeSet<Long>();
