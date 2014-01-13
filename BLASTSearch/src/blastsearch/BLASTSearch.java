@@ -63,14 +63,14 @@ public class BLASTSearch {
     }
 
     public static List<String> genWords(int length) {
-        generatedStrings = new LinkedList<>();
+        generatedStrings = new LinkedList<String>();
         int iterations = (int) Math.pow(alphabet.length, length);
         int[] intWord = new int[length];
         int[] subSequence = null;
         for (int i = 0; i < iterations; i++) {
             for (String seq : substrings) {
                 subSequence = getIntWordFromString(seq);
-                if (calcDistance(intWord, subSequence) > threshold) {
+                if (calcDistance(intWord, subSequence) >= threshold) {
                     generatedStrings.add(getStringFromIntWord(intWord));
                 }
             }
@@ -175,7 +175,7 @@ public class BLASTSearch {
     }
 
     public static void makeSubstrings() {
-        substrings = new LinkedList<>();
+        substrings = new LinkedList<String>();
         for (int i = 0; i < seq.length() - 1 - wordlength; i++) {
             substrings.add(seq.substring(i, i + wordlength));
         }
