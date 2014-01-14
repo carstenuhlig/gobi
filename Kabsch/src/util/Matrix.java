@@ -39,7 +39,7 @@ public class Matrix {
         return returnmatrix;
     }
 
-    public static DenseDoubleMatrix2D[] getReducedMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, int[][] pos_array) {
+    private static DenseDoubleMatrix2D[] getReducedMatrices(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b, int[][] pos_array) {
         DenseDoubleMatrix2D[] new_matrices = new DenseDoubleMatrix2D[2];
         new_matrices[0] = new DenseDoubleMatrix2D(pos_array[0].length, 3);
         new_matrices[1] = new DenseDoubleMatrix2D(pos_array[0].length, 3);

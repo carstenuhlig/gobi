@@ -13,11 +13,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
@@ -34,6 +30,8 @@ import java.util.regex.Pattern;
 
 import kabsch.Kabsch;
 
+import static java.nio.file.Files.newBufferedWriter;
+
 /**
  * @author uhligc
  */
@@ -41,6 +39,7 @@ public class IO {
 
     //HashMaps für Übersetzung der 3 letter codes von Aminosäuren
     final static HashMap<String, Character> lts = new HashMap<String, Character>(); // abk für: longToShort
+
     static {
         lts.put("ALA", 'A');
         lts.put("ARG", 'R');
@@ -63,8 +62,10 @@ public class IO {
         lts.put("TYR", 'Y');
         lts.put("VAL", 'V');
     }
+
     final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
     final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
+
     static {
         stl.put('A', "ALA");
         stl.put('R', "ARG");
@@ -87,6 +88,7 @@ public class IO {
         stl.put('Y', "TYR");
         stl.put('V', "VAL");
     }
+
     final static FileSystem FS = FileSystems.getDefault();
 
     public static DenseDoubleMatrix2D readSampleFile(String stringpath) throws IOException {
@@ -376,7 +378,7 @@ public class IO {
         }
 
         try {
-            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+            BufferedWriter bw = newBufferedWriter(path, StandardCharsets.UTF_8);
             bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
             bw.write(sb.toString());
             bw.write("TER\n");
@@ -412,7 +414,7 @@ public class IO {
         Iterator<Character> itchains = chains.iterator();
 
         try {
-            BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+            BufferedWriter bw = newBufferedWriter(path, StandardCharsets.UTF_8);
             bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
             while (itatom_types.hasNext()) {
 
@@ -473,8 +475,8 @@ public class IO {
         //init path und kram
         Path pairsp = FS.getPath(stringpathpairs);
         Path seqlibp = FS.getPath(stringpathseqlib);
-        BufferedWriter pairs = new BufferedWriter(Files.newBufferedWriter(pairsp, StandardCharsets.UTF_8));
-        BufferedWriter seqlib = new BufferedWriter(Files.newBufferedWriter(seqlibp, StandardCharsets.UTF_8));
+        BufferedWriter pairs = new BufferedWriter(newBufferedWriter(pairsp, StandardCharsets.UTF_8));
+        BufferedWriter seqlib = new BufferedWriter(newBufferedWriter(seqlibp, StandardCharsets.UTF_8));
 
         //Hauptteil
         LinkedList<String> liste = d.getPairs();
@@ -494,7 +496,7 @@ public class IO {
         seqlib.close();
     }
 
-    public static void importTMAlignment(Path file) throws IOException {
+    public static String[] importTMAlignment(Path file) throws IOException {
         List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
         boolean is_nextline = false;
         int counter = 0;
@@ -508,10 +510,56 @@ public class IO {
                     string1 = line;
                 } else if (counter == 2) {
                     string2 = line;
-                }
+                } else if (counter > 2)
+                    break;
                 counter++;
             }
         }
+        return new String[]{string1, string2};
+    }
+
+    public static void importTMAlignmentFolder(String folder, String stringoutput, Database database) throws IOException {
+        Path path_to_tmalignments = FS.getPath(folder);
+        Path output = FS.getPath(stringoutput);
+        BufferedWriter wr = Files.newBufferedWriter(output, StandardCharsets.UTF_8);
+
+        StringBuilder sb = new StringBuilder();
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        DecimalFormat df = new DecimalFormat("#0.00000000000000000", dfs);
+
+        // temp variables
+        String filename = "";
+        String pdb1, pdb2;
+        double rmsd, identity, gdt;
+        String[] alignments;
+
+        //TODO nur gleiche CATHS SCOP implementieren
+        //sind alle schon vorsortiert. deswegen nicht nötig. (wenn zeit noch ändern)
+
+
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(path_to_tmalignments)) {
+            for (Path p : ds) {
+                //aus filename pdbids ableiten
+                filename = p.getFileName().toString();
+                pdb1 = filename.split("\\s")[0];
+                pdb2 = filename.split("\\s")[1];
+
+                alignments = importTMAlignment(p);
+
+                DenseDoubleMatrix2D[] reduced_matrices = Matrix.processMatrices(database.getMatrix(pdb1), database.getMatrix(pdb2), alignments[0], alignments[1], database, pdb1, pdb2);
+
+                // Kabsch
+                Kabsch k = new Kabsch(reduced_matrices[0], reduced_matrices[1]);
+                k.main();
+                rmsd = k.getErmsd();
+                gdt = k.getGdt();
+                identity = Matrix.calcSequenceIdentity(alignments[0], alignments[1]);
+
+                sb.append(pdb1 + "\t" + pdb2 + "\t" + df.format(identity) + "\t" + df.format(rmsd) + "\t" + df.format(gdt) + "\n");
+            }
+        }
+        wr.close();
     }
 
     public static void processAlignmentFile(String stringpathin, String stringpathout, Database d) throws IOException {
@@ -519,7 +567,7 @@ public class IO {
         Path pathout = FS.getPath(stringpathout);
 
         BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-        BufferedWriter writer = Files.newBufferedWriter(pathout, StandardCharsets.UTF_8);
+        BufferedWriter writer = newBufferedWriter(pathout, StandardCharsets.UTF_8);
 
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
@@ -577,5 +625,12 @@ public class IO {
         }
         reader.close();
         writer.close();
+    }
+
+    public static void processTMAlignmentFiles(String pathfolder, String outputstring, Database database) throws IOException {
+        Path output = FS.getPath(outputstring);
+        BufferedWriter wr = newBufferedWriter(output, StandardCharsets.UTF_8);
+
+
     }
 }
