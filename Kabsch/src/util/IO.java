@@ -7,6 +7,7 @@ package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import data.Database;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,17 +31,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import kabsch.Kabsch;
 
 /**
- *
  * @author uhligc
  */
 public class IO {
 
     //HashMaps für Übersetzung der 3 letter codes von Aminosäuren
     final static HashMap<String, Character> lts = new HashMap<String, Character>(); // abk für: longToShort
-
     static {
         lts.put("ALA", 'A');
         lts.put("ARG", 'R');
@@ -63,11 +63,8 @@ public class IO {
         lts.put("TYR", 'Y');
         lts.put("VAL", 'V');
     }
-
     final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
-
     final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
-
     static {
         stl.put('A', "ALA");
         stl.put('R', "ARG");
@@ -90,7 +87,6 @@ public class IO {
         stl.put('Y', "TYR");
         stl.put('V', "VAL");
     }
-
     final static FileSystem FS = FileSystems.getDefault();
 
     public static DenseDoubleMatrix2D readSampleFile(String stringpath) throws IOException {
@@ -329,7 +325,7 @@ public class IO {
 
     public static void importListOfPDBIds(Database d) {
         List<String> list = d.getPdbids();
-        for (Iterator<String> it = list.iterator(); it.hasNext();) {
+        for (Iterator<String> it = list.iterator(); it.hasNext(); ) {
             StringBuilder sb = new StringBuilder(path_to_pdbfiles);
             String pdbid = it.next();
             sb.append(pdbid);
@@ -485,7 +481,7 @@ public class IO {
         HashMap<String, String> sequences = d.getSequences();
 
         //Pairs write
-        for (Iterator<String> it = liste.iterator(); it.hasNext();) {
+        for (Iterator<String> it = liste.iterator(); it.hasNext(); ) {
             pairs.write(it.next() + "\n");
         }
         pairs.close();
@@ -496,6 +492,26 @@ public class IO {
             seqlib.write(pdbid + ":" + seq + "\n");
         }
         seqlib.close();
+    }
+
+    public static void importTMAlignment(Path file) throws IOException {
+        List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+        boolean is_nextline = false;
+        int counter = 0;
+        String string1 = "";
+        String string2 = "";
+        for (String line : lines) {
+            if (line.startsWith("(\":\"")) {
+                is_nextline = true;
+            } else if (is_nextline) {
+                if (counter == 0) {
+                    string1 = line;
+                } else if (counter == 2) {
+                    string2 = line;
+                }
+                counter++;
+            }
+        }
     }
 
     public static void processAlignmentFile(String stringpathin, String stringpathout, Database d) throws IOException {
