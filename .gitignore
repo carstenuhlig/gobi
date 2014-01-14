@@ -24,3 +24,16 @@
 /Gotoh/src/res/matrices/BlakeCohenMatrix.mat
 /Gotoh/src/res/matrices/pam250.mat
 /Gotoh/src/res/matrices/THREADERSimilarityMatrix.mat
+/BLASTSearch/nbproject/private/
+/BLASTSearch/dist/
+/BLASTSearch/build/
+/BLASTSearch/manifest.mf
+/BLASTSearch/nbproject/project.properties
+/BLASTSearch/nbproject/project.xml
+/BLASTSearch/nbproject/genfiles.properties
+/BLASTSearch/build.xml
+/BLASTSearch/nbproject/build-impl.xml
+/BLASTSearch/res/outputfile.txt
+/BLASTSearch/res/sequence.fa
+/BLASTSearch/res/blosum62.txt
+/Kabsch/nbproject/private/
