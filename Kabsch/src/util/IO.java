@@ -578,4 +578,11 @@ public class IO {
         reader.close();
         writer.close();
     }
+
+    public static void processTMAlignmentFiles(String pathfolder, String outputstring, Database database) throws IOException {
+        Path output = FS.getPath(outputstring);
+        BufferedWriter wr = Files.newBufferedWriter(output, StandardCharsets.UTF_8);
+
+
+    }
 }
