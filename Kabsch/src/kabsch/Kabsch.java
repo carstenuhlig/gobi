@@ -111,6 +111,10 @@ public class Kabsch {
         calcRMSD();
     }
 
+    public double getGDTProtein(int p_aa, int q_aa) {
+        return Scores.calcGDTProtein(pDasOriginal, qDasOriginal, p_aa, q_aa);
+    }
+
     public static DenseDoubleMatrix2D applyVector(DenseDoubleMatrix2D matrix, DenseDoubleMatrix1D vector) {
         int rows = matrix.rows();
         int cols = matrix.columns();
@@ -225,7 +229,7 @@ public class Kabsch {
         return result + s.get(2, 2);
     }
 
-    public void init(double[][] matrixA, double[][] matrixB) {
+    private void init(double[][] matrixA, double[][] matrixB) {
         this.p = new DenseDoubleMatrix2D(matrixA);
         this.q = new DenseDoubleMatrix2D(matrixB);
     }

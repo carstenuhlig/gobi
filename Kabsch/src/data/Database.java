@@ -27,6 +27,7 @@ public class Database {
     HashMap<String, LinkedList<Integer>> positions;
     HashMap<String, String> sequences;
     HashMap<String, int[][]> positional_array;
+    HashMap<String, Alignment> alignments;
     LinkedList<String> pairs;
     LinkedList<String> pdbids;
 
@@ -43,12 +44,27 @@ public class Database {
 //        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }
 
+    public void addAlignment(String pdbidpair, Alignment alignment) {
+        alignments.put(pdbidpair, alignment);
+    }
+
+    public Alignment getAlignment(String pdbidpair) {
+        return alignments.get(pdbidpair);
+    }
+
     public void addSequence(String id, String seq) {
         sequences.put(id, seq);
     }
     
     public int[][] getPositionalArray(String pdbid_pair) {
         return positional_array.get(pdbid_pair);
+    }
+
+    public boolean hasMatrix(String pdbid) {
+        if (matrices.containsKey(pdbid))
+            return true;
+        else
+            return false;
     }
 
     public void addPositionalArray(String pdbid_pair, int[][] pos_array) {

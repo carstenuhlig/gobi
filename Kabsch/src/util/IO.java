@@ -6,6 +6,7 @@
 package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import data.Alignment;
 import data.Database;
 
 import java.io.BufferedReader;
@@ -29,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import kabsch.Kabsch;
+import kabsch.Scores;
 
 import static java.nio.file.Files.newBufferedWriter;
 
@@ -523,7 +525,7 @@ public class IO {
         Path output = FS.getPath(stringoutput);
         BufferedWriter wr = Files.newBufferedWriter(output, StandardCharsets.UTF_8);
 
-        StringBuilder sb = new StringBuilder();
+
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setDecimalSeparator('.');
         DecimalFormat df = new DecimalFormat("#0.00000000000000000", dfs);
@@ -537,36 +539,42 @@ public class IO {
         //TODO nur gleiche CATHS SCOP implementieren
         //sind alle schon vorsortiert. deswegen nicht nötig. (wenn zeit noch ändern)
 
-
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(path_to_tmalignments)) {
             for (Path p : ds) {
+                StringBuilder sb = new StringBuilder();
+
                 //aus filename pdbids ableiten
                 filename = p.getFileName().toString();
-                pdb1 = filename.split("\\s")[0];
-                pdb2 = filename.split("\\s")[1];
+                pdb1 = filename.split("-")[0];
+                pdb2 = filename.split("-")[1];
+
+                DenseDoubleMatrix2D[] reduced_matrices = null;
 
                 alignments = importTMAlignment(p);
+                try {
+                    reduced_matrices = Matrix.processMatrices(database.getMatrix(pdb1), database.getMatrix(pdb2), alignments[0], alignments[1], database, pdb1, pdb2);
+                    // Kabsch
+                    Kabsch k = new Kabsch(reduced_matrices[0], reduced_matrices[1]);
+                    k.main();
+                    rmsd = k.getErmsd();
+                    gdt = k.getGDTProtein(database.getMatrix(pdb1).rows(), database.getMatrix(pdb2).rows());
+                    identity = Matrix.calcSequenceIdentity(alignments[0], alignments[1]);
 
-                DenseDoubleMatrix2D[] reduced_matrices = Matrix.processMatrices(database.getMatrix(pdb1), database.getMatrix(pdb2), alignments[0], alignments[1], database, pdb1, pdb2);
+                    sb.append(pdb1 + "\t" + pdb2 + "\t" + df.format(identity) + "\t" + df.format(rmsd) + "\t" + df.format(gdt) + "\n");
+                    wr.write(sb.toString());
+                } catch (NullPointerException e) {
+                }
 
-                // Kabsch
-                Kabsch k = new Kabsch(reduced_matrices[0], reduced_matrices[1]);
-                k.main();
-                rmsd = k.getErmsd();
-                gdt = k.getGdt();
-                identity = Matrix.calcSequenceIdentity(alignments[0], alignments[1]);
-
-                sb.append(pdb1 + "\t" + pdb2 + "\t" + df.format(identity) + "\t" + df.format(rmsd) + "\t" + df.format(gdt) + "\n");
             }
+            wr.close();
         }
-        wr.close();
     }
 
     public static void processAlignmentFile(String stringpathin, String stringpathout, Database d) throws IOException {
-        Path path = FS.getPath(stringpathin);
+        Path pathin = FS.getPath(stringpathin);
         Path pathout = FS.getPath(stringpathout);
 
-        BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+        BufferedReader reader = Files.newBufferedReader(pathin, StandardCharsets.UTF_8);
         BufferedWriter writer = newBufferedWriter(pathout, StandardCharsets.UTF_8);
 
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -579,6 +587,8 @@ public class IO {
 
         String pdbid1 = null, pdbid2 = null, seq1 = null, seq2 = null;
         double rmsd, gdt, identity;
+
+        writer.write("pdbid1\tpdbid2\tidentity\t\trmsd\t\t\tgdt\n");
 
         String line = "";
         while ((line = reader.readLine()) != null) {
@@ -602,7 +612,7 @@ public class IO {
                     Kabsch k = new Kabsch(reducedMatrices[0], reducedMatrices[1]);
                     k.main();
                     rmsd = k.getErmsd();
-                    gdt = k.getGdt();
+                    gdt = k.getGDTProtein(a.rows(), b.rows());
                     identity = Matrix.calcSequenceIdentity(seq1, seq2);
 
                     StringBuilder sb = new StringBuilder();
@@ -627,10 +637,8 @@ public class IO {
         writer.close();
     }
 
-    public static void processTMAlignmentFiles(String pathfolder, String outputstring, Database database) throws IOException {
-        Path output = FS.getPath(outputstring);
-        BufferedWriter wr = newBufferedWriter(output, StandardCharsets.UTF_8);
-
-
+    public Alignment getAlignment(String pdbid1, String pdbid2) {
+        ExecuteShellCommand.executeCommand("ls");
+        return null;
     }
 }

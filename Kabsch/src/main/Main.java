@@ -21,6 +21,8 @@ public class Main {
         IO.importCathScop(stringcathscop, d);
         IO.importListOfPDBIds(d);
 //        IO.exportForGotoh(args[0], args[1], d);
-        IO.processAlignmentFile(args[0], args[1], d);
+        String arg1 = "res/alignments";
+        String arg2 = "res/gotoh_alignments_output";
+        IO.processAlignmentFile(arg1, arg2, d);
     }
 }

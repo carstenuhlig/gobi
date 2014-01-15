@@ -47,6 +47,37 @@ public class Scores {
         return ((p1 + p2 + p4 + p8) / (4. * size));
     }
 
+    public static double calcGDTProtein(DenseDoubleMatrix2D matrixa, DenseDoubleMatrix2D matrixb, int nr_of_aa_p, int nr_of_aa_q) {
+        int p1 = 0;
+        int p2 = 0;
+        int p4 = 0;
+        int p8 = 0;
+
+        int size = matrixa.rows();
+        double tmp;
+
+        for (int i = 0; i < size; i++) {
+            tmp = getDistance(matrixa.viewRow(i), matrixb.viewRow(i));
+            if (tmp <= 1) {
+                p1++;
+                p2++;
+                p4++;
+                p8++;
+            } else if (tmp <= 2) {
+                p2++;
+                p4++;
+                p8++;
+            } else if (tmp <= 4) {
+                p4++;
+                p8++;
+            } else if (tmp <= 8) {
+                p8++;
+            }
+        }
+
+        return ((p1 + p2 + p4 + p8) / (2. * (nr_of_aa_p + nr_of_aa_q)));
+    }
+
     public static double getRMSD(DenseDoubleMatrix2D a, DenseDoubleMatrix2D b) {
         //copy schritt kann weggelassen werden falls keine nachstehenden operation an a mehr gibt
         
