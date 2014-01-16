@@ -5,6 +5,7 @@ package data;
  */
 public class Alignment {
     String one, two, id1, id2, type;
+    double tmscore, seqid;
 
     public Alignment(String one, String two, String id1, String id2) {
         this.one = one;
@@ -19,6 +20,15 @@ public class Alignment {
         this.id1 = id1;
         this.id2 = id2;
         this.type = type;
+    }
+
+    public Alignment(String one, String two, String id1, String id2, double tmscore) {
+        this.one = one;
+        this.two = two;
+        this.id1 = id1;
+        this.id2 = id2;
+        this.type = "tmalign";
+        this.tmscore = tmscore;
     }
 
     public String getOne() {
@@ -49,5 +59,21 @@ public class Alignment {
             return true;
         else
             return false;
+    }
+
+    public String getId1() {
+        return id1;
+    }
+
+    public String getId2() {
+        return id2;
+    }
+
+    public void setTmscore(double tmscore) {
+        this.tmscore = tmscore;
+    }
+
+    public double getTmscore() {
+        return tmscore;
     }
 }
