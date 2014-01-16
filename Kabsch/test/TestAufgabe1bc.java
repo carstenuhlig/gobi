@@ -20,28 +20,44 @@ public class TestAufgabe1bc {
 
     public static void main(String[] args) throws IOException {
         Database d = new Database();
-        List<String> mylist = IO.readSimList(path_to_pdblist);
+//        List<String> mylist = IO.readSimList(path_to_pdblist);
+        String[] mylist = IO.readSimList(path_to_pdblist, true);
         HashMap<String, Alignment> alignmentHashMap = new HashMap<>();
         String template_pdbid = "1bj4.A";
         Alignment tmp = null;
         Alignment first = null;
         Alignment second = null;
-        double firstscore = 0.;
-        double secondscore = 0.;
+//        double firstscore = 0.;
+//        double secondscore = 0.;
 
+//        for (String pdbid : mylist) {
+//            tmp = IO.readManualTMalignment(template_pdbid, pdbid);
+//            d.addAlignment(template_pdbid + " " + pdbid, tmp);
+//            if (tmp.getTmscore() > firstscore) {
+//                secondscore = firstscore;
+//                second = first;
+//                firstscore = tmp.getTmscore();
+//                first = tmp;
+//            } else if (tmp.getTmscore() > secondscore) {
+//                second = tmp;
+//                secondscore = second.getTmscore();
+//            }
+//            alignmentHashMap.put(pdbid, tmp);
+//            //IO.readPDBFile(pdbid, d, true); //true steht für nicht cathscop structures
+//        }
+
+        int counter = 0;
         for (String pdbid : mylist) {
             tmp = IO.readManualTMalignment(template_pdbid, pdbid);
             d.addAlignment(template_pdbid + " " + pdbid, tmp);
-            if (tmp.getTmscore() > firstscore) {
-                secondscore = firstscore;
-                second = first;
-                firstscore = tmp.getTmscore();
-                first = tmp;
-            } else if (tmp.getTmscore() > secondscore) {
-                second = tmp;
-                secondscore = second.getTmscore();
-            }
             alignmentHashMap.put(pdbid, tmp);
+            if (counter == 0) {
+                first = tmp;
+            } else if (counter == 1) {
+                second = tmp;
+            } else
+                break;
+            counter++;
             //IO.readPDBFile(pdbid, d, true); //true steht für nicht cathscop structures
         }
 
@@ -49,9 +65,11 @@ public class TestAufgabe1bc {
         //template pdb
         IO.readPDBFile(template_pdbid, d, true);
         IO.readPDBFileWhole(template_pdbid, d, true);
+
         //first score pdb
         IO.readPDBFile(first.getId2(), d, true);
         IO.readPDBFileWhole(first.getId2(), d, true);
+
         //second score pdb
         IO.readPDBFile(second.getId2(), d, true);
         IO.readPDBFileWhole(second.getId2(), d, true);
