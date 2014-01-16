@@ -6,10 +6,10 @@
 package util;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import data.Alignment;
 import data.Database;
 
 /**
- *
  * @author Carsten
  */
 public class Matrix {
@@ -65,6 +65,11 @@ public class Matrix {
         return tmpdmatrix;
     }
 
+    public static DenseDoubleMatrix2D[] processMatrices(String a, String b, Database d) {
+        Alignment tmp = d.getAlignment(a + " " + b);
+        return processMatrices(d.getMatrix(a), d.getMatrix(b), tmp.getOne(), tmp.getTwo(), d, a, b);
+    }
+
     public static double calcSequenceIdentity(String astring, String bstring) {
         int counter = 0;
         int size = astring.length();
@@ -75,10 +80,10 @@ public class Matrix {
         }
         return (double) counter / size;
     }
-    
+
     public static boolean checkContainsInteger(int[] array, int search) {
-        for ( int i = 0; i<array.length; i++) {
-            if ( array[i] == search) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == search) {
                 return true;
             }
         }

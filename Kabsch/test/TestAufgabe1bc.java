@@ -1,10 +1,12 @@
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import data.Alignment;
 import data.Database;
+import kabsch.Kabsch;
 import util.IO;
+import util.Matrix;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -12,6 +14,9 @@ import java.util.List;
  */
 public class TestAufgabe1bc {
     final static String path_to_pdblist = "/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/TMSIM/1bj4.A.simlist";
+    final static String outputfile0 = "res/pdb.pdb";
+    final static String outputfile1 = "res/pdbone.pdb";
+    final static String outputfile2 = "res/pdbtwo.pdb";
 
     public static void main(String[] args) throws IOException {
         Database d = new Database();
@@ -26,6 +31,7 @@ public class TestAufgabe1bc {
 
         for (String pdbid : mylist) {
             tmp = IO.readManualTMalignment(template_pdbid, pdbid);
+            d.addAlignment(template_pdbid + " " + pdbid, tmp);
             if (tmp.getTmscore() > firstscore) {
                 secondscore = firstscore;
                 second = first;
@@ -50,6 +56,18 @@ public class TestAufgabe1bc {
         IO.readPDBFile(second.getId2(), d, true);
         IO.readPDBFileWhole(second.getId2(), d, true);
 
+        //Kabsch
+        DenseDoubleMatrix2D[] red_mat = Matrix.processMatrices(template_pdbid, first.getId2(), d);
+        Kabsch k = new Kabsch(red_mat);
+        k.main();
+        DenseDoubleMatrix2D wholeprocessed = k.processWholeStructure(d.getBigMatrix(first.getId2()));
+        IO.exportToPDB(d, first.getId2(), outputfile0, wholeprocessed, template_pdbid + " " + first.getId2(), 2);
+
+        red_mat = Matrix.processMatrices(template_pdbid, second.getId2(), d);
+        k = new Kabsch(red_mat);
+        k.main();
+        wholeprocessed = k.processWholeStructure(d.getBigMatrix(second.getId2()));
+        IO.exportToPDB(d, second.getId2(), outputfile2, wholeprocessed, template_pdbid + " " + second.getId2(), 2);
     }
 
 }

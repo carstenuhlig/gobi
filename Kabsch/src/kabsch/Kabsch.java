@@ -34,6 +34,13 @@ public class Kabsch {
         init(matrixA, matrixB);
     }
 
+    public Kabsch(DenseDoubleMatrix2D[] mat) {
+        this.p = mat[0];
+        this.q = mat[1];
+        pDasOriginal = (DenseDoubleMatrix2D) this.p.copy();
+        qDasOriginal = (DenseDoubleMatrix2D) this.q.copy();
+    }
+
     public Kabsch(DenseDoubleMatrix2D p, DenseDoubleMatrix2D q) {
         this.p = p;
         this.q = q;
