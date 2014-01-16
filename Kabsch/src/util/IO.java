@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import kabsch.Kabsch;
-import kabsch.Scores;
 
 import static java.nio.file.Files.newBufferedWriter;
 
@@ -65,7 +64,8 @@ public class IO {
         lts.put("VAL", 'V');
     }
 
-    final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
+    final static String path_to_pdbcathfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
+    final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/STRUCTURES/";
     final static String path_to_tmalign = "/home/proj/biosoft/PROTEINS/software/TMalign";
     final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
 
@@ -180,6 +180,63 @@ public class IO {
     }
 
     public static void readPDBFile(String pdbid, Database d) {
+        Path path = FS.getPath(path_to_pdbcathfiles + pdbid + ".pdb");
+        String along, xx, yy, zz, nr;
+        char ashort;
+        double x, y, z;
+        int i, max = 0;
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            StringBuilder aa = new StringBuilder();
+            double[][] result = new double[lines.size() / 4][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            for (String line : lines) {
+                if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
+                    if (line.substring(0, 4).equals("ATOM")) {
+                        if (line.substring(13, 15).equals("CA")) {
+                            //einlesen nach content format pdf files v3.3
+                            along = line.substring(17, 20);
+                            xx = line.substring(30, 38).replace(" ", "");
+                            yy = line.substring(38, 46).replace(" ", "");
+                            zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
+                            nr = line.substring(23, 26).replace(" ", "");
+
+                            //parse und valueof
+                            x = Double.parseDouble(xx);
+                            y = Double.parseDouble(yy);
+                            z = Double.parseDouble(zz);
+                            i = Integer.parseInt(nr);
+
+                            //aminosäure konvertieren
+                            ashort = lts.get(along);
+
+                            //einspeichern
+                            //rotationmatrix
+                            result[i][0] = x;
+                            result[i][1] = y;
+                            result[i][2] = z;
+
+                            //aminosequence
+                            aa.append(ashort);
+                            max++;
+                        }
+                    }
+                }
+            }
+            //trimtosize doublematrix
+            DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
+            resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, max, 3);
+            resultmatrix.trimToSize();
+
+            //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //save to database
+            d.addMatrix(pdbid, resultmatrix);
+            d.addSequence(pdbid, aa.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static void readPDBFile(String pdbid, Database d, boolean is_pdbnormal_flag) {
         Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
         String along, xx, yy, zz, nr;
         char ashort;
@@ -237,6 +294,70 @@ public class IO {
     }
 
     public static void readPDBFileWhole(String pdbid, Database d) {
+        Path path = FS.getPath(path_to_pdbcathfiles + pdbid + ".pdb");
+        String xx, yy, zz, nr, atom_type;
+        char chain;
+        double x, y, z;
+        int i = 0, position, residue;
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            double[][] result = new double[lines.size()][3]; //durch 4 da min 4 atomarten gibt (glycin)
+            LinkedList<String> atom_types = new LinkedList<>();
+            LinkedList<Character> chains = new LinkedList<>();
+            LinkedList<Integer> positions = new LinkedList<>();
+            LinkedList<Integer> residues = new LinkedList<>();
+            for (String line : lines) {
+                if (line.length() > 3) { //damit keine Exception geworfen wird mit stringindex out of range
+                    if (line.substring(0, 4).equals("ATOM")) {
+                        //einlesen nach content format pdf files v3.3
+                        xx = line.substring(30, 38).replace(" ", "");
+                        yy = line.substring(38, 46).replace(" ", "");
+                        zz = line.substring(46, Math.min(55, line.length())).replace(" ", "");
+                        nr = line.substring(23, 26).replace(" ", "");
+                        atom_type = line.substring(13, 16);
+                        chain = line.charAt(21);
+                        position = Integer.parseInt(line.substring(6, 11).replace(" ", ""));
+                        residue = Integer.parseInt(line.substring(22, 26).replace(" ", ""));
+
+                        //parse und valueof
+                        x = Double.parseDouble(xx);
+                        y = Double.parseDouble(yy);
+                        z = Double.parseDouble(zz);
+
+                        //einspeichern
+                        //rotationmatrix
+                        result[i][0] = x;
+                        result[i][1] = y;
+                        result[i][2] = z;
+                        atom_types.add(atom_type);
+                        chains.add(chain);
+                        positions.add(position);
+                        residues.add(residue);
+
+                        //aminosequence
+                        i++;
+                    }
+                }
+            }
+            //trimtosize doublematrix
+            DenseDoubleMatrix2D resultmatrix = new DenseDoubleMatrix2D(result);
+            resultmatrix = (DenseDoubleMatrix2D) resultmatrix.viewPart(0, 0, i, 3);
+            resultmatrix.trimToSize();
+
+            //TODO überprüfung ob wirklich fortlaufende residues in pdbfile sonst inkosistente daten
+            //save to database
+            d.addBigMatrix(pdbid, resultmatrix);
+            d.addAtomTypeList(pdbid, atom_types);
+            d.addChain(pdbid, chains);
+            d.addAtomPositionList(pdbid, positions);
+            d.addResiduePosList(pdbid, residues);
+
+        } catch (IOException ex) {
+            Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static void readPDBFileWhole(String pdbid, Database d, boolean is_pdb_folder_normal) {
         Path path = FS.getPath(path_to_pdbfiles + pdbid + ".pdb");
         String xx, yy, zz, nr, atom_type;
         char chain;
@@ -331,7 +452,7 @@ public class IO {
     public static void importListOfPDBIds(Database d) {
         List<String> list = d.getPdbids();
         for (Iterator<String> it = list.iterator(); it.hasNext(); ) {
-            StringBuilder sb = new StringBuilder(path_to_pdbfiles);
+            StringBuilder sb = new StringBuilder(path_to_pdbcathfiles);
             String pdbid = it.next();
             sb.append(pdbid);
             sb.append(".pdb");
@@ -537,7 +658,9 @@ public class IO {
         double rmsd, identity, gdt;
         String[] alignments;
 
-        //TODO Cathscop gleiche Gruppe (wird durch gotoh schon verhindert mit "r: merge(table gotoh, table tmalign, by pbdids)"
+        //TODO nur gleiche CATHS SCOP implementieren
+        //sind alle schon vorsortiert. deswegen nicht nötig. (wenn zeit noch ändern)
+
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(path_to_tmalignments)) {
             for (Path p : ds) {
                 StringBuilder sb = new StringBuilder();
@@ -636,15 +759,19 @@ public class IO {
         writer.close();
     }
 
-    public Alignment getAlignment(String pdbid1, String pdbid2) {
+    public static Alignment readManualTMalignment(String pdbid1, String pdbid2) {
         String fileoutput = "temp_tmalign";
-        String one, two;
-        String command = path_to_tmalign + " " + path_to_pdbfiles + pdbid1 + ".pbd " + path_to_pdbfiles + pdbid2 + ".pdb";
+        String one = null, two = null;
+        String command = path_to_tmalign + " " + path_to_pdbcathfiles + pdbid1 + ".pbd " + path_to_pdbcathfiles + pdbid2 + ".pdb";
         String output = ExecuteShellCommand.executeCommand(command);
         String[] outputinlines = output.split("\n");
         int counter = -1;
+        double tmscore = 0.;
 
         for (String line : outputinlines) {
+            if (line.contains("TM-score=")) {
+                tmscore = Double.parseDouble(line.replaceAll("^.+TM-score=(\\S+).*$", "$1"));
+            }
             if (line.startsWith("(\"") || counter > -1) {
                 if (counter == 0)
                     one = line;
@@ -656,9 +783,35 @@ public class IO {
             }
         }
 
+        Alignment tmp = null;
+        if (one != null && two != null) {
+            tmp = new Alignment(one, two, pdbid1, pdbid2, tmscore);
+        } else
+            return null;
 
         //clean
         ExecuteShellCommand.executeCommand("rm " + fileoutput);
-        return null;
+        return tmp;
+    }
+
+    public static List<String> readSimList(String path_to_simlist) throws IOException {
+        Path simlist = FS.getPath(path_to_simlist);
+        Set<String> set = new HashSet<>();
+        BufferedReader r = Files.newBufferedReader(simlist, StandardCharsets.UTF_8);
+        String line = "";
+        String regex = "^(\\w+)\\s+(\\w+).+tmscore:\\s(\\d\\.\\d+).*$";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher("");
+        String pdb, pdb1st, pdb2nd;
+        double tmscore = 0.0;
+        double fstmscore = 0.;
+        double scndtmscore = 0.;
+        while ((line = r.readLine()) != null) {
+            m.reset(line);
+            pdb = m.replaceAll("$2");
+            set.add(pdb);
+        }
+        r.close();
+        return (new LinkedList<String>(set));
     }
 }
