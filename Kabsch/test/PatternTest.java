@@ -35,5 +35,13 @@ public class PatternTest {
         double x3 = Double.parseDouble(matcher.replaceAll("$4"));
 
         System.out.println(pos + " " + x1 + " " + x2 + " " + x3);
+
+        regex = "^(\\S+)\\s+(\\S+).+tmscore:\\s(\\S+).*$";
+        input = "1bj4.A 3l49.A p1: 470 p2: 282 ali length: 161 tmscore: 0.40063 rmsd: 5.088(161)";
+        System.out.println();
+        if (input.matches(regex))
+            System.out.println("it worked\n");
+        System.out.println(input.replaceFirst(regex, "$1 $2"));
+        System.out.println(input.replaceAll("^(\\S+).*$", "$1"));
     }
 }
