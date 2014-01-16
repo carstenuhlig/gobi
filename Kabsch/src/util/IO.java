@@ -539,7 +539,8 @@ public class IO {
 
         try {
             BufferedWriter bw = newBufferedWriter(path, StandardCharsets.UTF_8);
-            bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
+//            bw.write("REMARK BLABLABLABLA ( unwichtiges Zeugs steht hier )\n");
+            bw.write("MODEL\n");
             while (itatom_types.hasNext()) {
 
                 String atom_type = itatom_types.next();
@@ -816,24 +817,38 @@ public class IO {
         return (new LinkedList<String>(set));
     }
 
-    public static List<String[]> readSimList(String path_to_simlist, boolean flag) throws IOException {
+    public static String[] readSimList(String path_to_simlist, boolean flag) throws IOException {
         Path simlist = FS.getPath(path_to_simlist);
-        Set<String> set = new HashSet<>();
+        String[] strs = new String[2];
+
         BufferedReader r = Files.newBufferedReader(simlist, StandardCharsets.UTF_8);
         String line = "";
         String regex = "^(\\S+)\\s+(\\S+).+tmscore:\\s(\\S+).*$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher("");
-        String pdb, pdb1st, pdb2nd;
+        String pdb;
+        strs[0] = "";
+        strs[1] = "";
         double tmscore = 0.0;
         double fstmscore = 0.;
         double scndtmscore = 0.;
         while ((line = r.readLine()) != null) {
             m.reset(line);
             pdb = m.replaceAll("$2");
-            set.add(pdb);
+            tmscore = Double.parseDouble(m.replaceAll("$3"));
+            if (m.replaceAll("$1").equals(pdb))
+                continue;
+            if (tmscore > fstmscore) {
+                scndtmscore = fstmscore;
+                strs[1] = strs[0];
+                fstmscore = tmscore;
+                strs[0] = pdb;
+            } else if (tmscore > scndtmscore) {
+                strs[1] = pdb;
+                scndtmscore = tmscore;
+            }
         }
         r.close();
-        return (new LinkedList<String>(set));
+        return strs;
     }
 }
