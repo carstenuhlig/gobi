@@ -66,6 +66,7 @@ public class IO {
     }
 
     final static String path_to_pdbfiles = "/home/proj/biosoft/PROTEINS/CATHSCOP/STRUCTURES/";
+    final static String path_to_tmalign = "/home/proj/biosoft/PROTEINS/software/TMalign";
     final static HashMap<Character, String> stl = new HashMap<Character, String>(); //abk für shortToLong
 
     static {
@@ -638,7 +639,28 @@ public class IO {
     }
 
     public Alignment getAlignment(String pdbid1, String pdbid2) {
-        ExecuteShellCommand.executeCommand("ls");
+        String fileoutput = "temp_tmalign";
+        String one, two;
+        String command = path_to_tmalign + " " + path_to_pdbfiles + pdbid1 + ".pbd " + path_to_pdbfiles + pdbid2 + ".pdb";
+        String output = ExecuteShellCommand.executeCommand(command);
+        String[] outputinlines = output.split("\n");
+        int counter = -1;
+
+        for (String line : outputinlines) {
+            if (line.startsWith("(\"") || counter > -1) {
+                if (counter == 0)
+                    one = line;
+                else if (counter == 2)
+                    two = line;
+                counter++;
+                if (counter > 2)
+                    break;
+            }
+        }
+
+
+        //clean
+        ExecuteShellCommand.executeCommand("rm " + fileoutput);
         return null;
     }
 }
