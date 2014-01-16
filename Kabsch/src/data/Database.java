@@ -40,6 +40,7 @@ public class Database {
         positions = new HashMap<>();
         residues = new HashMap<>();
         positional_array = new HashMap<>();
+        alignments = new HashMap<>();
 //        pdbids = new HashSet<>(); //kommt bei setten durch import von cathscop file
 //        pairs = new LinkedList<>(); //kommt bei setten durch import von cathscop file
     }

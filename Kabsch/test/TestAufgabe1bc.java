@@ -14,9 +14,9 @@ import java.util.List;
  */
 public class TestAufgabe1bc {
     final static String path_to_pdblist = "/home/proj/biosoft/PROTEINS/PDB_REP_CHAINS/TMSIM/1bj4.A.simlist";
-    final static String outputfile0 = "res/pdb.pdb";
-    final static String outputfile1 = "res/pdbone.pdb";
-    final static String outputfile2 = "res/pdbtwo.pdb";
+    final static String outputfile0 = "res/pdb-";
+    final static String outputfile1 = "res/pdbone-";
+    final static String outputfile2 = "res/pdbtwo-";
 
     public static void main(String[] args) throws IOException {
         Database d = new Database();
@@ -61,13 +61,13 @@ public class TestAufgabe1bc {
         Kabsch k = new Kabsch(red_mat);
         k.main();
         DenseDoubleMatrix2D wholeprocessed = k.processWholeStructure(d.getBigMatrix(first.getId2()));
-        IO.exportToPDB(d, first.getId2(), outputfile0, wholeprocessed, template_pdbid + " " + first.getId2(), 2);
+        IO.exportToPDB(d, first.getId2(), outputfile1 + first.getId2() + ".pdb", wholeprocessed, template_pdbid + " " + first.getId2(), 2);
 
         red_mat = Matrix.processMatrices(template_pdbid, second.getId2(), d);
         k = new Kabsch(red_mat);
         k.main();
         wholeprocessed = k.processWholeStructure(d.getBigMatrix(second.getId2()));
-        IO.exportToPDB(d, second.getId2(), outputfile2, wholeprocessed, template_pdbid + " " + second.getId2(), 2);
+        IO.exportToPDB(d, second.getId2(), outputfile2 + second.getId2() + ".pdb", wholeprocessed, template_pdbid + " " + second.getId2(), 2);
     }
 
 }

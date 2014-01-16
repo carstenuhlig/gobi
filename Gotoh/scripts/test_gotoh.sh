@@ -13,21 +13,21 @@ MODE=( freeshift global local )
 
 # AUSGABE=uhligc_$MODE.out
 
-for m in MODE; do
+for m in ${MODE[@]}; do
 	AUSGABE=uhligc_$m.out
 	java -Xms2G -Xmx4G -jar ${GOBI_GOTOH_DIR}uhligc/gotoh.jar -pairs $BENCHMARK_DIR/cathscop.inpairs -seqlib $BENCHMARK_DIR/domains.seqlib -mode $MODE -printali > $AUSGABE
 done
 
-exit 0
+#exit 0
 # noch keine richtige Implementierung von Matrix input
 
 # Evaluierung 2
 GOTOH_REFERENCE=/home/proj/biosoft/praktikum/genprakt-ws13/assignment1/gotoh
 DAYHOFF_MATRIX=/home/proj/biosoft/praktikum/genprakt-ws13/assignment1/matrices/dayhoff.mat
 
-for m in MODE; do
+for m in ${MODE[@]}; do
 	AUSGABE=uhligc_$m.out
-	$GOTOH_REFERENCE -mode $MODE -check $AUSGABE –matrix $DAYHOFF_MATRIX > $AUSGABE.check 2>&1
+	$GOTOH_REFERENCE -mode $MODE -check $AUSGABE –matrix dayhoff > $AUSGABE.check 2>&1
 done
 
 # for name in ${names[@]}

@@ -762,7 +762,7 @@ public class IO {
     public static Alignment readManualTMalignment(String pdbid1, String pdbid2) {
         String fileoutput = "temp_tmalign";
         String one = null, two = null;
-        String command = path_to_tmalign + " " + path_to_pdbcathfiles + pdbid1 + ".pbd " + path_to_pdbcathfiles + pdbid2 + ".pdb";
+        String command = path_to_tmalign + " " + path_to_pdbfiles + pdbid1 + ".pdb " + path_to_pdbfiles + pdbid2 + ".pdb";
         String output = ExecuteShellCommand.executeCommand(command);
         String[] outputinlines = output.split("\n");
         int counter = -1;
@@ -770,7 +770,8 @@ public class IO {
 
         for (String line : outputinlines) {
             if (line.contains("TM-score=")) {
-                tmscore = Double.parseDouble(line.replaceAll("^.+TM-score=(\\S+).*$", "$1"));
+                //tmscore = Double.parseDouble(line.replaceAll("^.+TM-score=(\\S+).*$", "$1"));
+                tmscore = Double.parseDouble(line.replaceAll("^.+TM-score=(\\d+\\.\\d+).*$", "$1"));
             }
             if (line.startsWith("(\"") || counter > -1) {
                 if (counter == 0)
@@ -790,7 +791,7 @@ public class IO {
             return null;
 
         //clean
-        ExecuteShellCommand.executeCommand("rm " + fileoutput);
+        //ExecuteShellCommand.executeCommand("rm " + fileoutput);
         return tmp;
     }
 
@@ -799,7 +800,28 @@ public class IO {
         Set<String> set = new HashSet<>();
         BufferedReader r = Files.newBufferedReader(simlist, StandardCharsets.UTF_8);
         String line = "";
-        String regex = "^(\\w+)\\s+(\\w+).+tmscore:\\s(\\d\\.\\d+).*$";
+        String regex = "^(\\S+)\\s+(\\S+).+tmscore:\\s(\\S+).*$";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher("");
+        String pdb, pdb1st, pdb2nd;
+        double tmscore = 0.0;
+        double fstmscore = 0.;
+        double scndtmscore = 0.;
+        while ((line = r.readLine()) != null) {
+            m.reset(line);
+            pdb = m.replaceAll("$2");
+            set.add(pdb);
+        }
+        r.close();
+        return (new LinkedList<String>(set));
+    }
+
+    public static List<String[]> readSimList(String path_to_simlist, boolean flag) throws IOException {
+        Path simlist = FS.getPath(path_to_simlist);
+        Set<String> set = new HashSet<>();
+        BufferedReader r = Files.newBufferedReader(simlist, StandardCharsets.UTF_8);
+        String line = "";
+        String regex = "^(\\S+)\\s+(\\S+).+tmscore:\\s(\\S+).*$";
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher("");
         String pdb, pdb1st, pdb2nd;
