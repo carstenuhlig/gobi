@@ -537,9 +537,7 @@ public class IO {
         double rmsd, identity, gdt;
         String[] alignments;
 
-        //TODO nur gleiche CATHS SCOP implementieren
-        //sind alle schon vorsortiert. deswegen nicht nötig. (wenn zeit noch ändern)
-
+        //TODO Cathscop gleiche Gruppe (wird durch gotoh schon verhindert mit "r: merge(table gotoh, table tmalign, by pbdids)"
         try (DirectoryStream<Path> ds = Files.newDirectoryStream(path_to_tmalignments)) {
             for (Path p : ds) {
                 StringBuilder sb = new StringBuilder();
