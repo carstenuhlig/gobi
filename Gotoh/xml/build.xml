@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="standard" default="jar" basedir="..">
+    <property name="src.dir" value="${basedir}/src/"/>
+    <property name="lib.dir" value="${basedir}/lib/"/>
+    <property name="jar.dir" value="${basedir}/build/jar/"/>
+    <property name="jar.name" value="Gotoh"/>
+    <property name="test.dir" value="${basedir}/out/"/>
+    <property name="original_res.dir" value="${basedir}/original_res/"/>
+    <property name="seqlib.name" value="domains.seqlib"/>
+    <property name="smalltest.name" value="sanity.pairs"/>
+    <property name="bigtest.name" value="cathscop.inpairs"/>
+
+    <path id="class.path">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${basedir}/build"/>
+        <delete dir="${test.dir}"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <mkdir dir="${basedir}/build/classes"/>
+        <javac srcdir="${src.dir}" destdir="${basedir}/build/classes">
+            <classpath refid="class.path"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="clean,compile">
+        <mkdir dir="${jar.dir}"/>
+        <echo>=== JAR ===</echo>
+        <jar destfile="${jar.dir}${jar.name}.jar" basedir="${basedir}/build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="main.Main"/>
+            </manifest>
+            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar"/>
+        </jar>
+    </target>
+
+    <!--<target name="run">
+        <echo>=== RUN ===</echo>
+        <java jar="${jar.dir}${jar.name}.jar" fork="true"/>
+    </target>-->
+
+    <target name="prepare" depends="clean,compile,jar">
+        <mkdir dir="${test.dir}"/>
+        <copy file="${jar.dir}${jar.name}.jar" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${smalltest.name}" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${seqlib.name}" todir="${test.dir}"/>
+    </target>
+
+    <target name="test" depends="clean,compile,jar,prepare">
+        <java jar="${test.dir}${jar.name}.jar" fork="true">
+            <arg value="-seqlib ${seqlib.name}"/>
+            <arg value="-pairs ${smalltest.name}"/>
+            <arg value="> out.file"/>
+        </java>
+    </target>
+
+</project>
