@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.nio.charset.*;
 
 import data.Raw;
+
 import java.net.URISyntaxException;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -38,14 +39,14 @@ public class ImportFile {
     /**
      * ReadFile for smatrices, pairfiles and seqlibfiles.
      *
-     * @param p Path provided as String (relative to working directory or
-     * absolute)
+     * @param p     Path provided as String (relative to working directory or
+     *              absolute)
      * @param aType Type of File that has to be imported provided as util.Type
      * @return if succeeded true
      * @throws IOException not readable File, etc.
      */
     public static boolean readFile(String p, Type aType, data.Matrix m,
-            data.Raw r) throws IOException {
+                                   data.Raw r) throws IOException {
         // Variable setting
         ImportFile.path = Paths.get(p);
         ImportFile.type = aType;
@@ -126,7 +127,7 @@ public class ImportFile {
     }
 
     private static void processLines(String line, int lineCnt, data.Matrix m,
-            Raw r) {
+                                     Raw r) {
         switch (type) {
             case PAIRFILE:
                 String pattern1 = "(\\S+)(\\s+)(\\S+).*";
@@ -189,10 +190,19 @@ public class ImportFile {
         return true;
     }
 
+    public static String returnMatricesFolder() {
+        if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+            return "res\\matrices";
+        } else {
+            return "res/matrices";
+        }
+    }
+
     public static void readMatricesFromResources(final data.Matrix m, final data.Raw r) throws URISyntaxException, IOException {
+        System.out.println(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0);
         Path jarpath = Paths.get(util.ImportFile.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         try (FileSystem fs = FileSystems.newFileSystem(jarpath, null)) {
-            Files.walkFileTree(fs.getPath("/res/matrices/"), new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(fs.getPath(returnMatricesFolder()), new SimpleFileVisitor<Path>() {
 
                 @Override
                 public FileVisitResult visitFile(Path t, BasicFileAttributes bfa) throws IOException {

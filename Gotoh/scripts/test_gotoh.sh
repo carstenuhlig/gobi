@@ -27,7 +27,7 @@ DAYHOFF_MATRIX=/home/proj/biosoft/praktikum/genprakt-ws13/assignment1/matrices/d
 
 for m in ${MODE[@]}; do
 	AUSGABE=uhligc_$m.out
-	$GOTOH_REFERENCE -mode $MODE -check $AUSGABE –matrix dayhoff > $AUSGABE.check 2>&1
+	$GOTOH_REFERENCE -mode $MODE -check $AUSGABE –matrix $DAYHOFF_MATRIX > $AUSGABE.check 2>&1
 done
 
 # for name in ${names[@]}

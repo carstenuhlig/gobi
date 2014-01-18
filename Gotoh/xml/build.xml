@@ -4,11 +4,13 @@
     <property name="lib.dir" value="${basedir}/lib/"/>
     <property name="jar.dir" value="${basedir}/build/jar/"/>
     <property name="jar.name" value="Gotoh"/>
+    <property name="compiled.dir" value="${basedir}/build/classes/"/>
     <property name="test.dir" value="${basedir}/out/"/>
     <property name="original_res.dir" value="${basedir}/original_res/"/>
     <property name="seqlib.name" value="domains.seqlib"/>
     <property name="smalltest.name" value="sanity.pairs"/>
     <property name="bigtest.name" value="cathscop.inpairs"/>
+    <property name="res.dir" value="${src.dir}res/"/>
 
     <path id="class.path">
         <fileset dir="${lib.dir}">
@@ -26,6 +28,10 @@
         <javac srcdir="${src.dir}" destdir="${basedir}/build/classes">
             <classpath refid="class.path"/>
         </javac>
+        <mkdir dir="${compiled.dir}res"/>
+        <copy todir="${compiled.dir}res/">
+            <fileset dir="${res.dir}"/>
+        </copy>
     </target>
 
     <target name="jar" depends="clean,compile">
@@ -35,7 +41,13 @@
             <manifest>
                 <attribute name="Main-Class" value="main.Main"/>
             </manifest>
-            <zipgroupfileset dir="${lib.dir}" includes="**/*.jar"/>
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+                <include name="**/*.mat"/>
+            </zipgroupfileset>
+            <!--<zipgroupfileset dir="${res.matrices.dir}">-->
+            <!--<include name="**/*.mat"/>-->
+            <!--</zipgroupfileset>-->
         </jar>
     </target>
 
@@ -53,9 +65,17 @@
 
     <target name="test" depends="clean,compile,jar,prepare">
         <java jar="${test.dir}${jar.name}.jar" fork="true">
-            <arg value="-seqlib ${seqlib.name}"/>
-            <arg value="-pairs ${smalltest.name}"/>
-            <arg value="> out.file"/>
+            <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${smalltest.name}"/>
+            <!--<arg value="seqlib ${seqlib.name}"/>-->
+            <!--<arg value="pairs ${smalltest.name}"/>-->
+        </java>
+    </target>
+
+    <target name="big-test" depends="clean,compile,jar,prepare">
+        <java jar="${test.dir}${jar.name}.jar" fork="true">
+            <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${bigtest.name}"/>
+            <!--<arg value="seqlib ${seqlib.name}"/>-->
+            <!--<arg value="pairs ${smalltest.name}"/>-->
         </java>
     </target>
 
