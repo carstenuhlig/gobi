@@ -19,11 +19,6 @@
 /TestApplication/nbproject/private/
 /TestApplication/build/
 /TestApplication/dist/
-/Gotoh/src/res/matrices/blosum50.mat
-/Gotoh/src/res/matrices/dayhoff.mat
-/Gotoh/src/res/matrices/BlakeCohenMatrix.mat
-/Gotoh/src/res/matrices/pam250.mat
-/Gotoh/src/res/matrices/THREADERSimilarityMatrix.mat
 /BLASTSearch/nbproject/private/
 /BLASTSearch/dist/
 /BLASTSearch/build/
