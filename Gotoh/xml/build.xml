@@ -120,36 +120,36 @@
 
     <target name="remote-test" depends="prepare-remote">
         <echo message="=== remote execute ==="/>
-        <echo message="${ssh.exec} -p 24 -f ${username}@${bioclient.server} ${remote.path.to.test.script}"/>
-        <exec executable="${ssh.exec}">
-            <arg line="-p 24 -f ${username}@${bioclient.server} ${remote.path.to.test.script}"/>
-        </exec>
-        <!--<sshexec host="${bioclient.server}" port="24" username="${username}" password="${password}" trust="true" command="~/git/gobi/Gotoh/scripts/test_gotoh.sh"/>-->
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="${remote.path.to.test.script}"/>
     </target>
 
-    <target name="retrieve-remote-testfiles" depends="clean-remote,remote-test">
-    <echo message="=== retrieve check files ==="/>
-        <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.check.mode.fileset} scripts/"/>-->
-        <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>-->
+    <target name="retrieve-remote-testfiles" depends="remote-test">
+        <echo message="=== retrieve check files ==="/>
         <exec executable="${scp.exec}">
-            <!--<arg line="-P 24 ${username}@${bioclient.server}:${remote.path.to.check.mode.fileset} scripts/"/>-->
-            <arg line="-P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>
+            <arg line="${username}@${lmu.server}:${remote.path.to.output.fileset} scripts/"/>
         </exec>
         <echo message="finished retrieve of files"/>
     </target>
 
     <target name="clean-remote">
         <echo message="=== cleaning out files on remote server ==="/>
-        <exec executable="${ssh.exec}">
-            <arg line="-p 24 -f ${username}@${bioclient.server} rm ${remote.path.to.output.fileset}"/>
-        </exec>
+        <echo message="${remote.path.to.output.fileset}"/>
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="rm ${remote.path.to.output.fileset}"/>
     </target>
 
     <target name="remote-test-test">
         <echo message="=== remote test test ==="/>
-        <exec executable="${ssh.exec}">
-            <arg line="-p 24 ${username}@${bioclient.server} sh ${remote.path.to.test.script}"/>
-        </exec>
+        <echo message="${remote.path.to.test.script}"/>
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="${remote.path.to.test.script}"/>
     </target>
 
 </project>
