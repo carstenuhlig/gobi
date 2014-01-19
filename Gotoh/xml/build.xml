@@ -79,4 +79,10 @@
         </java>
     </target>
 
+    <target name="cp-scripts.dir" depends="prepare">
+        <copy todir="${basedir}/scripts">
+            <fileset dir="${basedir}/out/"/>
+        </copy>
+    </target>
+
 </project>
