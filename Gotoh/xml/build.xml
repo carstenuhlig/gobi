@@ -14,7 +14,7 @@
     <property name="testscript.file" value="${basedir}/scripts/test_gotoh.sh"/>
     <property name="lmu.server" value="remote.cip.ifi.lmu.de"/>
     <property name="bioclient.server" value="bioclient6.bio.ifi.lmu.de"/>
-    <property name="remote.path.to.gotoh" value="~/git/gobi/Gotoh/"/>
+    <property name="remote.path.to.gotoh.dir" value="~/git/gobi/Gotoh/"/>
     <!--<property name="remote.path.to.assignment.gotoh"-->
     <!--value="/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/"/>-->
     <property file="xml/build.properties"/>
@@ -33,6 +33,7 @@
     <target name="clean">
         <delete dir="${basedir}/build"/>
         <delete dir="${test.dir}"/>
+        <delete dir="scripts/" includes="*.out*"/>
     </target>
 
     <target name="compile" depends="clean">
@@ -105,9 +106,10 @@
     </target>
 
     <target name="prepare-remote" depends="jar">
+        <echo message="=== Copy to remote host ==="/>
         <exec executable="/usr/bin/scp">
             <arg value="${jar.dir}${jar.name}.jar"/>
-            <arg value="${username}@${lmu.server}:${remote.path.to.gotoh}scripts/"/>
+            <arg value="${username}@${lmu.server}:${remote.path.to.gotoh.dir}scripts/"/>
         </exec>
         <exec executable="/usr/bin/scp">
             <arg value="-P 24"/>
@@ -117,18 +119,16 @@
     </target>
 
     <target name="remote-test" depends="prepare-remote">
-        <echo message="eine nachricht"/>
-        <exec executable="/usr/bin/ssh">
-            <arg value="-p 24"/>
-            <arg value="-f"/>
-            <arg value="${username}@${bioclient.server}"/>
-            <arg value="${remote.path.to.test.script}"/>
+        <echo message="=== remote execute ==="/>
+        <echo message="${ssh.exec} -p 24 -f ${username}@${bioclient.server} ${remote.path.to.test.script}"/>
+        <exec executable="${ssh.exec}">
+            <arg line="-p 24 -f ${username}@${bioclient.server} ${remote.path.to.test.script}"/>
         </exec>
         <!--<sshexec host="${bioclient.server}" port="24" username="${username}" password="${password}" trust="true" command="~/git/gobi/Gotoh/scripts/test_gotoh.sh"/>-->
     </target>
 
-    <target name="retrieve-remote-testfiles" depends="remote-test">
-        <echo message="=== retrieve check files ==="/>
+    <target name="retrieve-remote-testfiles" depends="clean-remote,remote-test">
+    <echo message="=== retrieve check files ==="/>
         <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.check.mode.fileset} scripts/"/>-->
         <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>-->
         <exec executable="${scp.exec}">
@@ -136,6 +136,20 @@
             <arg line="-P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>
         </exec>
         <echo message="finished retrieve of files"/>
+    </target>
+
+    <target name="clean-remote">
+        <echo message="=== cleaning out files on remote server ==="/>
+        <exec executable="${ssh.exec}">
+            <arg line="-p 24 -f ${username}@${bioclient.server} rm ${remote.path.to.output.fileset}"/>
+        </exec>
+    </target>
+
+    <target name="remote-test-test">
+        <echo message="=== remote test test ==="/>
+        <exec executable="${ssh.exec}">
+            <arg line="-p 24 ${username}@${bioclient.server} sh ${remote.path.to.test.script}"/>
+        </exec>
     </target>
 
 </project>

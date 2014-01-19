@@ -1,8 +1,10 @@
 package main;
 
 import data.Matrix;
+
 import java.util.Arrays;
 import java.util.HashMap;
+
 import util.Type;
 
 public class Computation {
@@ -37,8 +39,8 @@ public class Computation {
     private static String id_b;
 
     public static void init(String as1, String as2, int[][] smatrix,
-            HashMap<Character, Integer> charmap, double gapopen, double gapextend, Type type,
-            String id1, String id2, int factor, int factor_smat) {
+                            HashMap<Character, Integer> charmap, double gapopen, double gapextend, Type type,
+                            String id1, String id2, int factor, int factor_smat) {
         Computation.a = as1;
         Computation.b = as2;
         Computation.mat = new int[3][a.length() + 1][b.length() + 1];
@@ -90,7 +92,7 @@ public class Computation {
             mat[2][0][col] = -Integer.MAX_VALUE / 2;
         }
     }
-    
+
     private static void calcInitMatricesLocalOrFreeshift() {
         for (int row = 1; row < a.length() + 1; row++) {
             // A0,k = g(k)
@@ -116,7 +118,7 @@ public class Computation {
                 // Matrix A
                 mat[0][row][col] = Math.max(
                         mat[0][row - 1][col - 1]
-                        + getSMatrixScore(a.charAt(row - 1),
+                                + getSMatrixScore(a.charAt(row - 1),
                                 b.charAt(col - 1)),
                         Math.max(mat[1][row][col], mat[2][row][col]));
             }
@@ -136,7 +138,7 @@ public class Computation {
                 mat[0][row][col] = Math.max(
                         Math.max(
                                 mat[0][row - 1][col - 1]
-                                + getSMatrixScore(a.charAt(row - 1),
+                                        + getSMatrixScore(a.charAt(row - 1),
                                         b.charAt(col - 1)),
                                 Math.max(mat[1][row][col], mat[2][row][col])),
                         0);
@@ -153,6 +155,7 @@ public class Computation {
                 int row = a.length();
                 int col = b.length();
                 while (row > 0 && col > 0) {
+                    // Ai,j == Ai-1,j-1 + S(si,ti) -> Ai-1,j-1
                     if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
                             a.charAt(row - 1), b.charAt(col - 1)))) {
                         alignment[0][a.length() + b.length() - 1 - count] = a
@@ -164,6 +167,7 @@ public class Computation {
                         col--;
                         // if (!(row > 0) || !(col > 0))
                         // break;
+                        //Ai,j == Ii,j -> k suche sodass: Ai-k,j + g(k) == Ai,j
                     } else if (mat[0][row][col] == mat[2][row][col]) {
                         int k = 1;
                         while (mat[0][row - k][col] + calcGapScore(k) != mat[0][row][col]) {
@@ -178,6 +182,7 @@ public class Computation {
                             // if (!(row > 0))
                             // break;
                         }
+                        //Ai,j == Di,j -> k suche sodass: Ai,j-k + g(k) == Ai,j
                     } else if (mat[0][row][col] == mat[1][row][col]) {
                         int k = 1;
                         while (mat[0][row][col - k] + calcGapScore(k) != mat[0][row][col]) {
@@ -194,6 +199,23 @@ public class Computation {
                         }
                     }
                 }
+                // rest backtracking
+                while (col > 0) {
+                    alignment[0][a.length() + b.length() - 1 - count] = '-';
+                    alignment[1][a.length() + b.length() - 1 - count] = b
+                            .charAt(col - 1);
+                    count++;
+                    col--;
+                }
+
+                while (row > 0) {
+                    alignment[0][a.length() + b.length() - 1 - count] = a
+                            .charAt(row - 1);
+                    alignment[1][a.length() + b.length() - 1 - count] = '-';
+                    count++;
+                    row--;
+                }
+
                 Computation.backtrack = alignment;
                 Computation.score = mat[0][mat[0].length - 1][mat[0][0].length - 1] / (Math.pow(10, factor));
                 break;
