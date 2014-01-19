@@ -199,17 +199,21 @@ public class ImportFile {
     }
 
     public static void readMatricesFromResources(final data.Matrix m, final data.Raw r) throws URISyntaxException, IOException {
-        System.out.println(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0);
-        Path jarpath = Paths.get(util.ImportFile.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        try (FileSystem fs = FileSystems.newFileSystem(jarpath, null)) {
-            Files.walkFileTree(fs.getPath(returnMatricesFolder()), new SimpleFileVisitor<Path>() {
+//        System.out.println(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0);
+        if (ImportFile.class.getResource("ImportFile.class").toString().startsWith("jar")) {
+            Path jarpath = Paths.get(util.ImportFile.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            try (FileSystem fs = FileSystems.newFileSystem(jarpath, null)) {
+                Files.walkFileTree(fs.getPath(returnMatricesFolder()), new SimpleFileVisitor<Path>() {
 
-                @Override
-                public FileVisitResult visitFile(Path t, BasicFileAttributes bfa) throws IOException {
-                    boolean bla = readFile(t, Type.SUBSTITUTIONMATRIX, m, r);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+                    @Override
+                    public FileVisitResult visitFile(Path t, BasicFileAttributes bfa) throws IOException {
+                        boolean bla = readFile(t, Type.SUBSTITUTIONMATRIX, m, r);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            }
+        } else {
+            readDir(returnMatricesFolder(), m, r);
         }
     }
 }

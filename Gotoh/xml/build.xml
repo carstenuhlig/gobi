@@ -11,6 +11,18 @@
     <property name="smalltest.name" value="sanity.pairs"/>
     <property name="bigtest.name" value="cathscop.inpairs"/>
     <property name="res.dir" value="${src.dir}res/"/>
+    <property name="testscript.file" value="${basedir}/scripts/test_gotoh.sh"/>
+    <property name="lmu.server" value="remote.cip.ifi.lmu.de"/>
+    <property name="bioclient.server" value="bioclient6.bio.ifi.lmu.de"/>
+    <property name="remote.path.to.gotoh" value="~/git/gobi/Gotoh/"/>
+    <!--<property name="remote.path.to.assignment.gotoh"-->
+    <!--value="/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/"/>-->
+    <property file="xml/build.properties"/>
+    <property file="xml/credentials.properties"/>
+    <propertyfile file="xml/build.properties">
+        <entry key="built.nr" default="0" type="int" operation="+"/>
+        <entry key="last_exec.date" type="date" value="now" default="now" pattern="DD.MM.YY HH.mm"/>
+    </propertyfile>
 
     <path id="class.path">
         <fileset dir="${lib.dir}">
@@ -82,7 +94,48 @@
     <target name="cp-scripts.dir" depends="prepare">
         <copy todir="${basedir}/scripts">
             <fileset dir="${basedir}/out/"/>
+            <file file="scripts/test_gotoh.sh"/>
         </copy>
+    </target>
+
+    <target name="sanity-check" depends="prepare,cp-scripts.dir">
+        <exec executable="${bash.exec}">
+            <arg value="${testscript.file}"/>
+        </exec>
+    </target>
+
+    <target name="prepare-remote" depends="jar">
+        <exec executable="/usr/bin/scp">
+            <arg value="${jar.dir}${jar.name}.jar"/>
+            <arg value="${username}@${lmu.server}:${remote.path.to.gotoh}scripts/"/>
+        </exec>
+        <exec executable="/usr/bin/scp">
+            <arg value="-P 24"/>
+            <arg value="${jar.dir}${jar.name}.jar"/>
+            <arg value="${username}@${bioclient.server}:${remote.path.to.assignment.gotoh}"/>
+        </exec>
+    </target>
+
+    <target name="remote-test" depends="prepare-remote">
+        <echo message="eine nachricht"/>
+        <exec executable="/usr/bin/ssh">
+            <arg value="-p 24"/>
+            <arg value="-f"/>
+            <arg value="${username}@${bioclient.server}"/>
+            <arg value="${remote.path.to.test.script}"/>
+        </exec>
+        <!--<sshexec host="${bioclient.server}" port="24" username="${username}" password="${password}" trust="true" command="~/git/gobi/Gotoh/scripts/test_gotoh.sh"/>-->
+    </target>
+
+    <target name="retrieve-remote-testfiles" depends="remote-test">
+        <echo message="=== retrieve check files ==="/>
+        <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.check.mode.fileset} scripts/"/>-->
+        <!--<echo message="${scp.exec} -P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>-->
+        <exec executable="${scp.exec}">
+            <!--<arg line="-P 24 ${username}@${bioclient.server}:${remote.path.to.check.mode.fileset} scripts/"/>-->
+            <arg line="-P 24 ${username}@${bioclient.server}:${remote.path.to.output.fileset} scripts/"/>
+        </exec>
+        <echo message="finished retrieve of files"/>
     </target>
 
 </project>

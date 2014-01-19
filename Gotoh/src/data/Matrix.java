@@ -252,13 +252,14 @@ public class Matrix {
         }
 
         private void optimiseAlignmentArray() {
+            //TODO verhalten zum abschneiden ändern
             int end = -1;
             for (int i = 0; i < this.alignment[0].length; i++) {
-                if (Character.getNumericValue(alignment[0][i]) == -1) {
+                if (Character.getNumericValue(alignment[0][i]) == -1 && Character.getNumericValue(alignment[1][i]) == -1) {
                     end = i;
                 }
                 // TODO mit while schleife schneller
-                if (Character.getNumericValue(alignment[0][i]) > -1) {
+                if (Character.getNumericValue(alignment[0][i]) > -1 || Character.getNumericValue(alignment[1][i]) > -1) {
                     break;
                 }
             }

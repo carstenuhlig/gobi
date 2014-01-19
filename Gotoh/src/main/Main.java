@@ -339,6 +339,7 @@ public class Main {
 //        } else {
 //            ImportFile.readDir(getCurrentFolder() + "/res/matrices", m, r);
 //        }
+
         ImportFile.readMatricesFromResources(m, r);
 //        ImportFile.readDir("res\\matrices", m, r);
 //        ImportFile.readDir("/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/res/matrices", m, r);
