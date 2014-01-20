@@ -3,7 +3,7 @@
     <property name="src.dir" value="${basedir}/src/"/>
     <property name="lib.dir" value="${basedir}/lib/"/>
     <property name="jar.dir" value="${basedir}/build/jar/"/>
-    <property name="jar.name" value="Gotoh"/>
+    <property name="jar.name" value="gotoh"/>
     <property name="compiled.dir" value="${basedir}/build/classes/"/>
     <property name="test.dir" value="${basedir}/out/"/>
     <property name="original_res.dir" value="${basedir}/original_res/"/>
@@ -76,19 +76,22 @@
         <copy file="${original_res.dir}${seqlib.name}" todir="${test.dir}"/>
     </target>
 
+    <target name="prepare-big" depends="clean,compile,jar">
+        <mkdir dir="${test.dir}"/>
+        <copy file="${jar.dir}${jar.name}.jar" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${bigtest.name}" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${seqlib.name}" todir="${test.dir}"/>
+    </target>
+
     <target name="test" depends="clean,compile,jar,prepare">
         <java jar="${test.dir}${jar.name}.jar" fork="true">
             <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${smalltest.name}"/>
-            <!--<arg value="seqlib ${seqlib.name}"/>-->
-            <!--<arg value="pairs ${smalltest.name}"/>-->
         </java>
     </target>
 
-    <target name="big-test" depends="clean,compile,jar,prepare">
+    <target name="big-test" depends="clean,compile,jar,prepare-big">
         <java jar="${test.dir}${jar.name}.jar" fork="true">
             <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${bigtest.name}"/>
-            <!--<arg value="seqlib ${seqlib.name}"/>-->
-            <!--<arg value="pairs ${smalltest.name}"/>-->
         </java>
     </target>
 
@@ -118,7 +121,7 @@
         </exec>
     </target>
 
-    <target name="remote-test" depends="prepare-remote">
+    <target name="remote-test" depends="clean-remote,prepare-remote">
         <echo message="=== remote execute ==="/>
         <sshexec host="${lmu.server}"
                  username="${username}"
