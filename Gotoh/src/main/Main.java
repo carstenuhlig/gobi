@@ -14,6 +14,7 @@ import util.Type;
 
 import data.Matrix;
 import data.Raw;
+
 import java.io.BufferedWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -175,7 +176,6 @@ public class Main {
         String as1 = r.getSequenceById(id1);
         String as2 = r.getSequenceById(id2);
         int[][] smatrix = m.getSubstitutionMatrix(matrixname);
-        //TODO deprecated m.getConvMat
         char[] schars = m.getConvMat(matrixname);
         Computation.init(as1, as2, smatrix, m.getCharMap(matrixname), gapopen, gapextend, modus, id1, id2, 3, m.getFactorOfSubstitionMatrix(matrixname));
         if (mode == Type.LOCAL) {
@@ -205,7 +205,7 @@ public class Main {
             prepareOutputFile();
         }
 
-        for (Iterator<String[]> it = r.pairs.iterator(); it.hasNext();) {
+        for (Iterator<String[]> it = r.pairs.iterator(); it.hasNext(); ) {
             String[] ids = it.next();
 
             String as1 = r.getSequenceById(ids[0]);
@@ -241,7 +241,7 @@ public class Main {
                         + ids[1]
                         + " "
                         + util.MatrixHelper.formatDecimal(Computation
-                                .backtrack()));
+                        .backtrack()));
             }
 
             if (checkscores) {
@@ -262,7 +262,7 @@ public class Main {
                             + ids[1]
                             + " "
                             + util.MatrixHelper.formatDecimal(Computation
-                                    .backtrack()));
+                            .backtrack()));
                     Computation.saveAlignment(m);
                     m.printAlignment(name);
                 } else if (printalignment && !printmatrices) {

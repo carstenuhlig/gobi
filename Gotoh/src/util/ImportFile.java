@@ -63,7 +63,6 @@ public class ImportFile {
             lineCnt++;
         }
         if (lineCnt > 2) {
-            // TODO Import Chars
             if (type == Type.SUBSTITUTIONMATRIX) {
                 m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix,
                         ImportFile.matChrs);
@@ -115,7 +114,6 @@ public class ImportFile {
             lineCnt++;
         }
         if (lineCnt > 2) {
-            // TODO Import Chars
             if (type == Type.SUBSTITUTIONMATRIX) {
                 m.addSubstitutionMatrix(ImportFile.name, ImportFile.matrix,
                         ImportFile.matChrs);

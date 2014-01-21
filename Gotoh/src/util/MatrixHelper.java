@@ -81,10 +81,10 @@ public class MatrixHelper {
         dfs.setDecimalSeparator('.');
         DecimalFormat f = new DecimalFormat("0.000", dfs);
         f.setGroupingUsed(false);
-        
+
 //        NumberFormat df = DecimalFormat.getInstance();
 //        df.setGroupingUsed(false);
-        
+
 //        df.setMinimumFractionDigits(3);
 //        df.setMaximumFractionDigits(3);
 //        df.setRoundingMode(RoundingMode.HALF_EVEN);
@@ -103,7 +103,6 @@ public class MatrixHelper {
     }
 
     public static int[][] convertTo2DimInteger(double[][] matrix, int factor) {
-        //TODO fehler bei sym matrizen
         int[][] returnmatrix = new int[matrix.length][matrix[0].length];
         if (matrix.length != matrix[0].length) {
             for (int i = 0; i < matrix.length; i++) {

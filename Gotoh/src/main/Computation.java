@@ -33,7 +33,6 @@ public class Computation {
     private static int[][][] mat;
 
     // matrix für das Backtracken...
-    // TODO Backtracking Planung
     private static char[][] backtrack;
     private static String id_a;
     private static String id_b;
@@ -55,7 +54,6 @@ public class Computation {
 
         Computation.charmap = charmap;
 
-        //TODO schars als hashmap -> getsmatrixscore um einiges schneller
         Computation.schars = schars;
         Computation.backtrack = null;
         Computation.score = -Double.MAX_VALUE;
@@ -694,7 +692,6 @@ public class Computation {
                 Computation.b);
     }
 
-    //TODO überprüfen ob richtiges ergebnis
     private static int[] getHighestFreeShiftScore() {
         int[] returnint = new int[2];
         double max = -Double.MAX_VALUE;

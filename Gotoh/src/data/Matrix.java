@@ -3,11 +3,12 @@ package data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import util.Type;
 
 public class Matrix {
 
-//    private ArrayList<SMatrix> substitionmatrices = new ArrayList<SMatrix>();
+    //    private ArrayList<SMatrix> substitionmatrices = new ArrayList<SMatrix>();
     private HashMap<String, SMatrix> substitionmatrices = new HashMap<String, SMatrix>();
     private ArrayList<SMatrix> matrices = new ArrayList<SMatrix>();
 
@@ -33,14 +34,14 @@ public class Matrix {
 
     // TODO boolean return if succeeded (validate no duplicate)
     public void addMatrix(String id1, String id2, int[][] matrixA,
-            int[][] matrixD, int[][] matrixI, Type type, String as1,
-            String as2) {
+                          int[][] matrixD, int[][] matrixI, Type type, String as1,
+                          String as2) {
         matrices.add(new SMatrix(id1 + ":" + id2, matrixA, matrixD, matrixI,
                 type, as1, as2));
     }
 
     public void addSubstitutionMatrix(String name, double[][] matrix,
-            char[] chars) {
+                                      char[] chars) {
         // int[][] new_matrix = new int[matrix.length][matrix.length];
         // char[] new_chars = new char[chars.length];
         // System.arraycopy(matrix, 0, new_matrix, 0, matrix.length);
@@ -48,8 +49,6 @@ public class Matrix {
         substitionmatrices.put(name, new SMatrix(name, matrix, chars));
     }
 
-    // TODO gucken ob alle substitionmatrizen gleich struktur.. bzw. gleiches
-    // Alphabet und Reihenfolge haben
     public int[][] getSubstitutionMatrix(String name) {
         if (substitionmatrices.containsKey(name)) {
             return substitionmatrices.get(name).mat;
@@ -86,12 +85,11 @@ public class Matrix {
     }
 
     public void addAlignment(String id1, String id2, String a, String b,
-            char[][] alignment, double score, Type type, int[][][] matrix) {
+                             char[][] alignment, double score, Type type, int[][][] matrix) {
         for (SMatrix sm : matrices) {
             if (sm.name.equals(id1 + ":" + id2)) {
                 sm.score = score;
                 sm.alignment = alignment;
-                // TODO beim saveMatrices String a und b hinzufügen
                 sm.a = a;
                 sm.b = b;
                 sm.optimiseAlignmentArray();
@@ -180,7 +178,6 @@ public class Matrix {
         // substitionmatrix
         public SMatrix(String name, double[][] matrix, char[] chars) {
             this.name = name;
-            //TODO sollte merken für substitionswerte immer faktor 2
             this.mat = util.MatrixHelper.convertTo2DimInteger(matrix, 3);
             this.charmap = util.StringHelper.convertCharArrayToHashMap(chars);
             this.chars = chars;
@@ -196,7 +193,7 @@ public class Matrix {
         // calculated matrix
         // TODO fehlende Werte einfügen
         public SMatrix(String name, int[][] matrixA, int[][] matrixD,
-                int[][] matrixI, Type type, String as1, String as2) {
+                       int[][] matrixI, Type type, String as1, String as2) {
             this.name = name;
             this.matA = matrixA;
             this.matD = matrixD;
@@ -207,7 +204,7 @@ public class Matrix {
         }
 
         public SMatrix(String name, String a, String b, char[][] alignment,
-                double score, Type type, int[][][] matrix) {
+                       double score, Type type, int[][][] matrix) {
             this.name = name;
             this.matA = matrix[0];
             this.matD = matrix[1];
@@ -252,7 +249,6 @@ public class Matrix {
         }
 
         private void optimiseAlignmentArray() {
-            //TODO verhalten zum abschneiden ändern
             int end = -1;
             for (int i = 0; i < this.alignment[0].length; i++) {
                 if (Character.getNumericValue(alignment[0][i]) == -1 && Character.getNumericValue(alignment[1][i]) == -1) {
@@ -367,7 +363,7 @@ public class Matrix {
                         sb.append(" \t");
                     }
                     for (int x = 0; x < matD[0].length; x++) {
-                        if (matD[y][x] == -Integer.MAX_VALUE/2) {
+                        if (matD[y][x] == -Integer.MAX_VALUE / 2) {
                             sb.append("-Inf\t");
                         } else {
                             sb.append(util.MatrixHelper.formatDecimal(matD[y][x], 1, 3));
@@ -395,7 +391,7 @@ public class Matrix {
                         sb.append(" \t");
                     }
                     for (int x = 0; x < matI[0].length; x++) {
-                        if (matI[y][x] == -Integer.MAX_VALUE/2) {
+                        if (matI[y][x] == -Integer.MAX_VALUE / 2) {
                             sb.append("-Inf\t");
                         } else {
                             sb.append(util.MatrixHelper.formatDecimal(matI[y][x], 1, 3));
