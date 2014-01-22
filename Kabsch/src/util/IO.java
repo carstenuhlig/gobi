@@ -686,6 +686,7 @@ public class IO {
                     sb.append(pdb1 + "\t" + pdb2 + "\t" + df.format(identity) + "\t" + df.format(rmsd) + "\t" + df.format(gdt) + "\n");
                     wr.write(sb.toString());
                 } catch (NullPointerException e) {
+
                 }
 
             }
