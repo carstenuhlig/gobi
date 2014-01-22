@@ -6,6 +6,9 @@ import static main.Main.m;
 import util.ImportFile;
 import util.Type;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -17,8 +20,8 @@ import util.Type;
  */
 public class ComputationTest extends Init{
 
-    public static void main(String[] args) {
-        ImportFile.readDir("res\\matrices", m, r);
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        ImportFile.readMatricesFromResources(m, r);
         Computation.init("WTHA", "WTHGQA", m.getSubstitutionMatrix("BLOSUM50"),
                 m.getCharMap("BLOSUM50"), -10.0, -2.0, Type.GLOBAL,
                 "Gobiepraesentation1", "Gobiepraesentation2", 3, 3);

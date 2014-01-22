@@ -4,6 +4,8 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class MatrixHelper {
 
@@ -169,5 +171,21 @@ public class MatrixHelper {
         }
 
         return mat;
+    }
+
+    public static int[] convertCharsToInts(char[] chars) {
+        int[] newint = new int[chars.length];
+        for (int i = 0; i < newint.length; i++) {
+            newint[i] = (int) chars[i];
+        }
+        return newint;
+    }
+
+    public static char[] convertIntsToChars(int[] ints) {
+        char[] newchars = new char[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            newchars[i] = (char) ints[i];
+        }
+        return newchars;
     }
 }

@@ -5,6 +5,7 @@ import data.Matrix;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import util.MatrixHelper;
 import util.Type;
 
 public class Computation {
@@ -36,12 +37,33 @@ public class Computation {
     private static char[][] backtrack;
     private static String id_a;
     private static String id_b;
+    private static int[] ints_a;
+    private static int[] ints_b;
+    private static HashMap<Integer, Character> intmap;
+    private static StringBuilder align_a;
+    private static StringBuilder align_b;
 
     public static void init(String as1, String as2, int[][] smatrix,
                             HashMap<Character, Integer> charmap, double gapopen, double gapextend, Type type,
-                            String id1, String id2, int factor, int factor_smat) {
+                            String id1, String id2, int factor, int factor_smat, HashMap<Integer, Character> intmap) {
         Computation.a = as1;
         Computation.b = as2;
+        Computation.intmap = intmap;
+
+        Computation.align_a = new StringBuilder();
+        Computation.align_b = new StringBuilder();
+
+        ints_a = new int[a.length()];
+        ints_b = new int[b.length()];
+
+        for (int i = 0; i < a.length(); i++) {
+            ints_a[i] = charmap.get(a.charAt(i));
+        }
+
+        for (int i = 0; i < b.length(); i++) {
+            ints_b[i] = charmap.get(b.charAt(i));
+        }
+
         Computation.mat = new int[3][a.length() + 1][b.length() + 1];
         Computation.ge = (int) (gapextend * (int) Math.pow(10, factor));
         Computation.go = (int) (gapopen * (int) Math.pow(10, factor));
@@ -154,8 +176,10 @@ public class Computation {
                 int col = b.length();
                 while (row > 0 && col > 0) {
                     // Ai,j == Ai-1,j-1 + S(si,ti) -> Ai-1,j-1
-                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
+                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScoreByInt(
                             a.charAt(row - 1), b.charAt(col - 1)))) {
+                        align_a.append(a);
+                        align_b.append(b);
                         alignment[0][a.length() + b.length() - 1 - count] = a
                                 .charAt(row - 1);
                         alignment[1][a.length() + b.length() - 1 - count] = b
@@ -225,22 +249,28 @@ public class Computation {
                 score = mat[0][row][col] / (Math.pow(10, factor));
 
                 for (int j = b.length() - 1; j >= col; j--) {
+                    align_a.append('-');
                     alignment[0][a.length() + b.length() - 1 - count] = '-';
+                    align_b.append(intmap.get(ints_b[j]));
                     alignment[1][a.length() + b.length() - 1 - count] = b.charAt(j);
                     count++;
                 }
 
                 for (int i = a.length() - 1; i >= row; i--) {
+                    align_a.append(intmap.get(ints_a[i]));
                     alignment[0][a.length() + b.length() - 1 - count] = a.charAt(i);
+                    align_b.append('-');
                     alignment[1][a.length() + b.length() - 1 - count] = '-';
                     count++;
                 }
 
                 while (row > 0 && col > 0 && mat[0][row][col] > 0) {
-                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
+                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScoreByInt(
                             a.charAt(row - 1), b.charAt(col - 1)))) {
+                        align_a.append(intmap.get(ints_a[row - 1]));
                         alignment[0][a.length() + b.length() - 1 - count] = a
                                 .charAt(row - 1);
+                        align_b.append(intmap.get(ints_b[col - 1]));
                         alignment[1][a.length() + b.length() - 1 - count] = b
                                 .charAt(col - 1);
                         count++;
@@ -254,8 +284,10 @@ public class Computation {
                             k++;
                         }
                         for (int i = 1; i < k + 1; i++) {
+                            align_a.append(intmap.get(ints_a[row - 1]));
                             alignment[0][a.length() + b.length() - 1 - count] = a
                                     .charAt(row - 1);
+                            align_b.append('-');
                             alignment[1][a.length() + b.length() - 1 - count] = '-';
                             count++;
                             row--;
@@ -266,7 +298,9 @@ public class Computation {
                             k++;
                         }
                         for (int i = 1; i < k + 1; i++) {
+                            align_a.append('-');
                             alignment[0][a.length() + b.length() - 1 - count] = '-';
+                            align_b.append(intmap.get(ints_b[col - 1]));
                             alignment[1][a.length() + b.length() - 1 - count] = b
                                     .charAt(col - 1);
                             count++;
@@ -277,7 +311,9 @@ public class Computation {
 
                 // restlichen AS in Alignment
                 while (col > 0) {
+                    align_a.append('-');
                     alignment[0][a.length() + b.length() - 1 - count] = '-';
+                    align_b.append(intmap.get(ints_b[col - 1]));
                     alignment[1][a.length() + b.length() - 1 - count] = b
                             .charAt(col - 1);
                     count++;
@@ -316,7 +352,7 @@ public class Computation {
 
                 // Hauptteil
                 while (row > 0 && col > 0) {
-                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScore(
+                    if (mat[0][row][col] == (mat[0][row - 1][col - 1] + getSMatrixScoreByInt(
                             a.charAt(row - 1), b.charAt(col - 1)))) {
                         alignment[0][a.length() + b.length() - 1 - count] = a
                                 .charAt(row - 1);
@@ -406,7 +442,7 @@ public class Computation {
                                 modi = 1;
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -418,7 +454,7 @@ public class Computation {
                                 returndouble += ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -430,7 +466,7 @@ public class Computation {
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -443,7 +479,7 @@ public class Computation {
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -471,7 +507,7 @@ public class Computation {
                                 modi = 1;
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -483,7 +519,7 @@ public class Computation {
                                 returndouble += ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -495,7 +531,7 @@ public class Computation {
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -508,16 +544,12 @@ public class Computation {
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                     }
                 }
-                if (returndouble == score) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return returndouble == score;
             case LOCAL:
                 start = getStartLOCAL();
                 ende = getEndLOCAL();
@@ -535,7 +567,7 @@ public class Computation {
                                 modi = 1;
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -547,7 +579,7 @@ public class Computation {
                                 returndouble += ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -559,7 +591,7 @@ public class Computation {
                                 returndouble += go + ge;
                             } else { // wenn S(a,b)
                                 modi = 0;
-                                returndouble += getSMatrixScore(backtrack[0][x2],
+                                returndouble += getSMatrixScoreByInt(backtrack[0][x2],
                                         backtrack[1][x2]);
                             }
                             break;
@@ -577,11 +609,7 @@ public class Computation {
                             }
                     }
                 }
-                if (returndouble == score) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return returndouble == score;
             default:
                 break;
         }
@@ -651,8 +679,8 @@ public class Computation {
 //                bi = i;
 //            }
 //        }
-        int ai = 0;
-        int bi = 0;
+        int ai;
+        int bi;
         try {
             ai = charmap.get(a);
             bi = charmap.get(b);
@@ -665,6 +693,10 @@ public class Computation {
         } else {
             return smat[ai][bi];
         }
+    }
+
+    private static int getSMatrixScoreByInt(int a, int b) {
+        return smat[a][b];
     }
 
     private static int[] getHighestScore() {

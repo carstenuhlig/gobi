@@ -166,6 +166,7 @@ public class Matrix {
 
         //für getsmatrix score -> chars als hashmap... schneller
         public HashMap<Character, Integer> charmap;
+        public HashMap<Integer, Character> intmap;
 
         // Strings mit Gaps
         public char[][] alignment;
@@ -179,7 +180,8 @@ public class Matrix {
         public SMatrix(String name, double[][] matrix, char[] chars) {
             this.name = name;
             this.mat = util.MatrixHelper.convertTo2DimInteger(matrix, 3);
-            this.charmap = util.StringHelper.convertCharArrayToHashMap(chars);
+            this.charmap = util.StringHelper.convertCharArrayToCharHashMap(chars);
+            this.intmap = util.StringHelper.convertCharHashMapToIntToHashMap(charmap);
             this.chars = chars;
             this.factor = 3;
             t = Type.SUBSTITUTIONMATRIX;
