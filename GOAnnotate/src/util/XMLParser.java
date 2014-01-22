@@ -28,6 +28,10 @@ public class XMLParser {
         XMLParser.d = d;
     }
 
+    public static String getRootFolder(){
+        return ExecuteShellCommand.executeCommand("ls");
+    }
+
     public static void parseXML(String stringpath) throws IOException {
         Path p = FS.getPath(stringpath);
         BufferedReader r = Files.newBufferedReader(p, StandardCharsets.UTF_8);
@@ -54,6 +58,9 @@ public class XMLParser {
         while ((line = r.readLine()) != null) {
             // read lines here
             if (line.contains("</term>")) {
+                if (id.equals("GO:2000901")) {
+                    System.out.printf("");
+                }
                 if (id != null)
                     addKnode(id, name, subclasses);
                 id = null;
@@ -75,8 +82,16 @@ public class XMLParser {
 
     public static void addKnode(String id, String name, HashSet<String> parentids) {
         //TODO addknode
+
         LinkedList<Node> parentnodes = new LinkedList<>();
-        Node thisnode = new Node(id, name);
+
+        Node thisnode = d.getNode(id);
+        if (thisnode == null) {
+            thisnode = new Node(id, name);
+        }
+        else {
+            thisnode.setName(name);
+        }
         for (String parentid : parentids) {
             Node tmp = d.getNode(parentid);
             if (tmp == null) {
@@ -86,6 +101,7 @@ public class XMLParser {
                 d.addNode(tmp);
             } else {
                 //wenn parent schon vorhanden
+                parentnodes.add(tmp);
                 d.addChild(parentid, thisnode);
             }
         }

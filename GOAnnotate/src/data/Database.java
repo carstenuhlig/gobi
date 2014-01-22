@@ -14,7 +14,6 @@ public class Database {
     }
 
     public Node getNode(String id) {
-        Node n = knoedel.get(id);
         return knoedel.get(id);
     }
 
@@ -44,5 +43,13 @@ public class Database {
 
     public Set<Node> getAllChildrenFromID(String id) {
         return knoedel.get(id).getAllChildren();
+    }
+
+    public boolean hasNoNames(){
+        for (Node node : knoedel.values()) {
+            if (!node.hasName())
+                return true;
+        }
+        return false;
     }
 }

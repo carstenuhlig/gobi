@@ -94,9 +94,29 @@ public class Node {
 
     @Override
     public String toString() {
+        StringBuilder p = new StringBuilder();
+        StringBuilder c = new StringBuilder();
+        for (Iterator<Node> nodeIterator = parents.iterator(); nodeIterator.hasNext(); ) {
+            Node node = nodeIterator.next();
+            if (nodeIterator.hasNext())
+                p.append(node.getId() + ", ");
+            else
+                p.append(node.getId());
+        }
+
+        for (Iterator<Node> nodeIterator = children.iterator(); nodeIterator.hasNext(); ) {
+            Node node = nodeIterator.next();
+            if (nodeIterator.hasNext())
+                c.append(node.getId() + ", ");
+            else
+                c.append(node.getId());
+        }
+
         return "Node{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
+                ",\n\t\t\t\t\t\tParents='" + p.toString() + '\'' +
+                ",\n\t\t\t\t\t\tChildren='" + c.toString() + '\'' +
                 '}' + "\n";
     }
 
@@ -108,5 +128,9 @@ public class Node {
         }
         tmp.add(this);
         return tmp;
+    }
+
+    public boolean hasName() {
+        return name != null;
     }
 }
