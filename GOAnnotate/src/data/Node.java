@@ -10,8 +10,10 @@ public class Node {
     private String id;
     //type -> term
     private String name;
-    private ArrayList<Node> children;
-    private ArrayList<Node> parents;
+    private List<Node> children;
+    private List<Node> parents;
+    //protein ensemble gene id
+    private Set<String> proteins;
 
     public Node(String id) {
         init();
@@ -43,17 +45,11 @@ public class Node {
         this.name = name;
     }
 
-    //evtl doch gebraucht
-    /*public Node(String id, String name, List<String> children) {
-        init();
-        this.id = id;
-        this.name = name;
-    }*/
-
     private void init() {
         children = new ArrayList<>();
         parents = new ArrayList<>();
         name = null;
+        proteins = new HashSet<>();
     }
 
     public String getId() {
@@ -64,11 +60,11 @@ public class Node {
         return name;
     }
 
-    public ArrayList<Node> getChildren() {
+    public List<Node> getChildren() {
         return children;
     }
 
-    public ArrayList<Node> getParents() {
+    public List<Node> getParents() {
         return parents;
     }
 
@@ -88,6 +84,7 @@ public class Node {
         this.children.add(child);
     }
 
+    //kann gar nicht vorkommen da direkt bei id fund dem konstruktor übergeben
     public void addParent(Node parent) {
         this.parents.add(parent);
     }
@@ -112,11 +109,24 @@ public class Node {
                 c.append(node.getId());
         }
 
+
+//        StringBuilder pr = new StringBuilder();
+        /*List<String> pr = new LinkedList<>();
+        Iterator proteinit = proteins.iterator();
+        while (proteins.iterator().hasNext()) {
+            String s = proteins.iterator().next();
+            if (proteins.iterator().hasNext())
+                pr.add(s + ", ");
+            else
+                pr.add(s);
+        }*/
+
         return "Node{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ",\n\t\t\t\t\t\tParents='" + p.toString() + '\'' +
                 ",\n\t\t\t\t\t\tChildren='" + c.toString() + '\'' +
+                ",\n\t\t\t\t\t\tNr of Proteins='" + proteins.toString() + '\'' +
                 '}' + "\n";
     }
 
@@ -132,5 +142,64 @@ public class Node {
 
     public boolean hasName() {
         return name != null;
+    }
+
+    public boolean hasParent(String id) {
+        for (Node parent : parents) {
+            if (parent.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasChild(String id) {
+        for (Node child : children) {
+            if (child.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasParent(Node n) {
+        for (Node parent : parents) {
+            if (parent == n) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasChild(Node n) {
+        for (Node child : children) {
+            if (child == n) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void printIncompleteConnections() {
+        for (Node parent : parents) {
+            if (!parent.hasChild(this))
+                System.out.println(this.id + " -> Parent?: " + parent.id);
+        }
+
+        for (Node child : children) {
+            if (!child.hasParent(this))
+                System.out.println(this.id + " -> Child?: " + child.id);
+        }
+    }
+
+    public Set<String> getProteins() {
+        return proteins;
+    }
+
+    public void addProtein(String proteinid) {
+        if (proteins.contains(proteinid))
+            return;
+        else
+            proteins.add(proteinid);
     }
 }

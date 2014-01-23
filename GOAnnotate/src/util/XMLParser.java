@@ -28,7 +28,7 @@ public class XMLParser {
         XMLParser.d = d;
     }
 
-    public static String getRootFolder(){
+    public static String getRootFolder() {
         return ExecuteShellCommand.executeCommand("ls");
     }
 
@@ -58,9 +58,7 @@ public class XMLParser {
         while ((line = r.readLine()) != null) {
             // read lines here
             if (line.contains("</term>")) {
-                if (id.equals("GO:2000901")) {
-                    System.out.printf("");
-                }
+
                 if (id != null)
                     addKnode(id, name, subclasses);
                 id = null;
@@ -74,6 +72,11 @@ public class XMLParser {
                 } else if (m_subclass.reset(line).matches()) {
                     subclasses.add(m_subclass.replaceAll("$1"));
                 }
+                if (id != null) {
+                    if (id.equals("GO:0008868")) {
+                        System.out.printf("");
+                    }
+                }
             }
         }
 
@@ -81,22 +84,18 @@ public class XMLParser {
     }
 
     public static void addKnode(String id, String name, HashSet<String> parentids) {
-        //TODO addknode
-
         LinkedList<Node> parentnodes = new LinkedList<>();
 
         Node thisnode = d.getNode(id);
         if (thisnode == null) {
             thisnode = new Node(id, name);
-        }
-        else {
+        } else
             thisnode.setName(name);
-        }
         for (String parentid : parentids) {
             Node tmp = d.getNode(parentid);
             if (tmp == null) {
                 //wenn parent noch nicht vorhanden
-                tmp = new Node(id, name, thisnode);
+                tmp = new Node(parentid, name, thisnode);
                 parentnodes.add(tmp);
                 d.addNode(tmp);
             } else {
