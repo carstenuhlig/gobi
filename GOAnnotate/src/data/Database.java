@@ -45,6 +45,10 @@ public class Database {
         return knoedel.get(id).getAllChildren();
     }
 
+    public Set<Node> getAllParentsFromID(String id) {
+        return knoedel.get(id).getAllParents();
+    }
+
     public boolean hasNoNames() {
         for (Node node : knoedel.values()) {
             if (!node.hasName())
@@ -100,8 +104,9 @@ public class Database {
     }
 
     public void addNodeInformation(String id, String proteinid) {
-        if (knoedel.containsKey(id))
-            knoedel.get(id).addProtein(proteinid);
+        Node n = knoedel.get(id);
+        if (n != null)
+            n.addProtein(proteinid);
     }
 
     public void addNodeInformation(String id, List<String> proteinids) {
@@ -109,5 +114,9 @@ public class Database {
         for (String proteinid : proteinids) {
             n.addProtein(proteinid);
         }
+    }
+
+    public int getNumberOfNodes() {
+        return knoedel.size();
     }
 }

@@ -140,6 +140,16 @@ public class Node {
         return tmp;
     }
 
+    public Set<Node> getAllParents() {
+        //Catch 'em all !!! Pokemon
+        HashSet<Node> tmp = new HashSet<>();
+        for (Node parent : parents) {
+            tmp.addAll(parent.getAllParents());
+        }
+        tmp.add(this);
+        return tmp;
+    }
+
     public boolean hasName() {
         return name != null;
     }
@@ -201,5 +211,12 @@ public class Node {
             return;
         else
             proteins.add(proteinid);
+    }
+
+    public boolean hasProteins() {
+        if (proteins.isEmpty())
+            return false;
+        else
+            return true;
     }
 }
