@@ -3,6 +3,7 @@ package main;
 import data.Database;
 import data.Node;
 import util.BiomartParser;
+import util.ExecuteShellCommand;
 import util.IO;
 import util.XMLParser;
 
@@ -22,6 +23,8 @@ public class Main {
     public static final String NUMBER = "nr";
     public static final String PROTEIN = "protein";
     public static final String OUTPUT = "output";
+    public static final String PROSITE = "prosite";
+    public static final String PATH_SUFFIX = ".prosite";
     static String outputfile;
     static Database data;
 
@@ -180,5 +183,22 @@ public class Main {
             }
         }
         IO.closeBufferedWriter();
+    }
+
+    public static void convertToFasta(String filein) {
+        ExecuteShellCommand.executeCommand("python scripts/converttofasta.py " + filein + " " + filein + ".fasta");
+        ExecuteShellCommand.executeCommand("rm " + filein);
+    }
+
+    public static void executeProsite(String prosite_executable, String prosite_database, String sequencefile) {
+        ExecuteShellCommand.executeCommand(prosite_executable + " -d " + prosite_database + " " + sequencefile + " > " + sequencefile + PATH_SUFFIX);
+    }
+
+    public static void processPrositeFile(String prosite_prefix_file) {
+        String file = prosite_prefix_file + PATH_SUFFIX;
+        //TODO processprositefile:
+        //1. name von nodes mit prosite vergleichen
+        //2. wenn gleich dann in liste speichern
+        //3. ...
     }
 }
