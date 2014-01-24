@@ -72,11 +72,6 @@ public class XMLParser {
                 } else if (m_subclass.reset(line).matches()) {
                     subclasses.add(m_subclass.replaceAll("$1"));
                 }
-                if (id != null) {
-                    if (id.equals("GO:0008868")) {
-                        System.out.printf("");
-                    }
-                }
             }
         }
 
