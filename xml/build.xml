@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="all" default="jar" basedir="..">
+    <!--<property name="src.dir" value="${basedir}/src/"/>-->
+    <property name="lib.dir" value="lib/"/>
+    <property name="jar.dir" value="out/artifacts"/>
+    <property name="compiled.dir" value="out/compiled/"/>
+    <property name="test.dir" value="out/test/"/>
+    <property name="original_res.dir" value="${basedir}/original_res/"/>
+    <property name="seqlib.name" value="domains.seqlib"/>
+    <property name="res.dir" value="$res/"/>
+    <property name="testscript.file" value="${basedir}/scripts/test_gotoh.sh"/>
+    <property name="lmu.server" value="remote.cip.ifi.lmu.de"/>
+    <property name="bioclient.server" value="bioclient6.bio.ifi.lmu.de"/>
+    <property name="remote.path.to.gotoh.dir" value="~/git/gobi/Gotoh/"/>
+    <!--<property name="remote.path.to.assignment.gotoh"-->
+    <!--value="/home/proj/biocluster/praktikum/genprakt-ws13/abgaben/assignment1/uhligc/"/>-->
+    <!--<property file="xml/build.properties"/>-->
+    <!--<property file="xml/credentials.properties"/>-->
+    <propertyfile file="xml/build.properties">
+        <entry key="built.nr" default="0" type="int" operation="+"/>
+        <entry key="last_exec.date" type="date" value="now" default="now" pattern="DD.MM.YY HH.mm"/>
+    </propertyfile>
+
+
+    <path id="class.path">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="goannotate.class.path">
+        <file name=""/>
+    </path>
+
+    <target name="clean">
+        <delete dir="${basedir}/build"/>
+        <delete dir="${test.dir}"/>
+        <delete dir="scripts/" includes="*.out*"/>
+    </target>
+
+    <target name="compile-kabsch" depends="clean">
+        <mkdir dir="${compiled.dir}kabsch"/>
+        <javac srcdir="" destdir="${compiled.dir}kabsch">
+            <classpath refid="class.path"/>
+        </javac>
+    </target>
+
+    <target name="compile-goannotate" depends="clean">
+        <mkdir dir="${compiled.dir}"/>
+        <javac srcdir="GOAnnotate/src/" destdir="${compiled.dir}">
+            <classpath refid="class.path"/>
+        </javac>
+        <mkdir dir="${compiled.dir}res"/>
+        <copy todir="${compiled.dir}res/">
+            <fileset dir="${res.dir}"/>
+        </copy>
+    </target>
+
+    <target name="compile" depends="clean">
+    <mkdir dir="${compiled.dir}"/>
+    <javac srcdir="" destdir="${basedir}/build/classes">
+        <classpath refid="class.path"/>
+    </javac>
+    <mkdir dir="${compiled.dir}res"/>
+    <copy todir="${compiled.dir}res/">
+        <fileset dir="${res.dir}"/>
+    </copy>
+</target>
+
+    <target name="jar" depends="clean,compile">
+        <mkdir dir="${jar.dir}"/>
+        <echo>=== JAR ===</echo>
+        <jar destfile="${jar.dir}${jar.name}.jar" basedir="${basedir}/build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="main.Main"/>
+            </manifest>
+            <zipgroupfileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+                <include name="**/*.mat"/>
+            </zipgroupfileset>
+            <!--<zipgroupfileset dir="${res.matrices.dir}">-->
+            <!--<include name="**/*.mat"/>-->
+            <!--</zipgroupfileset>-->
+        </jar>
+    </target>
+
+    <!--<target name="run">
+        <echo>=== RUN ===</echo>
+        <java jar="${jar.dir}${jar.name}.jar" fork="true"/>
+    </target>-->
+
+    <target name="prepare" depends="clean,compile,jar">
+        <mkdir dir="${test.dir}"/>
+        <copy file="${jar.dir}${jar.name}.jar" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${smalltest.name}" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${seqlib.name}" todir="${test.dir}"/>
+    </target>
+
+    <target name="prepare-big" depends="clean,compile,jar">
+        <mkdir dir="${test.dir}"/>
+        <copy file="${jar.dir}${jar.name}.jar" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${bigtest.name}" todir="${test.dir}"/>
+        <copy file="${original_res.dir}${seqlib.name}" todir="${test.dir}"/>
+    </target>
+
+    <target name="test" depends="clean,compile,jar,prepare">
+        <java jar="${test.dir}${jar.name}.jar" fork="true">
+            <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${smalltest.name}"/>
+        </java>
+    </target>
+
+    <target name="big-test" depends="clean,compile,jar,prepare-big">
+        <java jar="${test.dir}${jar.name}.jar" fork="true">
+            <arg line="-seqlib ${test.dir}${seqlib.name} -pairs ${test.dir}${bigtest.name}"/>
+        </java>
+    </target>
+
+    <target name="cp-scripts.dir" depends="prepare">
+        <copy todir="${basedir}/scripts">
+            <fileset dir="${basedir}/out/"/>
+            <file file="scripts/test_gotoh.sh"/>
+        </copy>
+    </target>
+
+    <target name="sanity-check" depends="prepare,cp-scripts.dir">
+        <exec executable="${bash.exec}">
+            <arg value="${testscript.file}"/>
+        </exec>
+    </target>
+
+    <target name="prepare-remote" depends="jar">
+        <echo message="=== Copy to remote host ==="/>
+        <exec executable="/usr/bin/scp">
+            <arg value="${jar.dir}${jar.name}.jar"/>
+            <arg value="${username}@${lmu.server}:${remote.path.to.gotoh.dir}scripts/"/>
+        </exec>
+        <exec executable="/usr/bin/scp">
+            <arg value="-P 24"/>
+            <arg value="${jar.dir}${jar.name}.jar"/>
+            <arg value="${username}@${bioclient.server}:${remote.path.to.assignment.gotoh}"/>
+        </exec>
+    </target>
+
+    <target name="remote-test" depends="clean-remote,prepare-remote">
+        <echo message="=== remote execute ==="/>
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="${remote.path.to.test.script}"/>
+    </target>
+
+    <target name="retrieve-remote-testfiles" depends="remote-test">
+        <echo message="=== retrieve check files ==="/>
+        <exec executable="${scp.exec}">
+            <arg line="${username}@${lmu.server}:${remote.path.to.output.fileset} scripts/"/>
+        </exec>
+        <echo message="finished retrieve of files"/>
+    </target>
+
+    <target name="clean-remote">
+        <echo message="=== cleaning out files on remote server ==="/>
+        <echo message="${remote.path.to.output.fileset}"/>
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="rm ${remote.path.to.output.fileset}"/>
+    </target>
+
+    <target name="remote-test-test">
+        <echo message="=== remote test test ==="/>
+        <echo message="${remote.path.to.test.script}"/>
+        <sshexec host="${lmu.server}"
+                 username="${username}"
+                 password="${password}"
+                 command="${remote.path.to.test.script}"/>
+    </target>
+
+</project>

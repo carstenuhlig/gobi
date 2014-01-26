@@ -9,6 +9,7 @@ import util.XMLParser;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -154,16 +155,22 @@ public class Main {
      */
     public static void writeAllChildrenProteinsInList(String goid) throws IOException {
         IO.startBufferedWriter(outputfile);
+
         Set<Node> nodes = data.getAllChildrenFromID(goid);
+        Set<String> proteinlist = new HashSet<>();
+
         for (Node n : nodes) {
             if (n.hasProteins()) {
-                StringBuilder sb = new StringBuilder();
                 for (String p : n.getProteins()) {
-                    sb.append(p + "\n");
+                    proteinlist.add(p);
                 }
-                IO.writeBufferedWriter(sb.toString());
             }
         }
+
+        for (String s : proteinlist) {
+            IO.writeBufferedWriter(s + "\n");
+        }
+
         IO.closeBufferedWriter();
     }
 

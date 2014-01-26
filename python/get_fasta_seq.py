@@ -8,12 +8,14 @@ ps_scanlistfile = open(sys.argv[3],'w')
 seqlib = {}
 
 for line in seqlibfile:
-    seqlib[line.split(':')[0]] = seqlib[line.split(':')[1]]
+    seqlib[line.split(':')[0]] = line.split(':')[1]
 
 seqlibfile.close()
 
 for line in proteinlistfile:
-    if seqlib.has_key(line):
-        ps_scanlistfile.write(">" + line + "\n" + seqlib[line] + "\n")
+    id = line.rstrip()
+    if seqlib.has_key(id):
+        ps_scanlistfile.write(">" + id + "\n" + seqlib[id])
 
 proteinlistfile.close()
+ps_scanlistfile.close()
