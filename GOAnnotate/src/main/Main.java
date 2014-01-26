@@ -31,6 +31,7 @@ public class Main {
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Usage: java -jar <jar> <file-go-annotate-database> <file-biomart-database> <options>...");
+            System.out.println("\t\t<options>:\n\t\t\tsubclass|parentclass\n\t\t\tprotein\n\t\t\t<go:id>\n\t\t\toutput\n\t\t\t<output-file>");
             System.exit(1);
         }
 
@@ -191,7 +192,8 @@ public class Main {
     }
 
     public static void executeProsite(String prosite_executable, String prosite_database, String sequencefile) {
-        ExecuteShellCommand.executeCommand(prosite_executable + " -d " + prosite_database + " " + sequencefile + " > " + sequencefile + PATH_SUFFIX);
+        // -s parameter for only complicated patterns
+        ExecuteShellCommand.executeCommand(prosite_executable + " -s -d " + prosite_database + " " + sequencefile + " > " + sequencefile + PATH_SUFFIX);
     }
 
     public static void processPrositeFile(String prosite_prefix_file) {
