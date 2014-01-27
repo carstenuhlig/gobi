@@ -11,15 +11,17 @@ data = {}
 for line in results:
     if line.startswith(">"):
         pieces = line.split(" ")
-        bla = ""
-        for i in range(4, pieces.length()):
-            bla += pieces[i]
-        if data.has_key(bla): # ohne abfrage testen ob bla direkt data[bla] direkt initialisiert wird
-            data[bla] += 1
+        # ohne abfrage testen ob bla direkt data[bla] direkt initialisiert wird
+        kkey = pieces[3]
+        if kkey in data:
+            data[kkey] += 1
+        else:
+            data[kkey] = 0
+            print kkey
 
 results.close()
 
 for key in data:
-    stats.write(data[key] + "\n")
+    stats.write(key + "\t" + str(data[key]) + "\n")
 
 stats.close()

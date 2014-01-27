@@ -65,7 +65,7 @@
         <echo>finished createing goannotate.jar</echo>
     </target>
 
-    <target name="prepare-goannotate" depends="jar-goannotate">
+    <target name="prepare-goannotate" depends="jar-goannotate,prepare-res">
         <copy file="${jar.dir}goannotate.jar" todir="${res.dir}"/>
     </target>
 
@@ -92,7 +92,7 @@
 
     <target name="ps_scan" depends="prepare-ps_scan">
         <exec executable="${perl.exec}" output="${ps_scan.output.file}">
-            <arg line="${exec.ps_scan.file} -s -d ${prosite.database.file} -o fasta ${ps_scan.input.file}"/>
+            <arg line="${ps_scan.exec} -s -d ${prosite.database.file} -o fasta ${ps_scan.input.file}"/>
         </exec>
     </target>
 
@@ -108,5 +108,31 @@
         <exec executable="${r.exec}">
             <arg line="CMD BATCH ${r.script.file}"/>
         </exec>
+    </target>
+
+    <target name="check">
+        <condition property="resources.present">
+            <and>
+                <not>
+                    <available file="${res.dir}"/>
+                    <available file="${go.xml.file}"/>
+                    <available file="${biomart.ensp.file}"/>
+                    <available file="${ps_scan.exec}"/>
+                    <available file="${prosite.database.file}"/>
+                </not>
+            </and>
+        </condition>
+    </target>
+
+    <target name="prepare-res" if="resources.present">
+        <mkdir dir="${res.dir}"/>
+        <copy todir="${res.dir}">
+            <file file="${biomart.biolmu.file}"/>
+            <file file="${prosite.database.biolmu.file}"/>
+            <file file="${go.xml.biolmu.file}"/>
+        </copy>
+        <copy todir="${tools.dir}">
+            <fileset dir="${ps_scan.biolmu.dir"/>
+        </copy>
     </target>
 </project>
