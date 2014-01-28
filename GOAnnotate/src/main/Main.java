@@ -193,6 +193,9 @@ public class Main {
         IO.closeBufferedWriter();
     }
 
+    /**Deprecated:
+     * mit ant durchgeführt
+    **/
     public static void convertToFasta(String filein) {
         ExecuteShellCommand.executeCommand("python scripts/converttofasta.py " + filein + " " + filein + ".fasta");
         ExecuteShellCommand.executeCommand("rm " + filein);

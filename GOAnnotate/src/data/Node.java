@@ -109,18 +109,6 @@ public class Node {
                 c.append(node.getId());
         }
 
-
-//        StringBuilder pr = new StringBuilder();
-        /*List<String> pr = new LinkedList<>();
-        Iterator proteinit = proteins.iterator();
-        while (proteins.iterator().hasNext()) {
-            String s = proteins.iterator().next();
-            if (proteins.iterator().hasNext())
-                pr.add(s + ", ");
-            else
-                pr.add(s);
-        }*/
-
         return "Node{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
