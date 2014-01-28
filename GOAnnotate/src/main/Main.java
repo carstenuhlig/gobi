@@ -3,7 +3,7 @@ package main;
 import data.Database;
 import data.Node;
 import util.BiomartParser;
-import util.ExecuteShellCommand;
+//import util.ExecuteShellCommand;
 import util.IO;
 import util.XMLParser;
 
@@ -193,18 +193,18 @@ public class Main {
         IO.closeBufferedWriter();
     }
 
-    /**Deprecated:
-     * mit ant durchgeführt
-    **/
-    public static void convertToFasta(String filein) {
-        ExecuteShellCommand.executeCommand("python scripts/converttofasta.py " + filein + " " + filein + ".fasta");
-        ExecuteShellCommand.executeCommand("rm " + filein);
-    }
-
-    public static void executeProsite(String prosite_executable, String prosite_database, String sequencefile) {
-        // -s parameter for only complicated patterns
-        ExecuteShellCommand.executeCommand(prosite_executable + " -s -d " + prosite_database + " " + sequencefile + " > " + sequencefile + PATH_SUFFIX);
-    }
+//    /**Deprecated:
+//     * mit ant durchgeführt
+//    **/
+//    public static void convertToFasta(String filein) {
+//        ExecuteShellCommand.executeCommand("python scripts/converttofasta.py " + filein + " " + filein + ".fasta");
+//        ExecuteShellCommand.executeCommand("rm " + filein);
+//    }
+//
+//    public static void executeProsite(String prosite_executable, String prosite_database, String sequencefile) {
+//        // -s parameter for only complicated patterns
+//        ExecuteShellCommand.executeCommand(prosite_executable + " -s -d " + prosite_database + " " + sequencefile + " > " + sequencefile + PATH_SUFFIX);
+//    }
 
     public static void processPrositeFile(String prosite_prefix_file) {
         String file = prosite_prefix_file + PATH_SUFFIX;

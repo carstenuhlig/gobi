@@ -5,7 +5,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/GOAnnotate/META-INF/MANIFEST.MF" />
       </element>
-      <element id="module-output" name="goannotate" />
+      <element id="module-output" name="GOAnnotate" />
     </root>
   </artifact>
 </component>

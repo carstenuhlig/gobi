@@ -28,9 +28,9 @@ public class XMLParser {
         XMLParser.d = d;
     }
 
-    public static String getRootFolder() {
-        return ExecuteShellCommand.executeCommand("ls");
-    }
+//    public static String getRootFolder() {
+//        return ExecuteShellCommand.executeCommand("ls");
+//    }
 
     public static void parseXML(String stringpath) throws IOException {
         Path p = FS.getPath(stringpath);
