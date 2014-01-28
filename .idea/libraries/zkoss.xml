@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="zkoss">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zcommon.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zel.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zhtml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zkbind.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zkplus.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zul.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zk-bin-7.0.0/dist/lib/zweb.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
