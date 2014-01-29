@@ -8,6 +8,7 @@ package util;
 import data.Exon;
 import data.Protein;
 import data.Transcript;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,11 +17,11 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
- *
  * @author uhligc
  */
 public class Isoform {
 
+    //TODO umbenennen denn ist nicht wirklich einen isoform sondern schon das spliceevent
     Transcript t1, t2;
     Protein p1, p2;
 
@@ -126,7 +127,7 @@ public class Isoform {
         }
     }
 
-//        //isoform1
+    //        //isoform1
 //        int exonanzahl = p1.getNrExons();
 //        for (int i = 0; i < exonanzahl; i++) {
 //            int frame = p1.getExon(i).getCDS().getFrame();
@@ -211,7 +212,7 @@ public class Isoform {
         }
     }
 
-//    public void getSequence() throws IOException {
+    //    public void getSequence() throws IOException {
 //        long start = 0;
 //        long stop = 0;
 //        String chromosome = 
@@ -253,7 +254,7 @@ public class Isoform {
         }
     }
 
-//    public void getSequence() throws IOException {
+    //    public void getSequence() throws IOException {
 //        long start = 0;
 //        long stop = 0;
 //        String chromosome = 
