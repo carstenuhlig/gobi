@@ -20,6 +20,7 @@
 =======
       <element id="javaee-facet-resources" facet="ZKOSS/web/Web" />
 >>>>>>> 3984582e079d4759155791f302245dca9a78247b
+      <element id="javaee-facet-resources" facet="ZKOSS/web/Web" />
     </root>
   </artifact>
 </component>
