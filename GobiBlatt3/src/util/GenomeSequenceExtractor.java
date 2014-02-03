@@ -62,7 +62,7 @@ public class GenomeSequenceExtractor {
         start += (headeroffset + start / 60);
         stop += (headeroffset + start / 60);
         byte[] b = new byte[(int) (stop - start + 1)];
-        raf.seek(start - 1);
+        raf.seek(start);
         raf.read(b);
         raf.close();
         String tmp = new String(b);

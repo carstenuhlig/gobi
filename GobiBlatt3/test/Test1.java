@@ -28,8 +28,8 @@ public class Test1 {
 
     public static void main(String[] args) throws IOException {
         String geneid = "ENSG00000176974";
-        String proteinid1 = "ENSP00000318868";
-        String proteinid2 = "ENSP00000318805";
+        String proteinid1 = "ENSP00000383125";
+        String proteinid2 = "ENSP00000373083";
 
         Genes g = new Genes();
         String path = "/home/proj/biosoft/GENOMIC/HUMAN/Homo_sapiens.GRCh37.63.gtf";
