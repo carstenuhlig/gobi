@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.sun.tools.classfile.StackMapTable_attribute;
 import util.GenomeSequenceExtractor;
 
 public class Protein {
@@ -68,6 +69,14 @@ public class Protein {
 
     public String getId() {
         return id;
+    }
+
+    public int getLength() {
+        int tmp = 0;
+        for (Exon exon : exons) {
+            tmp += exon.getLength();
+        }
+        return tmp;
     }
 
 }

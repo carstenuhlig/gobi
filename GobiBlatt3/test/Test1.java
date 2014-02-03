@@ -45,6 +45,7 @@ public class Test1 {
         System.out.println(a);
         System.out.println(b);
         System.out.println(se);
+        System.out.println("a = " + g.getProtein(proteinid1).getLength());
 //        gene.getTranscript(proteinid1);
 //        HashMap<String, Transcript> map = gene.getTranscripts();
 //        Protein p1 = g.getProtein(proteinid1);

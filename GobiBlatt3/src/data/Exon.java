@@ -32,6 +32,10 @@ public class Exon implements Comparable<Exon> {
         return (int) (this.getCDS().getStart() - o.getCDS().getStart());
     }
 
+    public int getLength() {
+        return (int) (cds.getStop() - cds.getStart() + 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
