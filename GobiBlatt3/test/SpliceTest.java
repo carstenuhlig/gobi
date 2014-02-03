@@ -17,6 +17,7 @@ public class SpliceTest {
         GTFParser.readFile(path, g);
 
         SpliceEvent se = new SpliceEvent(g.getProtein(en1), g.getProtein(en2));
+        se.main();
         System.out.println(se.toString());
     }
 }
