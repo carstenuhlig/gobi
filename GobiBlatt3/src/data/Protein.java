@@ -3,6 +3,7 @@ package data;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import util.GenomeSequenceExtractor;
 
 public class Protein {
@@ -12,6 +13,10 @@ public class Protein {
 
     public Protein() {
         exons = new ArrayList<>();
+    }
+
+    public List<Exon> getExons() {
+        return exons;
     }
 
     public Protein(String protein_id, Exon exon) {
@@ -42,7 +47,7 @@ public class Protein {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<Exon> it = exons.iterator(); it.hasNext();) {
+        for (Iterator<Exon> it = exons.iterator(); it.hasNext(); ) {
             Exon exon = it.next();
             sb.append("Protein: ");
             sb.append(id);

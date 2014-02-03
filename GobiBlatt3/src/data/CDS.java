@@ -1,5 +1,7 @@
 package data;
 
+import com.sun.jndi.url.iiopname.iiopnameURLContextFactory;
+
 public class CDS {
 
     long start, stop;
@@ -100,4 +102,21 @@ public class CDS {
         return sb.toString(); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        CDS tmp = (CDS) obj;
+        if (start == tmp.getStart()) {
+            if (stop == tmp.getStop()) {
+                if (frame == tmp.getFrame()) {
+                    if (strand.equals(tmp.getStrand())) {
+                        if (seq == null && tmp.getSeq() == null)
+                            return true;
+                        else if (seq.equals(tmp.getSeq()))
+                            return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

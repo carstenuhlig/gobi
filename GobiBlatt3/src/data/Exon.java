@@ -31,4 +31,21 @@ public class Exon implements Comparable<Exon> {
     public int compareTo(Exon o) {
         return (int) (this.getCDS().getStart() - o.getCDS().getStart());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Exon exon = (Exon) o;
+
+        if (cds != null ? !cds.equals(exon.cds) : exon.cds != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return cds != null ? cds.hashCode() : 0;
+    }
 }

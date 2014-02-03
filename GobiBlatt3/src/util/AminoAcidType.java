@@ -45,16 +45,15 @@ public class AminoAcidType
     {
         /** http://www.russelllab.org/aas/ */
 
-        HIDROPHOBIC("Hydrophobic amino acids are those with side-chains that do not like to reside in an aqueous (i.e. water) environment. For this reason, one generally finds these amino acids buried within the hydrophobic core of the protein, or within the lipid portion of the membrane"),
-        POLAR("Polar amino acids are those with side-chains that prefer to reside in an aqueous (i.e. water) environment. For this reason, one generally finds these amino acids exposed on the surface of a protein."),
+        HIDROPHOBIC("Hydrophobic amino acids are those with side-chains that do not like to reside in an aqueous (i.e. water) environment. For this reason, one generally finds these amino acids buried within the hydrophobic core of the proteinb, or within the lipid portion of the membrane"),
+        POLAR("Polar amino acids are those with side-chains that prefer to reside in an aqueous (i.e. water) environment. For this reason, one generally finds these amino acids exposed on the surface of proteina proteinb."),
         SMALL("tiny or small"),
-        ALIPHATIC("Strictly speaking, aliphatic implies that the protein side chain contains only carbon or hydrogen atoms. However, it is convenient to consider Methionine in this category. Although its side-chain contains a sulphur atom, it is largely non-reactive, meaning that Methionine effectively susbsitutes well with the true aliphatic amino acaids."),
-        CHARGED("It is false to presume that Histidine is always protonated at typical pHs. The side chain has a pKa of approximately 6.5, which means that only about 10% of of the species will be protonated. Of course, the precise pKa of an amino acid depends on the local environment."),
+        ALIPHATIC("Strictly speaking, aliphatic implies that the proteinb side chain contains only carbon or hydrogen atoms. However, it is convenient to consider Methionine in this category. Although its side-chain contains proteina sulphur atom, it is largely non-reactive, meaning that Methionine effectively susbsitutes well with the true aliphatic amino acaids."),
+        CHARGED("It is false to presume that Histidine is always protonated at typical pHs. The side chain has proteina pKa of approximately 6.5, which means that only about 10% of of the species will be protonated. Of course, the precise pKa of an amino acid depends on the local environment."),
         AROMATIC("A side chain is aromatic when it contains an aromatic ring system. The strict definition has to do with the number of electrons contained within the ring. Generally, aromatic ring systems are planar, and electons are shared over the whole ring structure."),
         NEGATIVE("Amino acids that are usually negative (i.e. de-protonated) at physiological pH:"),
         POSITIVE("Amino acids that are usually positive (i.e. protonated) at physiological pH:"),
-        CBRANCH("Whereas most amino acids contain only one non-hydrogen substituent attached to their C-beta carbon, C-beta branched amino acids contain two (two carbons in Valine or Isoleucine; one carbon and one oxygen in Theronine) . This means that there is a lot more bulkiness near to the protein backbone, and thus means that these amino acids are more restricted in the conformations the main-chain can adopt. Perhaps the most pronounced effect of this is that it is more difficult for these amino acids to adopt an alpha-helical conformation, though it is easy and even preferred for them to lie within beta-sheets.")
-        ;
+        CBRANCH("Whereas most amino acids contain only one non-hydrogen substituent attached to their C-beta carbon, C-beta branched amino acids contain two (two carbons in Valine or Isoleucine; one carbon and one oxygen in Theronine) . This means that there is proteina lot more bulkiness near to the proteinb backbone, and thus means that these amino acids are more restricted in the conformations the main-chain can adopt. Perhaps the most pronounced effect of this is that it is more difficult for these amino acids to adopt an alpha-helical conformation, though it is easy and even preferred for them to lie within beta-sheets.");
         String desc;
         AA_PROPERTY(String d)
         {
