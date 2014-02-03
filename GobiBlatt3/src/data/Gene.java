@@ -1,9 +1,9 @@
 package data;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
-public class Gene {
+public class Gene implements Serializable {
 
     HashMap<String, Transcript> transcripts;
 
@@ -23,6 +23,26 @@ public class Gene {
         } else {
             transcripts.put(transcript_id, transcript);
         }
+    }
+
+    public Transcript getRandomTranscript() {
+        Random rnd = new Random();
+        int toget = rnd.nextInt(transcripts.size());
+        int i = 0;
+        for (Transcript transcript : transcripts.values()) {
+            if (i == toget)
+                return transcript;
+            i++;
+        }
+        return transcripts.values().iterator().next();
+    }
+
+    public boolean uniqueExons() {
+        for (Transcript transcript : transcripts.values()) {
+            if (!transcript.uniqueExons())
+                return false;
+        }
+        return true;
     }
 
     @Override

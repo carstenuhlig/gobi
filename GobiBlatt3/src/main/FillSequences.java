@@ -66,9 +66,8 @@ public class FillSequences {
     public static String getProteinSequence(String proteinid, Genes g) throws IOException {
         StringBuilder sb = new StringBuilder();
         Protein protein = g.getProtein(proteinid);
-        int size_exons = protein.getNrExons();
-        for (int i = 0; i < size_exons; i++) {
-            CDS tmp = protein.getExon(i).getCDS();
+        for (Exon exon : protein.getExons()) {
+            CDS tmp = exon.getCDS();
             if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
                 String seq = GenomeSequenceExtractor.easySearch(protein.getChromosome(), tmp.getStart(), tmp.getStop());
                 sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));

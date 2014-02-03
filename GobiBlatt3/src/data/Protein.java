@@ -1,12 +1,14 @@
 package data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import util.GenomeSequenceExtractor;
 
-public class Protein {
+public class Protein implements Serializable {
 
     String seq, id, chromosome;
     List<Exon> exons;
@@ -78,4 +80,28 @@ public class Protein {
         return tmp;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Protein protein = (Protein) o;
+
+        if (!id.equals(protein.id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    public boolean uniqueExons() {
+        HashSet<Exon> set = new HashSet<>(exons);
+        if (set.size() == exons.size()) {
+            return true;
+        } else
+            return false;
+    }
 }

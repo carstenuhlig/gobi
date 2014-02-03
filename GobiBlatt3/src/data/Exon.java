@@ -1,6 +1,8 @@
 package data;
 
-public class Exon implements Comparable<Exon> {
+import java.io.Serializable;
+
+public class Exon implements Comparable<Exon>, Serializable {
 
     CDS cds;
 

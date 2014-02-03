@@ -2,7 +2,9 @@ package data;
 
 import com.sun.jndi.url.iiopname.iiopnameURLContextFactory;
 
-public class CDS {
+import java.io.Serializable;
+
+public class CDS implements Serializable {
 
     long start, stop;
     int frame;

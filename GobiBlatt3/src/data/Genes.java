@@ -1,15 +1,19 @@
 package data;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-public class Genes {
+public class Genes implements Serializable {
 
     HashMap<String, Gene> genes;
 
     public Genes() {
         genes = new HashMap<>();
     }
+
 
     public Gene get(String gene_id) {
         return genes.get(gene_id);
@@ -63,6 +67,35 @@ public class Genes {
         return null;
     }
 
+    public String[] getRandomProteinIDs() {
+        Random rnd = new Random();
+        String[] proteins = new String[2];
+        for (Map.Entry<String, Gene> geneEntry : genes.entrySet()) {
+            String key = geneEntry.getKey();
+            Gene g = geneEntry.getValue();
+
+            if (g.getTranscripts().size() > 1) {
+                if (rnd.nextBoolean()) {
+                    proteins[0] = g.getRandomTranscript().getProtein().getId();
+                    proteins[1] = g.getRandomTranscript().getProtein().getId();
+                    while (proteins[0].equals(proteins[1])) {
+                        proteins[1] = g.getRandomTranscript().getProtein().getId();
+                    }
+                }
+            }
+        }
+        return proteins;
+    }
+
+    public boolean uniqueExons() {
+        for (Gene gene : genes.values()) {
+            if (!gene.uniqueExons()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Protein getProtein(String protein_id) {
         for (Map.Entry<String, Gene> entry : genes.entrySet()) {
             String gene_id = entry.getKey();
@@ -82,4 +115,6 @@ public class Genes {
         }
         return null;
     }
+
+
 }

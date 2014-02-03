@@ -1,9 +1,11 @@
 package data;
 
 import java.io.IOException;
+import java.io.Serializable;
+
 import util.GenomeSequenceExtractor;
 
-public class Transcript {
+public class Transcript implements Serializable {
 
     Protein protein;
     String chromosome;
@@ -33,6 +35,10 @@ public class Transcript {
 
     public void addInformation(Exon exon) {
         protein.addExon(exon);
+    }
+
+    public boolean uniqueExons() {
+        return protein.uniqueExons();
     }
 
     @Override
