@@ -8,7 +8,6 @@ package test;
 import util.GenomicUtils;
 
 /**
- *
  * @author uhligc
  */
 public class SimpleTest {

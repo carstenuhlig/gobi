@@ -8,11 +8,19 @@ import util.GenomeSequenceExtractor;
 
 public class Protein {
 
-    String seq, id;
+    String seq, id, chromosome;
     List<Exon> exons;
 
     public Protein() {
         exons = new ArrayList<>();
+    }
+
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
+    }
+
+    public String getChromosome() {
+        return chromosome;
     }
 
     public List<Exon> getExons() {

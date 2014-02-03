@@ -5,10 +5,8 @@
  */
 package main;
 
-import data.CDS;
-import data.Gene;
-import data.Genes;
-import data.Transcript;
+import data.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -63,6 +61,20 @@ public class FillSequences {
             }
         }
         gse.close();
+    }
+
+    public static String getProteinSequence(String proteinid, Genes g) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Protein protein = g.getProtein(proteinid);
+        int size_exons = protein.getNrExons();
+        for (int i = 0; i < size_exons; i++) {
+            CDS tmp = protein.getExon(i).getCDS();
+            if ((tmp.getStop() - tmp.getStart() - tmp.getFrame()) >= 3) {
+                String seq = GenomeSequenceExtractor.easySearch(protein.getChromosome(), tmp.getStart(), tmp.getStop());
+                sb.append(GenomicUtils.convertToAA(seq, tmp.getStrand(), tmp.getFrame()));
+            }
+        }
+        return sb.toString();
     }
 
     //TODO in aminosäuresequenz

@@ -75,6 +75,7 @@ public class Genes {
                 Protein protein = transcript.getProtein();
                 String protein_id2 = protein.getId();
                 if (protein_id2.equals(protein_id)) {
+                    protein.setChromosome(transcript.getChromsome());
                     return protein;
                 }
             }
