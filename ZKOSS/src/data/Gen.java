@@ -4,15 +4,53 @@ public class Gen {
 
     private Integer id;
     private String geneid;
-    private Integer transcripts;
+    private String transcriptid;
+    private String chr;
+    private Long start;
+    private Long stop;
 
     public Gen() {
     }
 
-    public Gen(Integer id, String geneid, Integer transcripts) {
+    public Gen(Integer id, String geneid, String transcriptid, String chr, Long start, Long stop) {
         this.id = id;
         this.geneid = geneid;
-        this.transcripts = transcripts;
+        this.transcriptid = transcriptid;
+        this.chr = chr;
+        this.start = start;
+        this.stop = stop;
+    }
+
+    public String getTranscriptid() {
+        return transcriptid;
+    }
+
+    public void setTranscriptid(String transcriptid) {
+        this.transcriptid = transcriptid;
+    }
+
+    public String getChr() {
+        return chr;
+    }
+
+    public void setChr(String chr) {
+        this.chr = chr;
+    }
+
+    public Long getStart() {
+        return start;
+    }
+
+    public void setStart(Long start) {
+        this.start = start;
+    }
+
+    public Long getStop() {
+        return stop;
+    }
+
+    public void setStop(Long stop) {
+        this.stop = stop;
     }
 
     public Integer getId() {
@@ -21,14 +59,6 @@ public class Gen {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getTranscripts() {
-        return transcripts;
-    }
-
-    public void setTranscripts(Integer transcripts) {
-        this.transcripts = transcripts;
     }
 
     public String getGeneid() {

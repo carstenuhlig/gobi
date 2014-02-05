@@ -3,10 +3,10 @@ package main;
 import data.Gen;
 import data.Gene;
 import data.Genes;
+import data.Transcript;
 import util.GTFParser;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,29 +16,42 @@ public class GenServiceImpl implements GenService {
     //data model
     private List<Gen> genList = new LinkedList<Gen>();
     private static int id = 1;
+    private String message;
 
     //initialize book data
     public GenServiceImpl() {
         Genes genes = new Genes();
-        String path = "res/gtf_modified.txt";
+        String path = "/Volumes/SSD/git/gobi/out/compiled/artifacts/ZKOSS_war_exploded/gtf_modified.txt";
 
+//        message = "something";
         try {
             GTFParser.readFile(path, genes);
+//            System.out.println("File was read");
+            message = "Alles gut gelaufen.";
         } catch (IOException e) {
+            message = path + e.toString();
             e.printStackTrace();
         }
 
-        HashMap<String, Gene> hashmap = genes.getGenes();
-
-        for (Map.Entry<String, Gene> geneEntry : hashmap.entrySet()) {
+        for (Map.Entry<String, Gene> geneEntry : genes.getGenes().entrySet()) {
             String geneid = geneEntry.getKey();
-            Gene geneValue = geneEntry.getValue();
-            genList.add(new Gen(id++, geneid, geneValue.getTranscripts().size()));
+            Gene gene = geneEntry.getValue();
+            for (Map.Entry<String, Transcript> transcriptEntry : gene.getTranscripts().entrySet()) {
+                String transcriptid = transcriptEntry.getKey();
+                Transcript transcript = transcriptEntry.getValue();
+                Long start = transcript.getProtein().getStartPosition();
+                Long stop = transcript.getProtein().getStopPosition();
+                genList.add(new Gen(id++, geneid, transcriptid, transcript.getChromsome(), start, stop));
+            }
         }
     }
 
     public List<Gen> findAll() {
         return genList;
+    }
+
+    public String getStatus() {
+        return message;
     }
 
     public List<Gen> search(String keyword) {

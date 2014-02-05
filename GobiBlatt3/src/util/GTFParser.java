@@ -98,4 +98,8 @@ public class GTFParser {
 //        frame = -Integer.MAX_VALUE;
 //        score = -Integer.MAX_VALUE;
     }
+
+    public static String getCurrentFolder() {
+        return System.getProperty("user.dir");
+    }
 }

@@ -104,4 +104,22 @@ public class Protein implements Serializable {
         } else
             return false;
     }
+
+    public long getStartPosition() {
+        long start = Integer.MAX_VALUE;
+        for (Exon exon : exons) {
+            if (exon.getCDS().getStart() < start)
+                start = exon.getCDS().getStart();
+        }
+        return start;
+    }
+
+    public long getStopPosition() {
+        long stop = -1;
+        for (Exon exon : exons) {
+            if (stop < exon.getCDS().getStop())
+                stop = exon.getCDS().getStop();
+        }
+        return stop;
+    }
 }

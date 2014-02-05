@@ -20,4 +20,11 @@ public interface GenService {
      * @return list of car that match the keyword
      */
     public List<Gen> search(String keyword);
+
+    /**
+     * get status (ie. error)
+     *
+     * @return message
+     */
+    public String getStatus();
 }

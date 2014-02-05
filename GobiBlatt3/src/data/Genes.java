@@ -1,10 +1,7 @@
 package data;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class Genes implements Serializable {
 
@@ -20,7 +17,7 @@ public class Genes implements Serializable {
     }
 
     public void addGene(String protein_id, String gene_id, String transcript_id, String seqname,
-            String strand, int start, int end, int frame) {
+                        String strand, int start, int end, int frame) {
         if (genes.containsKey(gene_id)) {
             Gene temp_gene = genes.get(gene_id);
             temp_gene.addTranscript(transcript_id, new Transcript(new Protein(protein_id,
@@ -115,6 +112,4 @@ public class Genes implements Serializable {
         }
         return null;
     }
-
-
 }
