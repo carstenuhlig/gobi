@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="prosaslib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/slf4j-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/silvertail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zweb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zel.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/flashchart.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zkbind.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zkplus.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/commons-io.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/bsh.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/commons-codec.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/commons-cli-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zhtml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/sapphire.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zcommon.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zul.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/commons-fileupload.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/slf4j-jdk14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/log4j-1.2.17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ProSAS/WebContent/WEB-INF/lib/zk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
