@@ -4,7 +4,7 @@
         <textbox id="keywordBox"/>
         <button id="searchButton" label="Search" image="/img/search.png"/>
     </hbox>
-    <listbox id="carListbox" height="160px" emptyMessage="No car found in the result">
+    <listbox id="carListbox" height="160px" emptyMessage="No gene found in the result">
         <listhead>
             <listheader label="Model"/>
             <listheader label="Make"/>
@@ -14,7 +14,7 @@
             <listcell label="product name"></listcell>
             <listcell label="make"></listcell>
             <listcell>$
-                <label value="price"/>
+                <label value="transcripts"/>
             </listcell>
         </listitem>
     </listbox>

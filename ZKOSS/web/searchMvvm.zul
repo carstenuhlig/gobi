@@ -5,30 +5,30 @@
         <textbox value="@bind(vm.keyword)"/>
         <button label="Search" image="/img/search.png" onClick="@command('search')"/>
     </hbox>
-    <listbox height="160px" model="@bind(vm.carList)" emptyMessage="No car found in the result"
-             selectedItem="@bind(vm.selectedCar)">
+    <listbox height="160px" geneid="@bind(vm.carList)" emptyMessage="No gene found in the result"
+             selectedItem="@bind(vm.selectedGen)">
         <listhead>
             <listheader label="Model"/>
             <listheader label="Make"/>
             <listheader label="Price" width="20%"/>
         </listhead>
-        <template name="model">
+        <template name="geneid">
             <listitem>
-                <listcell label="@bind(each.model)"></listcell>
+                <listcell label="@bind(each.geneid)"></listcell>
                 <listcell label="@bind(each.make)"></listcell>
                 <listcell>$
-                    <label value="@bind(each.price)"/>
+                    <label value="@bind(each.transcripts)"/>
                 </listcell>
             </listitem>
         </template>
     </listbox>
     <hbox style="margin-top:20px">
-        <image width="250px" src="@bind(vm.selectedCar.preview)"/>
+        <image width="250px" src="@bind(vm.selectedGen.preview)"/>
         <vbox>
-            <label value="@bind(vm.selectedCar.model)"/>
-            <label value="@bind(vm.selectedCar.make)"/>
-            <label value="@bind(vm.selectedCar.price)"/>
-            <label value="@bind(vm.selectedCar.description)"/>
+            <label value="@bind(vm.selectedGen.geneid)"/>
+            <label value="@bind(vm.selectedGen.make)"/>
+            <label value="@bind(vm.selectedGen.transcripts)"/>
+            <label value="@bind(vm.selectedGen.description)"/>
         </vbox>
     </hbox>
 </window>
