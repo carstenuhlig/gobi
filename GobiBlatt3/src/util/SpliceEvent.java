@@ -54,7 +54,6 @@ public class SpliceEvent {
         long enda = a.getCDS().getStop();
         long startb = b.getCDS().getStart();
         long endb = b.getCDS().getStop();
-
         if (a.equals(b)) {
             return 0;
         } else if (Math.min(enda, endb) - Math.max(starta, startb) < 0) {
@@ -364,6 +363,14 @@ public class SpliceEvent {
                 }
             }
         }
+    }
+
+    public String getVarSplic() {
+        return vs_aa.toString();
+    }
+
+    public String getNucleotideSplice() {
+        return vs_nucleotide.toString();
     }
 
     @Override
